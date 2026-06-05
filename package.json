@@ -1,12 +1,12 @@
 {
-  "name": "gc-backoffice-front",
-  "displayName": "GesCamp 360",
+  "name": "ge-rest-ovejo-backoffice-front",
+  "displayName": "Ge-Rest El ovejo",
   "version": "0.10.1",
   "description": "Angular & Tailwind CSS Admin Dashboard Starter Kit, Free and Open Source",
-  "homepage": "https://github.com/GesCamp/gc-backoffice-front?#readme",
+  "homepage": "https://github.com/ovejo-rest/ge-rest-ovejo-front?#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GesCamp/gc-backoffice-front.git"
+    "url": "git+https://github.com/ovejo-rest/ge-rest-ovejo-front.git"
   },
   "keywords": [
     "angular",
