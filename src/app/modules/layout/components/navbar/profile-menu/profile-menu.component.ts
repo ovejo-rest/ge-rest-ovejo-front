@@ -119,8 +119,10 @@ export class ProfileMenuComponent implements OnInit {
   }
 
   public logout() {
-    this.$authService.logout();
-    this._router.navigateByUrl('/auth/sign-in');
+    this.$authService.logout().subscribe({
+      complete: () => this._router.navigateByUrl('/auth/sign-in'),
+      error: () => this._router.navigateByUrl('/auth/sign-in'),
+    });
   }
 
   ngOnInit(): void {
