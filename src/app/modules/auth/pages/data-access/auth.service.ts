@@ -106,23 +106,41 @@ export class AuthService {
       );
   }
 
-  logout() {
-    localStorage.removeItem(this.tokenKey);
-    this.token = null;
-    this.currentUserLoginOn.next(false);
-    this.currentUserData.next({
-      token: { token: '' },
-      userData: {
-        code: '',
-        email: '',
-        fatherLastName: '',
-        id: 0,
-        motherLastName: '',
-        name: '',
-        rut: '',
-        status: '',
-      },
-    });
+  logout(): Observable<void> {
+    this.#isLoading$.next(true);
+
+    return this.http.post<void>(`${ApiPathEnum.AUTH}/login/logout`, {}).pipe(
+      tap(() => this.#error$.next(undefined)),
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = '';
+        if (error.error instanceof ErrorEvent) {
+          errorMessage = `Error ${error.error.message}`;
+        } else {
+          errorMessage = `Error code: ${error.status}, message: ${error.message}`;
+        }
+        this.#error$.next(error.status);
+        return throwError(() => errorMessage);
+      }),
+      finalize(() => {
+        this.#isLoading$.next(false);
+        localStorage.removeItem(this.tokenKey);
+        this.token = null;
+        this.currentUserLoginOn.next(false);
+        this.currentUserData.next({
+          token: { token: '' },
+          userData: {
+            code: '',
+            email: '',
+            fatherLastName: '',
+            id: 0,
+            motherLastName: '',
+            name: '',
+            rut: '',
+            status: '',
+          },
+        });
+      }),
+    );
   }
 
   isLogin() {
