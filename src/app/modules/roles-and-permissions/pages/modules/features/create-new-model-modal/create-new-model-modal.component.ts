@@ -7,7 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
-import { CaseTransformDirective } from 'src/app/shared/directives';
+import { CaseTransformDirective } from 'src/ui';
 import {
   ButtonComponent,
   IconComponent,

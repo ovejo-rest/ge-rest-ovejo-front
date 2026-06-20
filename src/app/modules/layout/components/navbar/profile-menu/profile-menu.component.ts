@@ -7,7 +7,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
 import { IconComponent } from 'src/ui';
 import { AuthService } from 'src/app/modules/auth/pages/data-access';
 import { LoginOutputDto } from 'src/app/modules/auth/pages/dtos';
-import { ClickOutsideDirective } from 'src/app/shared/directives';
+import { ClickOutsideDirective } from 'src/ui';
 
 @Component({
   selector: 'app-profile-menu',
@@ -62,7 +62,7 @@ export class ProfileMenuComponent implements OnInit {
   public themeColors = [
     {
       name: 'base',
-      code: '#e11d48',
+      code: '#ea580c',
     },
     {
       name: 'yellow',

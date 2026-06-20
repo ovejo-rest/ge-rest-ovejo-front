@@ -3,9 +3,16 @@
 th {
   font-weight: 500;
   padding: 0.625rem 1rem;
-  font-weight: 500;
   font-size: 0.8125rem;
   line-height: 1.125rem;
   vertical-align: middle;
-  @apply border-muted/20 bg-muted/5 border-r border-b;
+  background-color: color-mix(in srgb, var(--muted) 15%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--border) 25%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 25%, transparent);
+}
+
+.dark th {
+  background-color: color-mix(in srgb, var(--muted) 8%, transparent);
+  border-right-color: color-mix(in srgb, var(--border) 12%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--border) 12%, transparent);
 }
