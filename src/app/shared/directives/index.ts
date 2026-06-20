@@ -1,2 +1,1 @@
-export * from './click-outside.directive';
-export * from './case-transform.directive';
+// Directives migrated to src/ui/utils

@@ -1,4 +1,4 @@
-<div class="flex-col rounded-lg bg-background px-8 py-8 sm:flex-row">
+<div class="flex-col rounded-lg glass px-8 py-8 sm:flex-row">
   <div class="mb-4 flex items-center justify-between">
     <div class="flex-col items-center">
       <h3 class="text-md font-bold text-foreground">Active Auctions</h3>
@@ -30,7 +30,7 @@
           *ngFor="let auction of activeAuction"
           [auction]="auction"
           nft-auctions-table-item
-          class="border-b border-dashed border-border hover:bg-card"></tr>
+          class="glass-row"></tr>
       </tbody>
       <!--end::Table body-->
     </table>

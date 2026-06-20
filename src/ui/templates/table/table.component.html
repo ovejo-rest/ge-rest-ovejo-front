@@ -3,7 +3,7 @@
 <app-divider />
 }
 
-<div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
+<div class="glass flex min-w-full flex-col rounded-xl p-2">
   @if(slots['filters']; as filters){
   <div class="flex flex-wrap items-center justify-end gap-2 py-3 px-5">
     <div class="flex flex-wrap gap-2">
@@ -43,7 +43,7 @@
     class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted grow overflow-x-auto px-5">
     <table
       class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
-      <thead class="border-muted/20 text-muted-foreground text-md border">
+      <thead class="glass-header text-muted-foreground text-md">
         @if(slots['head']; as head){
         <ng-container [ngTemplateOutlet]="head" />
 

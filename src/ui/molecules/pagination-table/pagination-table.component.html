@@ -9,7 +9,7 @@
       <!-- Aquí puedes generar los botones de paginación según totalPages -->
       <!-- Solo botones de ejemplo -->
       <button
-        class="bg-background inline-flex h-7 w-7 cursor-pointer rounded-md text-sm"
+        class="glass-row inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-sm"
         [disabled]="pagination.page === 1"
         (click)="previousPage()">
         <app-icon>arrow_left</app-icon>
@@ -17,7 +17,8 @@
       @for (pageNum of pages; track pageNum) {
       <button
         class="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-sm"
-        [class.bg-gray-300]="pageNum === pagination.page"
+        [class.glass-row]="pageNum !== pagination.page"
+        [style.background-color]="pageNum === pagination.page ? 'color-mix(in srgb, var(--primary) 30%, transparent)' : ''"
         (click)="goToPage(pageNum)">
         <div class="text-primary text-center">{{ pageNum }}</div>
       </button>
