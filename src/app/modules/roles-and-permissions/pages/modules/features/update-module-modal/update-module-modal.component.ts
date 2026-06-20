@@ -3,7 +3,7 @@ import { GetAllModulesDto, GetAllModulesService, UpdateModuleDto, UpdateModuleSe
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { CaseTransformDirective } from 'src/app/shared/directives';
+import { CaseTransformDirective } from 'src/ui';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({

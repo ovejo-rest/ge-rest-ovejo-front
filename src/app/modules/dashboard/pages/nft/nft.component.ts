@@ -6,7 +6,7 @@ import { NftHeaderComponent } from '../../components/nft/nft-header/nft-header.c
 import { NftSingleCardComponent } from '../../components/nft/nft-single-card/nft-single-card.component';
 import { Nft } from '../../models/nft';
 import { CardComponent } from 'src/ui';
-import { SlotDirective } from "../../../../../ui/utils/slot.directive";
+import { SlotDirective } from '../../../../../ui/utils/slot.directive';
 import { NgStyle } from '@angular/common';
 
 @Component({
@@ -20,8 +20,8 @@ import { NgStyle } from '@angular/common';
     NftChartCardComponent,
     NftAuctionsTableComponent,
     CardComponent,
-    SlotDirective
-],
+    SlotDirective,
+  ],
 })
 export class NftComponent implements OnInit {
   nft: Array<Nft>;
