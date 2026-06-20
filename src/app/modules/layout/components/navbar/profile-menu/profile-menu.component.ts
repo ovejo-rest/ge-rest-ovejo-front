@@ -1,39 +1,27 @@
-import { animate, state, style, transition, trigger } from '@angular/animations';
+import { animate, style, transition, trigger } from '@angular/animations';
 import { NgClass } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
+import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
+import { finalize, Observable } from 'rxjs';
 import { ThemeService } from '../../../../../core/services/theme.service';
 import { IconComponent } from 'src/ui';
 import { AuthService } from 'src/app/modules/auth/pages/data-access';
 import { LoginOutputDto } from 'src/app/modules/auth/pages/dtos';
-import { ClickOutsideDirective } from 'src/ui';
 
 @Component({
   selector: 'app-profile-menu',
   templateUrl: './profile-menu.component.html',
   styleUrls: ['./profile-menu.component.css'],
-  imports: [ClickOutsideDirective, NgClass, RouterLink, AngularSvgIconModule, IconComponent],
+  imports: [CdkConnectedOverlay, CdkOverlayOrigin, NgClass, RouterLink, AngularSvgIconModule, IconComponent],
   animations: [
     trigger('openClose', [
-      state(
-        'open',
-        style({
-          opacity: 1,
-          transform: 'translateY(0)',
-          visibility: 'visible',
-        }),
-      ),
-      state(
-        'closed',
-        style({
-          opacity: 0,
-          transform: 'translateY(-20px)',
-          visibility: 'hidden',
-        }),
-      ),
-      transition('open => closed', [animate('0.2s')]),
-      transition('closed => open', [animate('0.2s')]),
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-20px)' }),
+        animate('0.2s ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
+      ]),
+      transition(':leave', [animate('0.2s ease-in', style({ opacity: 0, transform: 'translateY(-20px)' }))]),
     ]),
   ],
 })
@@ -41,6 +29,22 @@ export class ProfileMenuComponent implements OnInit {
   userLoginOn: boolean = false;
   userData: LoginOutputDto['userData'] | null = null;
   public isOpen = false;
+  protected positions: ConnectedPosition[] = [
+    {
+      originX: 'end',
+      originY: 'bottom',
+      overlayX: 'end',
+      overlayY: 'top',
+      offsetY: 8,
+    },
+    {
+      originX: 'end',
+      originY: 'top',
+      overlayX: 'end',
+      overlayY: 'bottom',
+      offsetY: -8,
+    },
+  ];
   public profileMenu = [
     {
       title: 'Your Profile',
@@ -119,10 +123,9 @@ export class ProfileMenuComponent implements OnInit {
   }
 
   public logout() {
-    this.$authService.logout().subscribe({
-      complete: () => this._router.navigateByUrl('/auth/sign-in'),
-      error: () => this._router.navigateByUrl('/auth/sign-in'),
-    });
+    (this.$authService.logout() as Observable<void>)
+      .pipe(finalize(() => this._router.navigateByUrl('/auth/sign-in')))
+      .subscribe();
   }
 
   ngOnInit(): void {
