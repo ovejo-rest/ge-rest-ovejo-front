@@ -24,6 +24,7 @@
         <!-- Parent Menu -->
         <a
           [routerLink]="sub.route"
+          (click)="menuService.showMobileSidebar = false"
           routerLinkActive="text-primary"
           [routerLinkActiveOptions]="{ exact: true }"
           class="glass-row inline-block w-full rounded-lg px-4 py-2 text-xs">

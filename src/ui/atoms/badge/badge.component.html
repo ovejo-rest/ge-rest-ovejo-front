@@ -1,13 +1,22 @@
-@let type = $type();
-    <span
-    class="text-xs font-medium me-2 px-2.5 py-0.5 rounded-full" 
-    [ngClass]="{
-        'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300': type === 'info',
-        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300': type === 'dark',
-        'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300': type === 'error',
-        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300': type === 'success',
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300': type === 'warning',
-        'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300': type === 'purpe' ,   
-    }">
-        {{$text()}}
-    </span>
+@let type = $type(); @let isGlass = $glass(); @let rounded = $rounded();
+<span
+  class="text-xs font-medium me-2 px-2.5 py-0.5 inline-block"
+  [class.rounded-full]="rounded === 'full'"
+  [class.rounded-[30px]]="rounded === 'md'"
+  [class.glass-badge]="isGlass"
+  [ngClass]="{
+    'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300': !isGlass && type === 'info',
+    'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300': !isGlass && type === 'dark',
+    'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300': !isGlass && type === 'error',
+    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300': !isGlass && type === 'success',
+    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300': !isGlass && type === 'warning',
+    'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300': !isGlass && type === 'purpe',
+    'badge-glass-info': isGlass && type === 'info',
+    'badge-glass-dark': isGlass && type === 'dark',
+    'badge-glass-error': isGlass && type === 'error',
+    'badge-glass-success': isGlass && type === 'success',
+    'badge-glass-warning': isGlass && type === 'warning',
+    'badge-glass-purpe': isGlass && type === 'purpe',
+  }">
+  {{ $text() }}
+</span>
