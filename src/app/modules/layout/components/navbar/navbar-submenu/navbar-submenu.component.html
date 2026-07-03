@@ -1,4 +1,4 @@
-<ul #submenuRef class="bg-background shadow-custom mt-2 space-y-0.5 rounded-md py-3">
+<ul #submenuRef class="glass-overlay mt-2 space-y-0.5 rounded-md py-3">
   <li class="flex font-semibold" *ngFor="let item of submenu">
     <!-- Condition -->
     <ng-container
@@ -12,7 +12,7 @@
         [routerLink]="item.route"
         routerLinkActive="text-primary"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="text-muted-foreground hover:bg-card hover:text-foreground mx-3 flex w-full items-center justify-between rounded-md py-2 px-2 text-xs font-semibold">
+          class="text-muted-foreground glass-row mx-3 flex w-full items-center justify-between rounded-md py-2 px-2 text-xs font-semibold">
         <div class="flex items-center justify-start">
           <span class="text-muted-foreground/50 ltr:mr-2 rtl:ml-2" *ngIf="item.icon">
             <app-icon class="h-5 w-5">
@@ -28,7 +28,7 @@
     <ng-template #childMenu let-item="item">
       <div class="dropdown relative flex w-full">
         <button
-          class="text-muted-foreground hover:bg-card hover:text-foreground mx-3 flex w-full items-center justify-between rounded-md py-2 px-2 text-xs font-semibold">
+        class="text-muted-foreground glass-row mx-3 flex w-full items-center justify-between rounded-md py-2 px-2 text-xs font-semibold">
           <div class="flex items-center justify-start">
             <span class="text-muted-foreground/50 ltr:mr-2 rtl:ml-2" *ngIf="item.icon">
               <app-icon class="h-5 w-5">

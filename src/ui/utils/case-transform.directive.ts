@@ -1,4 +1,4 @@
-import { Directive, ElementRef, HostListener, Input } from '@angular/core';
+import { Directive, HostListener, Input } from '@angular/core';
 import { NgControl } from '@angular/forms';
 
 @Directive({
@@ -10,8 +10,11 @@ export class CaseTransformDirective {
 
   constructor(private control: NgControl) {}
 
-  @HostListener('input', ['$event.target.value'])
-  onInput(value: string) {
+  @HostListener('input', ['$event'])
+  onInput(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    if (value == null) return;
+
     let transformed = value;
 
     switch (this.caseType) {

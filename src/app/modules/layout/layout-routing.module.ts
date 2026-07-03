@@ -10,6 +10,11 @@ const routes: Routes = [
     loadChildren: () => import('../dashboard/dashboard.module').then((m) => m.DashboardModule),
   },
   {
+    path: 'components/table',
+    component: LayoutComponent,
+    loadChildren: () => import('../uim/uim.module').then((m) => m.UimModule),
+  },
+  {
     path: 'components',
     component: LayoutComponent,
     loadChildren: () => import('../uikit/uikit.module').then((m) => m.UikitModule),

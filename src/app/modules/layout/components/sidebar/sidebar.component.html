@@ -1,13 +1,16 @@
+<!-- Mobile backdrop -->
+@if (menuService.showMobileSidebar) {
+<div class="fixed inset-0 z-40 backdrop-blur-sm lg:hidden" (click)="toggleMobileSidebar()"></div>
+}
+
+<!-- Desktop sidebar -->
 <nav
-  class="bg-background hidden h-full flex-col justify-between pt-3 transition-all duration-300 lg:flex"
+  class="glass hidden h-full flex-col justify-between pt-3 transition-all duration-300 lg:flex"
   [ngClass]="menuService.showSideBar ? 'w-[210px] xl:w-[280px]' : 'w-[70px]'">
   <div class="overflow-hidden">
-    <!-- Logo -->
     <div
       class="mx-4 mb-2 flex h-9 items-center"
-      [ngClass]="
-        menuService.showSideBar ? 'justify-between' : 'justify-center'
-      ">
+      [ngClass]="menuService.showSideBar ? 'justify-between' : 'justify-center'">
       @if (menuService.showSideBar) {
       <div class="flex items-center">
         <a
@@ -29,26 +32,21 @@
       </button>
     </div>
 
-    <!-- Menu Items -->
     <div
       class="scrollbar-thumb--sm scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-card h-full overflow-auto px-4">
       <app-sidebar-menu></app-sidebar-menu>
     </div>
   </div>
 
-  <!-- Footer / Version -->
   <div class="mx-4 my-4 space-y-1">
     <a
       target="_blank"
-      href="https://github.com/GesCamp/gc-backoffice-front"
-      class="-sm hover:bg-card group flex h-9 cursor-pointer items-center justify-start p-2">
+      href="https://github.com/ovejo-rest/ge-rest-ovejo-backoffice-front"
+      class="-sm glass-row group flex h-9 cursor-pointer items-center justify-start rounded-md p-2">
       <app-icon class="text-muted-foreground/50 h-5 w-5">info</app-icon>
 
-      <div
-        class="ml-3 truncate text-[10px] font-semibold tracking-wide focus:outline-hidden">
-        <span class="bg-primary/10 text-primary px-2 font-semibold">
-          v{{ appJson.version }}
-        </span>
+      <div class="ml-3 truncate text-[10px] font-semibold tracking-wide focus:outline-hidden">
+        <span class="bg-primary/10 text-primary px-2 font-semibold"> v{{ appJson.version }} </span>
       </div>
 
       @if (!menuService.showSideBar) {
@@ -62,3 +60,45 @@
     </a>
   </div>
 </nav>
+
+<!-- Mobile sidebar overlay -->
+@if (menuService.showMobileSidebar) {
+<nav
+  class="glass fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col justify-between pt-3 shadow-2xl transition-all duration-300 lg:hidden">
+  <div class="overflow-hidden">
+    <div class="mx-4 mb-2 flex h-9 items-center justify-between">
+      <div class="flex items-center">
+        <a
+          class="bg-primary flex cursor-pointer items-center justify-center rounded-sm p-2 focus:outline-hidden focus:ring-1">
+          <svg-icon src="assets/icons/logo.svg"></svg-icon>
+        </a>
+        <b class="text-foreground ps-2 ml-1 grow text-sm font-bold">
+          {{ appJson.displayName }}
+        </b>
+      </div>
+      <button
+        (click)="toggleMobileSidebar()"
+        class="text-muted-foreground/50 hover:text-muted-foreground flex items-center justify-center rounded-md p-2 transition-all duration-200 focus:outline-hidden">
+        <app-icon>close</app-icon>
+      </button>
+    </div>
+
+    <div
+      class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-card h-full overflow-auto px-4">
+      <app-sidebar-menu></app-sidebar-menu>
+    </div>
+  </div>
+
+  <div class="mx-4 my-4 space-y-1">
+    <a
+      target="_blank"
+      href="https://github.com/ovejo-rest/ge-rest-ovejo-backoffice-front"
+      class="-sm glass-row group flex h-9 cursor-pointer items-center justify-start rounded-md p-2">
+      <app-icon class="text-muted-foreground/50 h-5 w-5">info</app-icon>
+      <div class="ml-3 truncate text-[10px] font-semibold tracking-wide focus:outline-hidden">
+        <span class="bg-primary/10 text-primary px-2 font-semibold"> v{{ appJson.version }} </span>
+      </div>
+    </a>
+  </div>
+</nav>
+}

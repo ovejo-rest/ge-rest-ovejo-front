@@ -1,0 +1,72 @@
+@reference "../../../styles.css";
+
+.glass-badge {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.badge-glass-info {
+  background-color: color-mix(in srgb, #3b82f6 15%, transparent);
+  color: #93c5fd;
+  border: 1px solid color-mix(in srgb, #3b82f6 20%, transparent);
+}
+
+.badge-glass-success {
+  background-color: color-mix(in srgb, #22c55e 15%, transparent);
+  color: #86efac;
+  border: 1px solid color-mix(in srgb, #22c55e 20%, transparent);
+}
+
+.badge-glass-warning {
+  background-color: color-mix(in srgb, #eab308 15%, transparent);
+  color: #fde047;
+  border: 1px solid color-mix(in srgb, #eab308 20%, transparent);
+}
+
+.badge-glass-error {
+  background-color: color-mix(in srgb, #ef4444 15%, transparent);
+  color: #fca5a5;
+  border: 1px solid color-mix(in srgb, #ef4444 20%, transparent);
+}
+
+.badge-glass-dark {
+  background-color: color-mix(in srgb, #6b7280 15%, transparent);
+  color: #d1d5db;
+  border: 1px solid color-mix(in srgb, #6b7280 20%, transparent);
+}
+
+.badge-glass-purpe {
+  background-color: color-mix(in srgb, #a855f7 15%, transparent);
+  color: #d8b4fe;
+  border: 1px solid color-mix(in srgb, #a855f7 20%, transparent);
+}
+
+.dark .badge-glass-info {
+  background-color: color-mix(in srgb, #3b82f6 10%, transparent);
+  border-color: color-mix(in srgb, #3b82f6 15%, transparent);
+}
+
+.dark .badge-glass-success {
+  background-color: color-mix(in srgb, #22c55e 10%, transparent);
+  border-color: color-mix(in srgb, #22c55e 15%, transparent);
+}
+
+.dark .badge-glass-warning {
+  background-color: color-mix(in srgb, #eab308 10%, transparent);
+  border-color: color-mix(in srgb, #eab308 15%, transparent);
+}
+
+.dark .badge-glass-error {
+  background-color: color-mix(in srgb, #ef4444 10%, transparent);
+  border-color: color-mix(in srgb, #ef4444 15%, transparent);
+}
+
+.dark .badge-glass-dark {
+  background-color: color-mix(in srgb, #6b7280 10%, transparent);
+  border-color: color-mix(in srgb, #6b7280 15%, transparent);
+}
+
+.dark .badge-glass-purpe {
+  background-color: color-mix(in srgb, #a855f7 10%, transparent);
+  border-color: color-mix(in srgb, #a855f7 15%, transparent);
+}
