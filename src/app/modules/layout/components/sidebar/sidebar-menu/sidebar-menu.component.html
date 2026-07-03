@@ -33,6 +33,7 @@
       } @else {
       <div
         routerLink="{{ item.route }}"
+        (click)="menuService.showMobileSidebar = false"
         class="text-muted-foreground hover:text-primary flex h-[36px] cursor-pointer items-center justify-start rounded-sm">
         <a
           [ngClass]="{ hidden: !menuService.showSideBar }"

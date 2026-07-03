@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { NgClass } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, computed, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
@@ -9,6 +9,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
 import { IconComponent } from 'src/ui';
 import { AuthService } from 'src/app/modules/auth/pages/data-access';
 import { LoginOutputDto } from 'src/app/modules/auth/pages/dtos';
+import { AvatarService } from 'src/app/core/services/avatar.service';
 
 @Component({
   selector: 'app-profile-menu',
@@ -21,9 +22,7 @@ import { LoginOutputDto } from 'src/app/modules/auth/pages/dtos';
         style({ opacity: 0, transform: 'translateY(-20px)' }),
         animate('0.2s ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
       ]),
-      transition(':leave', [
-        animate('0.2s ease-in', style({ opacity: 0, transform: 'translateY(-20px)' })),
-      ]),
+      transition(':leave', [animate('0.2s ease-in', style({ opacity: 0, transform: 'translateY(-20px)' }))]),
     ]),
   ],
 })
@@ -31,6 +30,7 @@ export class ProfileMenuComponent implements OnInit {
   userLoginOn: boolean = false;
   userData: LoginOutputDto['userData'] | null = null;
   public isOpen = false;
+
   protected positions: ConnectedPosition[] = [
     {
       originX: 'end',
@@ -99,7 +99,12 @@ export class ProfileMenuComponent implements OnInit {
   public themeMode = ['light', 'dark'];
   public themeDirection = ['ltr', 'rtl'];
 
-  constructor(public themeService: ThemeService, private $authService: AuthService, private readonly _router: Router) {}
+  constructor(
+    public themeService: ThemeService,
+    private $authService: AuthService,
+    private readonly _router: Router,
+    protected readonly avatarService: AvatarService,
+  ) {}
 
   public toggleMenu(): void {
     this.isOpen = !this.isOpen;
