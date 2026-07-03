@@ -10,6 +10,7 @@ import { MenuItem, SubMenuItem } from 'src/app/core/models/menu.model';
 export class MenuService implements OnDestroy {
   private _showSidebar = signal(true);
   private _showMobileMenu = signal(false);
+  private _showMobileSidebar = signal(false);
   private _pagesMenu = signal<MenuItem[]>([]);
   private _subscription = new Subscription();
 
@@ -53,6 +54,18 @@ export class MenuService implements OnDestroy {
   }
   set showMobileMenu(value: boolean) {
     this._showMobileMenu.set(value);
+  }
+
+  get showMobileSidebar() {
+    return this._showMobileSidebar();
+  }
+
+  set showMobileSidebar(value: boolean) {
+    this._showMobileSidebar.set(value);
+  }
+
+  public toggleMobileSidebar() {
+    this._showMobileSidebar.set(!this._showMobileSidebar());
   }
 
   public toggleSidebar() {

@@ -10,7 +10,7 @@ import { ToastComponent } from 'src/ui';
   imports: [RouterOutlet, ResponsiveHelperComponent, NgxSonnerToaster, ToastComponent],
 })
 export class AppComponent {
-  title = 'GesCamp 360';
+  title = 'Ge Rest';
 
   constructor(public themeService: ThemeService) {}
 }

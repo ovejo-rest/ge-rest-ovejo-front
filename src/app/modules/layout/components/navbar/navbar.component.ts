@@ -20,4 +20,8 @@ export class NavbarComponent implements OnInit {
   public toggleMobileMenu(): void {
     this.menuService.showMobileMenu = true;
   }
+
+  public toggleMobileSidebar(): void {
+    this.menuService.toggleMobileSidebar();
+  }
 }
