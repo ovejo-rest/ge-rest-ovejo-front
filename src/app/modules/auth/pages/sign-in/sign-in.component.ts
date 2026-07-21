@@ -77,11 +77,14 @@ export class SignInComponent {
         tap(
           (result: {
             token: AccessTokenDto['token'];
+            refreshToken: string;
             userData: UserDataDto;
           }) => {
             if (result.token && result.userData) {
               localStorage.setItem('token', result.token);
+              localStorage.setItem('refreshToken', result.refreshToken);
               localStorage.setItem('userData', JSON.stringify(result.userData));
+              localStorage.setItem('lastActivity', String(Date.now()));
               this._router.navigateByUrl('/dashboard/admin');
               this.toast.show(`Bienvenido ${result.userData.name}!`, 'success');
             }

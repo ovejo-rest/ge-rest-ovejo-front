@@ -1,0 +1,50 @@
+<app-header-dashboard
+  *appCheckPermission="'roles:see-module'"
+  title="Roles"
+  subtitle="Aquí, puedes gestionar los roles de cada organización.">
+  <app-button
+    *appCheckPermission="'roles:get-all-roles'"
+    full
+    impact="none"
+    tone="primary"
+    shape="rounded"
+    size="medium"
+    (buttonClick)="this.retry()"
+    retryData="retry()">
+    <app-icon class="h-6 w-7"> refresh </app-icon>
+  </app-button>
+  <app-button
+    *appCheckPermission="'roles:create-role'"
+    full
+    impact="bold"
+    tone="primary"
+    shape="rounded"
+    size="medium"
+    (buttonClick)="createNewRole()">
+    <app-icon class="h-6 w-7"> add </app-icon>
+    Crear rol
+  </app-button>
+</app-header-dashboard>
+
+@let isLoading = $getAllRolesService.$isLoading(); @let rolesDetail = $getAllRolesService.$roles(); @if(rolesDetail ||
+isLoading){
+<app-roles-table
+  *appCheckPermission="'roles:get-all-roles'"
+  [isLoading]="isLoading"
+  [getAllRolesDetail]="rolesDetail?.data ?? []"
+  [pagination]="
+    rolesDetail?.pagination ??
+    {
+      page: 1,
+      perPage: 10,
+      totalItems: 0,
+      totalPages: 0
+    }
+  "
+  (pageChange)="onPageChange($event)"
+  (perPageChange)="onPerPageChange($event)"
+  [searchCode]="currentSearchCode"
+  [searchName]="currentSearchName"
+  (filtersChanged)="onFiltersChange($event)"
+  (retryData)="retry()" />
+}

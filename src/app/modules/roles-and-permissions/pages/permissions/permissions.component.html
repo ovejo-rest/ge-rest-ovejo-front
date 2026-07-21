@@ -1,0 +1,37 @@
+<app-header-dashboard title="Permisos" subtitle="Aquí, puedes gestionar los permisos de cada organización.">
+  <app-button
+    *appCheckPermission="'permissions:get-all-permissions'"
+    full
+    impact="none"
+    tone="primary"
+    shape="rounded"
+    size="medium"
+    (buttonClick)="this.retry()"
+    retryData="retry()">
+    <app-icon class="h-6 w-7"> refresh </app-icon>
+  </app-button>
+  <app-button
+    *appCheckPermission="'permissions:create-permission'"
+    full
+    impact="bold"
+    tone="primary"
+    shape="rounded"
+    size="medium"
+    (buttonClick)="createNewPermission()">
+    <app-icon class="h-6 w-7"> add </app-icon>
+    Crear permiso
+  </app-button>
+</app-header-dashboard>
+
+<app-filters-table-permission
+  (searchCodeChange)="onSearchCodeChange($event)"
+  (searchNameChange)="onSearchNameChange($event)" />
+
+@let isLoading = $service.$isLoading(); @let modules = $service.$filteredModules(); @let total =
+$service.$allPermissionsCount();
+
+<div class="mb-2 px-2">
+  <span class="text-muted-foreground text-xs">Total: {{ total }} permiso{{ total !== 1 ? 's' : '' }}</span>
+</div>
+
+<app-permissions-list [modules]="modules" [isLoading]="isLoading" />

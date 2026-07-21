@@ -5,12 +5,13 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
 import { SubMenuItem } from 'src/app/core/models/menu.model';
 import { MenuService } from '../../../services/menu.service';
 import { IconComponent } from 'src/ui';
+import { CheckPermissionDirective } from 'src/app/shared/directives';
 
 @Component({
   selector: 'app-sidebar-submenu',
   templateUrl: './sidebar-submenu.component.html',
   styleUrls: ['./sidebar-submenu.component.css'],
-  imports: [NgClass, RouterLinkActive, IconComponent, RouterLink, AngularSvgIconModule],
+  imports: [NgClass, RouterLinkActive, IconComponent, RouterLink, AngularSvgIconModule, CheckPermissionDirective],
 })
 export class SidebarSubmenuComponent implements OnInit {
   @Input() public submenu = <SubMenuItem>{};

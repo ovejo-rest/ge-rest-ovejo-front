@@ -1,5 +1,5 @@
 import { Component, effect, inject, OnDestroy } from '@angular/core';
-import { GetAllModulesDto, GetAllModulesService, UpdateModuleDto, UpdateModuleService } from '../../data-access';
+import { GetAllModulesDto, GetAllModulesService, UpdateModuleService } from '../../data-access';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';

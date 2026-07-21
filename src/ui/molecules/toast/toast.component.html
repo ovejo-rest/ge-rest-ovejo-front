@@ -1,7 +1,7 @@
 
 @if(toast.$isVisible()){
     @let type = toast.$type();
-    <div id="toast-top-right" class="fixed flex items-center w-full max-w-xs p-4 space-x-4 text-gray-500 bg-white divide-x rtl:divide-x-reverse divide-gray-200 rounded-lg shadow-sm top-5 right-5 dark:text-gray-400 dark:divide-gray-700 dark:bg-gray-800" role="alert">
+    <div id="toast-top-right" class="fixed flex items-center w-full max-w-xs p-4 space-x-4 text-gray-500 bg-white divide-x rtl:divide-x-reverse divide-gray-200 rounded-lg shadow-sm top-5 right-5 z-[9999] dark:text-gray-400 dark:divide-gray-700 dark:bg-gray-800" role="alert">
     <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 rounded-2xl" 
     [ngClass]="{
         'text-green-500 bg-green-300 rounded-lg dark:bg-green-800 dark:text-green-200': type === 'success',

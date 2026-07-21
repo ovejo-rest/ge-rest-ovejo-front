@@ -1,4 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
+import { ViewEncapsulation } from '@angular/core';
 import {
   booleanAttribute,
   Component,
@@ -12,6 +13,8 @@ import { SLOT, SlotAsRecordPipe } from 'src/ui/utils';
   selector: 'app-modal-card',
   imports: [SlotAsRecordPipe, NgTemplateOutlet, DividerComponent],
   templateUrl: './modal-card.component.html',
+  styleUrl: './modal-card.component.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class ModalCardComponent {
   protected readonly $slots = contentChildren(SLOT);

@@ -4,7 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AlertComponent, ButtonComponent, ToastService } from 'src/ui';
 import { emailFormatValidator } from '../custom-validators';
 import { catchError, of, tap } from 'rxjs';
-import { ExternalDeactivateUserForPasswordService } from '../data-access';
+import { ForgotPasswordService } from '../data-access';
 
 @Component({
   selector: 'app-forgot-password',
@@ -13,7 +13,7 @@ import { ExternalDeactivateUserForPasswordService } from '../data-access';
   imports: [FormsModule, RouterLink, ButtonComponent, ReactiveFormsModule, AlertComponent],
 })
 export class ForgotPasswordComponent {
-  readonly #httpService = inject(ExternalDeactivateUserForPasswordService);
+  readonly #httpService = inject(ForgotPasswordService);
   private readonly $toast = inject(ToastService);
 
   submitted = false;
@@ -47,8 +47,8 @@ export class ForgotPasswordComponent {
         email: email,
       })
       .pipe(
-        tap((result: { statusCode: number; message: string }) => {
-          if (result.statusCode === 200) {
+        tap((result: { code: number; message: string }) => {
+          if (result.code === 200) {
             this.route.navigateByUrl('/auth/temporary-password');
             this.$toast.show(`Se ha creado un contraseña temporal`, 'success');
           }

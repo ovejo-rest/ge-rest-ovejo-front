@@ -1,0 +1,31 @@
+<app-header-dashboard title="Perfil de usuario" subtitle="Gestiona tu perfil"></app-header-dashboard>
+<div class="grid gap-4 p-2 md:grid-cols-12">
+  <!-- @let isLoading = $getProfileService.$isLoading();  -->
+  @let profile = $getProfileService.$profile(); @let isLoading = $getProfileService.$isLoading();
+  <div class="col-span-12 md:col-span-4">
+    @if (isLoading) {
+    <app-tarjet-profile-card-skeleton />
+    } @else {
+    <app-tarjet-profile-card
+      [name]="fullName"
+      [email]="profile?.email ?? ''"
+      [profilePhotoPath]="getAvatarUrl()"
+      [typeUserCode]="profile?.typeUserCode ?? ''" />
+    }
+  </div>
+  <div class="col-span-12 md:col-span-8">
+    @if(isLoading){
+    <app-personal-information-profile-card-skeleton />
+    } @else {
+    <app-personal-information-profile-card [profile]="profile!" />
+    }
+  </div>
+
+  <div class="col-span-12 col-end-9 md:col-span-8 md:col-end-13">
+    @if (isLoading) {
+    <app-contact-profile-card-skeleton />
+    } @else {
+    <app-contact-profile-card [profile]="profile!" />
+    }
+  </div>
+</div>

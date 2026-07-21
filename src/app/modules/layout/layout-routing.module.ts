@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LayoutComponent } from './layout.component';
-import { RolesAndPermissionsComponent } from '../roles-and-permissions/roles-and-permissions.component';
 
 const routes: Routes = [
   {
@@ -24,6 +23,11 @@ const routes: Routes = [
     component: LayoutComponent,
     loadChildren: () =>
       import('../roles-and-permissions/roles-and-permissions.module').then((m) => m.RolesAndPermissionsModule),
+  },
+  {
+    path: 'profile',
+    component: LayoutComponent,
+    loadChildren: () => import('../profile/profile.module').then((m) => m.ProfileModule),
   },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: 'error/404' },

@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, EMPTY, map, Subject, switchMap, tap } from 'rxjs';
 import { UpdateModuleDto } from './dtos';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { environment } from 'src/environments/environment';
+import { ApiPathEnum } from 'src/environments';
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +28,7 @@ export class UpdateModuleService {
         tap(() => this.#error$.next(undefined)),
         switchMap((input) =>
           this.#httpClient
-            .put(`${environment.baseUrl}/roles-and-permissions/modules/${input.id}/update`, {
+            .put(`${ApiPathEnum.AUTH}/roles-and-permissions/modules/${input.id}/update`, {
               newName: input.newName,
             })
             .pipe(

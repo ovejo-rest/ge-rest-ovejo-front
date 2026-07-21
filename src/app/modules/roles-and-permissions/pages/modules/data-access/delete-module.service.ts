@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, EMPTY, map, Subject, switchMap, tap } from 'rxjs';
 import { DeleteModuleDto } from './dtos/delete-module.dto';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { environment } from 'src/environments/environment';
+import { ApiPathEnum } from 'src/environments';
 
 @Injectable({
   providedIn: 'root',
@@ -27,7 +27,7 @@ export class DeleteModuleService {
         tap(() => this.#isLoading$.next(true)),
         tap(() => this.#error$.next(undefined)),
         switchMap((input) =>
-          this.#httpClient.put(`${environment.baseUrl}/roles-and-permissions/modules/${input.id}/delete`, null).pipe(
+          this.#httpClient.put(`${ApiPathEnum.AUTH}/roles-and-permissions/modules/${input.id}/delete`, null).pipe(
             tap(() => {
               this.#success$.next(true);
               this.#isLoading$.next(false);

@@ -1,0 +1,38 @@
+<app-header-dashboard
+  *appCheckPermission="'users:see-module'"
+  title="Usuarios"
+  subtitle="Gestiona los usuarios del sistema.">
+  <app-button
+    *appCheckPermission="'users:get-all-users'"
+    full
+    impact="none"
+    tone="primary"
+    shape="rounded"
+    size="medium"
+    (buttonClick)="retry()">
+    <app-icon class="h-6 w-7"> refresh </app-icon>
+  </app-button>
+  <app-button
+    *appCheckPermission="'users:create-user'"
+    full
+    impact="bold"
+    tone="primary"
+    shape="rounded"
+    size="medium"
+    (buttonClick)="createUser()">
+    <app-icon class="h-6 w-7"> add </app-icon>
+    Crear usuario
+  </app-button>
+</app-header-dashboard>
+
+@let isLoading = $service.$isLoading(); @let usersResp = $service.$users();
+
+<app-users-table
+  *appCheckPermission="'users:get-all-users'"
+  [isLoading]="isLoading"
+  [users]="usersResp?.data ?? []"
+  [pagination]="usersResp?.pagination ?? { page: 1, perPage: 10, totalItems: 0, totalPages: 0 }"
+  (pageChange)="onPageChange($event)"
+  (perPageChange)="onPerPageChange($event)"
+  (searchNameChange)="onSearchNameChange($event)"
+  (retryData)="retry()" />
