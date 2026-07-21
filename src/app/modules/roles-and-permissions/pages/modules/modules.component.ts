@@ -4,10 +4,11 @@ import { GetAllModulesService } from './data-access';
 import { ModulesTableComponent } from './features/modules-table/modules-table.component';
 import { CreateNewModelModalComponent } from './features/create-new-model-modal/create-new-model-modal.component';
 import { MatDialog } from '@angular/material/dialog';
+import { CheckPermissionDirective } from 'src/app/shared/directives';
 
 @Component({
   selector: 'app-modules',
-  imports: [HeaderDashboardComponent, ButtonComponent, IconComponent, ModulesTableComponent],
+  imports: [HeaderDashboardComponent, ButtonComponent, IconComponent, ModulesTableComponent, CheckPermissionDirective],
   templateUrl: './modules.component.html',
   styleUrl: './modules.component.css',
 })

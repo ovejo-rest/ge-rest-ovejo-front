@@ -23,6 +23,7 @@
         } @else {
         <!-- Parent Menu -->
         <a
+          *appCheckPermission="sub.permission"
           [routerLink]="sub.route"
           (click)="menuService.showMobileSidebar = false"
           routerLinkActive="text-primary"

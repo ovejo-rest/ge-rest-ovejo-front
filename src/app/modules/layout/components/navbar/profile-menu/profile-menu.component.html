@@ -6,7 +6,10 @@
     class="glass-overlay relative flex rounded-full text-sm"
     type="button">
     <span class="sr-only">Open user menu</span>
-    <img class="size-9 rounded-4xl shrink-0" src="https://avatars.githubusercontent.com/u/12519008?v=4" alt="" />
+    <img
+      class="size-9 rounded-4xl shrink-0"
+      [src]="avatarService.getAvatarUrl(userData?.name + ' ' + userData?.fatherLastName)"
+      alt="" />
   </button>
 
   <ng-template
@@ -17,7 +20,7 @@
     (overlayOutsideClick)="isOpen = false">
     <div
       @openClose
-      class="glass-overlay w-60 origin-top-right rounded-md border border-dashed py-4 focus:outline-hidden">
+      class="glass profile-menu-dropdown w-60 origin-top-right rounded-md border border-dashed py-4 focus:outline-hidden">
       <div class="flext-row flex items-center px-4 pb-4">
         <div class="w-10 shrink-0">
           <img

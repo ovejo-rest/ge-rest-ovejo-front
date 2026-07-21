@@ -1,0 +1,20 @@
+<app-header-dashboard
+  *appCheckPermission="'users-roles:see-module'"
+  title="Usuarios y roles"
+  subtitle="Gestiona los roles que tendrá cada usuario.">
+  <app-button full impact="none" tone="primary" shape="rounded" size="medium" (buttonClick)="retry()">
+    <app-icon class="h-6 w-7"> refresh </app-icon>
+  </app-button>
+</app-header-dashboard>
+
+@let isLoading = $service.$isLoading(); @let usersResp = $service.$users();
+
+<app-roles-user-table
+  *appCheckPermission="'users-roles:see-module'"
+  [isLoading]="isLoading"
+  [users]="usersResp?.data ?? []"
+  [pagination]="usersResp?.pagination ?? { page: 1, perPage: 10, totalItems: 0, totalPages: 0 }"
+  (pageChange)="onPageChange($event)"
+  (perPageChange)="onPerPageChange($event)"
+  (searchFullNameChange)="onSearchFullNameChange($event)"
+  (retryData)="retry()" />

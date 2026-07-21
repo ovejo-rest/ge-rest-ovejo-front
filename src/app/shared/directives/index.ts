@@ -1,1 +1,1 @@
-// Directives migrated to src/ui/utils
+export * from './check-permission.directive';

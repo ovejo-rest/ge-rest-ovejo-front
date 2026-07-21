@@ -2,7 +2,7 @@
 </app-header-dashboard>
 <div class="text-muted-foreground grid grid-cols-1 content-around gap-3 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
   @for (item of principalCards ; track $index) {
-  <a routerLink="{{ item.route }}">
+  <a *appCheckPermission="item.permission" routerLink="{{ item.route }}">
     <app-card addBottomLine="true">
       <div class="grid grid-cols-1">
         <div class="h-13 w-full content-center text-center ring-gray-300 dark:ring-gray-500">

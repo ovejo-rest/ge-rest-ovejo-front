@@ -14,8 +14,8 @@ import {
   tap,
 } from 'rxjs';
 import { GetAllModulesDto } from './dtos';
-import { environment } from 'src/environments/environment';
 import { StandardizedPagination } from 'src/app/core/standarized-response';
+import { ApiPathEnum } from 'src/environments';
 
 @Injectable({ providedIn: 'root' })
 export class GetAllModulesService {
@@ -55,7 +55,7 @@ export class GetAllModulesService {
         }
 
         return this.#httpClient
-          .get<StandardizedPagination<GetAllModulesDto>>(`${environment.baseUrl}/roles-and-permissions/modules`, {
+          .get<StandardizedPagination<GetAllModulesDto>>(`${ApiPathEnum.AUTH}/roles-and-permissions/modules`, {
             params: httpParams,
           })
           .pipe(

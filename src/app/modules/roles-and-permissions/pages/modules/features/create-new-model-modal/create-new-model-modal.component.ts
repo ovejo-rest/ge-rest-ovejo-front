@@ -1,20 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject, OnDestroy } from '@angular/core';
-import {
-  FormBuilder,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { CaseTransformDirective } from 'src/ui';
-import {
-  ButtonComponent,
-  IconComponent,
-  ModalCardComponent,
-  SlotDirective,
-  ToastService,
-} from 'src/ui';
+import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
 import {
   CreateModuleService,
   GetAllModulesService,
@@ -56,18 +45,12 @@ export class CreateNewModelModalComponent implements OnDestroy {
         this.$toast.show(`Creando módulo...`, 'warning');
       }
       if (this.createModuleService.$success()) {
-        this.$toast.show(
-          `Rol '${this.form.get('code')?.value}' creado con éxito`,
-          'success'
-        );
+        this.$toast.show(`Rol '${this.form.get('code')?.value}' creado con éxito`, 'success');
         this.$getAllModulesService.retry();
         this.dialogRef.close();
       }
       if (this.createModuleService.$hasError()) {
-        this.$toast.show(
-          `Algo salió mal. Por favor, vuelva a intentar.`,
-          'error'
-        );
+        this.$toast.show(`Algo salió mal. Por favor, vuelva a intentar.`, 'error');
       }
     });
   }

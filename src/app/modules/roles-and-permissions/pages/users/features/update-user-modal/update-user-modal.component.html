@@ -1,0 +1,34 @@
+@let isLoading = $isLoading();
+<app-modal-card class="w-full bg-transparent">
+  <ng-template app-slot="header">
+    <h1 class="text-primary dark:text-foreground">Actualizar usuario</h1>
+  </ng-template>
+  <button mat-icon-button class="close-button" (click)="dialogRef.close()">
+    <app-icon class="text-primary">close</app-icon>
+  </button>
+
+  <form [formGroup]="form">
+    <div class="grid grid-cols-3 gap-4 p-2">
+      <div class="text-end w-full pt-1"><h3 class="text-foreground">Nombres</h3></div>
+      <div class="col-span-2"><input type="text" id="name" formControlName="name" /></div>
+
+      <div class="text-end w-full pt-1"><h3 class="text-foreground">Ap. Paterno</h3></div>
+      <div class="col-span-2"><input type="text" id="fatherLastName" formControlName="fatherLastName" /></div>
+
+      <div class="text-end w-full pt-1"><h3 class="text-foreground">Ap. Materno</h3></div>
+      <div class="col-span-2"><input type="text" id="motherLastName" formControlName="motherLastName" /></div>
+
+      <div class="text-end w-full pt-1"><h3 class="text-foreground">Email</h3></div>
+      <div class="col-span-2"><input type="email" id="email" formControlName="email" /></div>
+    </div>
+  </form>
+
+  <ng-template app-slot="footer">
+    <div class="grid grid-cols-2 gap-2">
+      <app-button full impact="light" (buttonClick)="dialogRef.close()">Cancelar</app-button>
+      <app-button full impact="bold" [disabled]="form.invalid" (buttonClick)="submitForm()" [isLoading]="isLoading">
+        Actualizar
+      </app-button>
+    </div>
+  </ng-template>
+</app-modal-card>
