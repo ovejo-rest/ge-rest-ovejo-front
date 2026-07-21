@@ -17,11 +17,25 @@ export class Menu {
           label: 'Roles y permisos',
           route: '/roles-and-permissions',
           children: [
-            { label: 'Módulos', route: '/roles-and-permissions/modules' },
-            { label: 'Permisos', route: '/auth/sign-in' },
-            { label: 'Roles', route: '/auth/forgot-password' },
-            { label: 'Roles y permisos', route: '/auth/new-password' },
-            { label: 'Usuarios y roles', route: '' },
+            { label: 'Módulos', route: '/roles-and-permissions/modules', permission: 'modules:see-modules' },
+            { label: 'Permisos', route: '/roles-and-permissions/permissions', permission: 'permissions:see-module' },
+            { label: 'Roles', route: '/roles-and-permissions/roles', permission: 'roles:see-module' },
+            {
+              label: 'Roles y permisos',
+              route: '/roles-and-permissions/roles-permissions',
+              icon: 'home',
+              permission: 'roles-permissions:see-module',
+            },
+            {
+              label: 'Usuarios y roles',
+              route: '/roles-and-permissions/roles-user',
+              permission: 'users-roles:see-module',
+            },
+            {
+              label: 'Usuarios',
+              route: '/roles-and-permissions/users',
+              permission: 'users:see-module',
+            },
           ],
         },
         {

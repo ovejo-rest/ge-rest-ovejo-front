@@ -1,0 +1,67 @@
+<app-table>
+  <ng-template app-slot="filters">
+    <app-filters-table-roles-user (searchFullNameChange)="onSearchFullNameChange($event)" />
+  </ng-template>
+
+  <ng-template app-slot="head">
+    <tr>
+      @for (item of headerData; track $index) {
+      <th class="h-8 w-[25%] text-center">{{ item }}</th>
+      }
+      <th class="w-[60px]"></th>
+    </tr>
+  </ng-template>
+
+  @if (!isLoading()) { @for (user of $users(); track user.userId) {
+  <tr class="glass-row h-10">
+    <td class="text-center">{{ user.fullName }}</td>
+    <td class="text-center">{{ user.email }}</td>
+    <td class="text-center">
+      @for (role of user.roles; track role.id) {
+      <app-badge [text]="role.name" [glass]="true" />
+      }
+    </td>
+    <td class="w-[60px] text-center">
+      <div class="flex items-center justify-center">
+        <app-button
+          *appCheckPermission="'users-roles:assign-roles'"
+          size="small"
+          icon="admin_panel_settings"
+          (click)="assignRole(user)"></app-button>
+      </div>
+    </td>
+  </tr>
+  } @empty {
+  <tr>
+    <td class="py-4 text-center text-sm" colspan="4">
+      No hay usuarios
+      <app-button full impact="none" tone="primary" shape="rounded" size="medium" (buttonClick)="retry()">
+        <app-icon class="h-6 w-7"> refresh </app-icon>
+      </app-button>
+    </td>
+  </tr>
+  } } @if (isLoading()) {
+  <tr>
+    <td colspan="4" class="py-4 px-2">
+      <app-progress-bar />
+    </td>
+  </tr>
+  }
+
+  <ng-template app-slot="footer">
+    <div class="glass-footer -mx-5 -mb-3 flex flex-wrap items-center justify-between gap-2 px-5 py-3">
+      <div class="flex items-center gap-2">
+        Mostrar
+        <select class="glass-input w-16 rounded-md p-2" [value]="perPage()" (change)="onPerPageChange($event)">
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="30">30</option>
+          <option value="50">50</option>
+        </select>
+        por página
+      </div>
+      <app-pagination-table [pagination]="$pagination()" (pageChange)="onChangePage($event)" />
+    </div>
+  </ng-template>
+</app-table>

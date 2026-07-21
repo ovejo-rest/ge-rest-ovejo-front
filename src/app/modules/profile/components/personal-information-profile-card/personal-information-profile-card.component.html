@@ -1,0 +1,52 @@
+<app-card>
+  <ng-template app-slot="header">Información personal</ng-template>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="grid grid-cols-4 gap-4 p-2">
+    <div class="col-span-4 block">
+      <div class="text-start w-full pt-1"><h3 class="text-foreground">Nombre</h3></div>
+      <div class="col-span-2">
+        <input type="text" id="name" formControlName="name" class="peer block w-full" placeholder=" " />
+      </div>
+    </div>
+    <div class="col-span-4 block md:col-span-2">
+      <div class="w-full pt-1"><h3 class="text-foreground">Apellido paterno</h3></div>
+      <div class="col-span-2">
+        <input
+          type="text"
+          id="fatherLastName"
+          formControlName="fatherLastName"
+          class="peer block w-full"
+          placeholder=" " />
+      </div>
+    </div>
+
+    <div class="col-span-4 block md:col-span-2">
+      <div class="w-full pt-1"><h3 class="text-foreground">Apellido materno</h3></div>
+      <div class="col-span-2">
+        <input
+          type="text"
+          id="motherLastName"
+          formControlName="motherLastName"
+          class="peer block w-full"
+          placeholder=" " />
+      </div>
+    </div>
+    <div class="col-span-2 block md:col-span-2">
+      <div class="w-full pt-1"><h3 class="text-foreground">RUT</h3></div>
+      <div class="col-span-2">
+        <input maxlength="12" type="text" id="rut" formControlName="rut" class="peer block w-full" placeholder=" " />
+      </div>
+    </div>
+
+    <div class="col-span-4 block md:col-span-2">
+      <div class="w-full pt-1"><h3 class="text-foreground">Email</h3></div>
+      <div class="col-span-2">
+        <input type="email" id="email" formControlName="email" class="peer block w-full" placeholder=" " />
+      </div>
+    </div>
+  </form>
+
+  <ng-template app-slot="footer">
+    <app-button type="submit" (buttonClick)="onSubmit()">Actualizar información</app-button>
+  </ng-template>
+</app-card>

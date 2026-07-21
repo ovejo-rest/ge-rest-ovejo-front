@@ -13,4 +13,5 @@ export interface SubMenuItem {
   expanded?: boolean;
   active?: boolean;
   children?: Array<SubMenuItem>;
+  permission?: string;
 }

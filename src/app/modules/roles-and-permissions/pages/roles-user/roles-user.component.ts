@@ -1,0 +1,43 @@
+import { Component, inject } from '@angular/core';
+import { ButtonComponent, HeaderDashboardComponent, IconComponent } from 'src/ui';
+import { GetAllUsersWithRolesService } from './data-access';
+import { RolesUserTableComponent } from './features';
+import { CheckPermissionDirective } from 'src/app/shared/directives';
+
+@Component({
+  selector: 'app-roles-user',
+  imports: [
+    HeaderDashboardComponent,
+    ButtonComponent,
+    IconComponent,
+    RolesUserTableComponent,
+    CheckPermissionDirective,
+  ],
+  templateUrl: './roles-user.component.html',
+})
+export class RolesUserComponent {
+  protected readonly $service = inject(GetAllUsersWithRolesService);
+
+  page = 1;
+
+  constructor() {
+    this.$service.retry();
+  }
+
+  retry() {
+    this.$service.retry();
+  }
+
+  onPageChange(page: number) {
+    this.page = page;
+    this.$service.setParams({ page });
+  }
+
+  onPerPageChange(perPage: number) {
+    this.$service.setParams({ perPage, page: 1 });
+  }
+
+  onSearchFullNameChange(fullName: string) {
+    this.$service.setParams({ fullName, page: 1 });
+  }
+}

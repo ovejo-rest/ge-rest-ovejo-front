@@ -1,0 +1,22 @@
+<app-card>
+  <!-- <ng-template app-slot="header"><p class="text-center">Perfil</p></ng-template> -->
+
+  <div class="flex flex-col items-center pt-4 pb-4">
+    <div class="image">
+      <img [src]="profilePhotoPath" alt="" class="size-34 rounded-full object-cover" />
+    </div>
+    <h3 class="text-center text-xl font-semibold tracking-tight text-gray-600 dark:text-white">{{ name() }}</h3>
+    <p class="text-center text-lg font-light tracking-tight text-gray-600 dark:text-white">{{ role() }}</p>
+  </div>
+  <app-divider />
+
+  <div class="mt-2 mb-2 text-center">
+    <span class="text-sm font-light tracking-tight text-gray-900 dark:text-white">{{ email() }}</span>
+  </div>
+
+  <ng-template app-slot="footer"
+    ><div class="flex justify-center">
+      <app-button impact="light">Actualizar foto de perfil</app-button>
+    </div></ng-template
+  >
+</app-card>

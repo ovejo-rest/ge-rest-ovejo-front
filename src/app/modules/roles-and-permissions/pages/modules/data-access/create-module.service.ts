@@ -4,7 +4,7 @@ import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, catchError, EMPTY, map, Subject, switchMap, tap } from 'rxjs';
 import { CreateModuleDto } from './dtos';
-import { environment } from 'src/environments/environment';
+import { ApiPathEnum } from 'src/environments';
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +28,7 @@ export class CreateModuleService {
         tap(() => this.#isLoading$.next(true)),
         tap(() => this.#error$.next(undefined)),
         switchMap((input) =>
-          this.#httpClient.post(`${environment.baseUrl}/roles-and-permissions/modules`, input).pipe(
+          this.#httpClient.post(`${ApiPathEnum.AUTH}/roles-and-permissions/modules`, input).pipe(
             tap(() => {
               this.#success$.next(true);
               this.#isLoading$.next(false);

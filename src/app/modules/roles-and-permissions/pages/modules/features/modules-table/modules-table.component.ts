@@ -14,6 +14,7 @@ import { FiltersTableModuleComponent } from '../../ui';
 import { PaginationMeta } from 'src/app/core/standarized-response/standardized-pagination/pagination-meta.dto';
 import { UpdateModuleModalComponent } from '../update-module-modal/update-module-modal.component';
 import { DeleteModuleModalComponent } from '../delete-module-modal/delete-module-modal.component';
+import { CheckPermissionDirective } from 'src/app/shared/directives';
 
 @Component({
   selector: 'app-modules-table',
@@ -25,6 +26,7 @@ import { DeleteModuleModalComponent } from '../delete-module-modal/delete-module
     PaginationTableComponent,
     ProgressBarComponent,
     FiltersTableModuleComponent,
+    CheckPermissionDirective,
   ],
   templateUrl: './modules-table.component.html',
   styleUrl: './modules-table.component.css',

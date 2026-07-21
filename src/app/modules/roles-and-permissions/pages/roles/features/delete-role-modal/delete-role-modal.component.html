@@ -1,0 +1,23 @@
+@let isLoading = $isLoading();
+<app-modal-card class="w-full bg-transparent">
+  <ng-template app-slot="header">
+    <h1 class="text-primary dark:text-foreground">Eliminar rol</h1>
+  </ng-template>
+  <button mat-icon-button class="close-button" (click)="dialogRef.close()">
+    <app-icon class="text-primary">close</app-icon>
+  </button>
+
+  <div class="grid grid-cols-1 gap-2 p-2 text-center">
+    <div>¿Está seguro que desea eliminar el rol?</div>
+    <div>
+      <strong class="text-lg text-red-600">{{ data.id }}</strong> | {{ data.code }} | {{ data.name }}
+    </div>
+  </div>
+
+  <ng-template app-slot="footer">
+    <div class="grid grid-cols-2 gap-2">
+      <app-button full impact="light" (buttonClick)="dialogRef.close()">Cancelar</app-button>
+      <app-button full impact="bold" (buttonClick)="submit()" [isLoading]="isLoading">Eliminar</app-button>
+    </div>
+  </ng-template>
+</app-modal-card>

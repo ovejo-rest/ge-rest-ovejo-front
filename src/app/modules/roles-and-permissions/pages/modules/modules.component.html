@@ -1,5 +1,9 @@
-<app-header-dashboard title="Módulos" subtitle="Aquí, puedes gestionar los módulos para administrar los permisos.">
+<app-header-dashboard
+  *appCheckPermission="'modules:see-modules'"
+  title="Módulos"
+  subtitle="Aquí, puedes gestionar los módulos para administrar los permisos.">
   <app-button
+    *appCheckPermission="'modules:get-all-modules'"
     full
     impact="none"
     tone="primary"
@@ -9,7 +13,14 @@
     retryData="retry()">
     <app-icon class="h-6 w-7"> refresh </app-icon>
   </app-button>
-  <app-button full impact="bold" tone="primary" shape="rounded" size="medium" (buttonClick)="createNewModule()">
+  <app-button
+    *appCheckPermission="'modules:create-module'"
+    full
+    impact="bold"
+    tone="primary"
+    shape="rounded"
+    size="medium"
+    (buttonClick)="createNewModule()">
     <app-icon class="h-6 w-7"> add </app-icon>
     Crear módulo
   </app-button>

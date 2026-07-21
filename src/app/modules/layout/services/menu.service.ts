@@ -1,8 +1,9 @@
-import { Injectable, OnDestroy, signal } from '@angular/core';
+import { computed, inject, Injectable, OnDestroy, signal, Signal } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Menu } from 'src/app/core/constants/menu';
 import { MenuItem, SubMenuItem } from 'src/app/core/models/menu.model';
+import { WhoamiService } from 'src/app/core/services/whoami/whoami.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +14,31 @@ export class MenuService implements OnDestroy {
   private _showMobileSidebar = signal(false);
   private _pagesMenu = signal<MenuItem[]>([]);
   private _subscription = new Subscription();
+  private _whoamiService = inject(WhoamiService);
+
+  #filteredPagesMenu: Signal<MenuItem[]> = computed(() => {
+    const permissions = this._whoamiService.$permissionsSet();
+    const menus = this._pagesMenu();
+
+    return menus
+      .map((group) => ({
+        ...group,
+        items: group.items.filter((item) => {
+          if (!item.permission) return true;
+
+          if (item.children) {
+            const filteredChildren = item.children.filter((child) => {
+              if (!child.permission) return true;
+              return permissions.has(child.permission);
+            });
+            return filteredChildren.length > 0;
+          }
+
+          return permissions.has(item.permission);
+        }),
+      }))
+      .filter((group) => group.items.length > 0);
+  });
 
   constructor(private router: Router) {
     /** Set dynamic menu */
@@ -45,8 +71,8 @@ export class MenuService implements OnDestroy {
   get showMobileMenu() {
     return this._showMobileMenu();
   }
-  get pagesMenu() {
-    return this._pagesMenu();
+  get pagesMenu(): MenuItem[] {
+    return this.#filteredPagesMenu();
   }
 
   set showSideBar(value: boolean) {

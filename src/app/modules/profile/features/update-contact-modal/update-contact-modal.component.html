@@ -1,0 +1,89 @@
+<app-modal-card>
+  <ng-template app-slot="header">
+    <h1 class="text-primary dark:text-foreground">Actualizar módulo</h1>
+  </ng-template>
+  <button mat-icon-button class="close-button" (click)="dialogRef.close()">
+    <app-icon class="text-primary">close</app-icon>
+  </button>
+
+  <form [formGroup]="form" class="grid grid-cols-4 gap-4 p-2">
+    <div class="col-span-4 block md:col-span-2">
+      <div class="text-start w-full pt-1"><h3 class="text-foreground">Región</h3></div>
+      <div class="col-span-2">
+        @if ($getRegionsService.$isLoading()) {
+        <div class="bg-muted h-9 w-full animate-pulse rounded-md"></div>
+        } @else {
+        <select id="regionName" formControlName="regionName" class="peer block w-full">
+          <option value="">Seleccionar región</option>
+          @for (region of $getRegionsService.$regions() ?? []; track region.id) {
+          <option [value]="region.name">{{ region.name }}</option>
+          }
+        </select>
+        }
+      </div>
+    </div>
+    <div class="col-span-4 block md:col-span-2">
+      <div class="text-start w-full pt-1"><h3 class="text-foreground">Provincia</h3></div>
+      <div class="col-span-2">
+        @if ($getProvincesByRegionIdService.$isLoading()) {
+        <div class="bg-muted h-9 w-full animate-pulse rounded-md"></div>
+        } @else {
+        <select id="provinceName" formControlName="provinceName" class="peer block w-full">
+          <option value="">Seleccionar provincia</option>
+          @for (province of $getProvincesByRegionIdService.$provincesById() ?? []; track province.id) {
+          <option [value]="province.name">{{ province.name }}</option>
+          }
+        </select>
+        }
+      </div>
+    </div>
+    <div class="col-span-2 block">
+      <div class="w-full pt-1"><h3 class="text-foreground">Comuna</h3></div>
+      <div class="col-span-2">
+        @if ($getCommunesByProvincesIdService.$isLoading()) {
+        <div class="bg-muted h-9 w-full animate-pulse rounded-md"></div>
+        } @else {
+        <select id="communeName" formControlName="communeName" class="peer block w-full">
+          <option value="">Seleccionar comuna</option>
+          @for (commune of $getCommunesByProvincesIdService.$communesById() ?? []; track commune.id) {
+          <option [value]="commune.name">{{ commune.name }}</option>
+          }
+        </select>
+        }
+      </div>
+    </div>
+
+    <div class="col-span-2 block">
+      <div class="w-full pt-1"><h3 class="text-foreground">Ciudad</h3></div>
+      <div class="col-span-2">
+        <input type="text" id="city" formControlName="city" class="peer block w-full" />
+      </div>
+    </div>
+    <div class="col-span-4 block">
+      <div class="w-full pt-1"><h3 class="text-foreground">Dirección</h3></div>
+      <div class="col-span-2">
+        <input type="text" id="address" formControlName="address" class="peer block w-full" />
+      </div>
+    </div>
+
+    <div class="col-span-2 block">
+      <div class="w-full pt-1"><h3 class="text-foreground">Teléfono</h3></div>
+      <div class="col-span-2">
+        <input type="email" id="phone" formControlName="phone" class="peer block w-full" />
+      </div>
+    </div>
+    <div class="col-span-2 block">
+      <div class="w-full pt-1"><h3 class="text-foreground">Celular</h3></div>
+      <div class="col-span-2">
+        <input type="email" id="cellphone" formControlName="cellphone" class="peer block w-full" />
+      </div>
+    </div>
+  </form>
+
+  <ng-template app-slot="footer">
+    <div class="grid grid-cols-2 gap-2">
+      <app-button full impact="light" (buttonClick)="dialogRef.close()">Cancelar</app-button>
+      <app-button full impact="bold" [disabled]="form.invalid" (buttonClick)="updateContact()">Actualizar</app-button>
+    </div>
+  </ng-template>
+</app-modal-card>
