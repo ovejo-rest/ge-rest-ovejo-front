@@ -1,4 +1,5 @@
 export * from './button';
+export * from './confirm-modal';
 export * from './header-dashboard';
 export * from './bottom-navbar';
 export * from './alert';

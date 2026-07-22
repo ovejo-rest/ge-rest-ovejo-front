@@ -1,0 +1,41 @@
+<app-header-dashboard
+  *appCheckPermission="'roles-permissions:see-module'"
+  title="Roles y permisos"
+  subtitle="Administra los permisos asignados a cada rol.">
+  <app-button full impact="none" tone="primary" shape="rounded" size="medium" (buttonClick)="retry()">
+    <app-icon class="h-6 w-7"> refresh </app-icon>
+  </app-button>
+</app-header-dashboard>
+
+<div class="flex items-end gap-3 px-2 pb-3" *appCheckPermission="'roles-permissions:see-module'">
+  <div class="flex-1">
+    <label class="text-muted-foreground mb-1 block text-xs font-medium">Seleccionar rol</label>
+    <app-role-selector (selectedRoleChange)="onRoleSelected($event)" />
+  </div>
+  <app-button
+    impact="bold"
+    tone="primary"
+    shape="rounded"
+    size="medium"
+    [disabled]="!selectedRoleId() || !hasPendingChanges() || $saving()"
+    (buttonClick)="savePermissions()"
+    [isLoading]="$saving()"
+    icon="save">
+    Guardar
+  </app-button>
+</div>
+
+@let isLoading = $permissionsLoading(); @let modules = $modules(); @let pendingIds = pendingPermissionIds(); @let roleId
+= selectedRoleId(); @let total = $total();
+
+<div class="mb-2 px-2" *appCheckPermission="'roles-permissions:see-module'">
+  <span class="text-muted-foreground text-xs">Total: {{ total }} permiso{{ total !== 1 ? 's' : '' }}</span>
+</div>
+
+<app-roles-permissions-card
+  *appCheckPermission="'roles-permissions:see-module'"
+  [modules]="modules"
+  [rolePermissionIds]="pendingIds"
+  [isLoading]="isLoading"
+  [selectedRoleId]="roleId"
+  (togglePermission)="onTogglePermission($event)" />

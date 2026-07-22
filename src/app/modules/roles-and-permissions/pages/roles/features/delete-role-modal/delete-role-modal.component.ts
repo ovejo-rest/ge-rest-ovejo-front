@@ -1,0 +1,44 @@
+import { Component, effect, inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { DeleteRoleService, GetAllRolesService, RoleDto } from '../../data-access';
+import { ButtonComponent, CardComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
+
+@Component({
+  selector: 'app-delete-role-modal',
+  imports: [IconComponent, SlotDirective, ButtonComponent, ModalCardComponent],
+  templateUrl: './delete-role-modal.component.html',
+})
+export class DeleteRoleModalComponent {
+  protected readonly dialogRef = inject(MatDialogRef<DeleteRoleModalComponent>);
+  protected readonly $deleteRoleService = inject(DeleteRoleService);
+  private readonly $toast = inject(ToastService);
+  protected readonly $getAllRolesService = inject(GetAllRolesService);
+
+  protected readonly $isLoading = this.$deleteRoleService.$isLoading;
+
+  protected readonly data = inject(MAT_DIALOG_DATA) as RoleDto;
+
+  constructor() {
+    effect(() => {
+      if (this.$deleteRoleService.$isLoading()) {
+        this.$toast.show(`Eliminando rol...`, 'warning');
+      }
+      if (this.$deleteRoleService.$success()) {
+        this.$toast.show(`Rol '${this.data.id}' eliminado con éxito`, 'success');
+        this.$getAllRolesService.retry();
+        this.dialogRef.close();
+      }
+      if (this.$deleteRoleService.$hasError()) {
+        this.$toast.show(`Algo salió mal. Por favor, vuelva a intentar.`, 'error');
+      }
+    });
+  }
+
+  submit() {
+    this.$deleteRoleService.delete({ id: this.data.id });
+  }
+
+  ngOnDestroy(): void {
+    this.$deleteRoleService.reset();
+  }
+}

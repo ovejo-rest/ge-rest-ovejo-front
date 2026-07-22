@@ -2,7 +2,6 @@ import { Component, effect, inject, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
 import { DeleteModuleService, GetAllModulesService, ModuleDto } from '../../data-access';
-import { DeleteModuleDto } from '../../data-access/dtos/delete-module.dto';
 
 @Component({
   selector: 'app-delete-module-modal',

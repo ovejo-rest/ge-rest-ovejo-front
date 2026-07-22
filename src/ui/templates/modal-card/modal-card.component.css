@@ -1,0 +1,17 @@
+.mat-mdc-dialog-container {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 20%, transparent), color-mix(in srgb, var(--foreground) 8%, transparent)) !important;
+  border-radius: 1rem !important;
+  overflow: hidden !important;
+}
+
+.mat-mdc-dialog-surface {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 1rem !important;
+}
+
+.cdk-overlay-dark-backdrop {
+  background: color-mix(in srgb, var(--background) 20%, transparent) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}

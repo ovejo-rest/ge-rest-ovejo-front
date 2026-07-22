@@ -1,10 +1,10 @@
 export type LoginOutputDto = Readonly<{
   token: AccessTokenDto;
+  refreshToken: string;
   userData: UserDataDto;
 }>;
 
 export type UserDataDto = Readonly<{
-  id: number;
   rut: string;
   code: string;
   name: string;

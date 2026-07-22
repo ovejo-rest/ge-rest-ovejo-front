@@ -5,12 +5,23 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
 import { SubMenuItem } from 'src/app/core/models/menu.model';
 import { MenuService } from 'src/app/modules/layout/services/menu.service';
 import { IconComponent } from 'src/ui';
+import { CheckPermissionDirective } from 'src/app/shared/directives';
 
 @Component({
   selector: 'app-navbar-mobile-submenu',
   templateUrl: './navbar-mobile-submenu.component.html',
   styleUrls: ['./navbar-mobile-submenu.component.css'],
-  imports: [NgClass, NgFor, NgTemplateOutlet, RouterLinkActive,IconComponent, RouterLink, AngularSvgIconModule, IconComponent],
+  imports: [
+    NgClass,
+    NgFor,
+    NgTemplateOutlet,
+    RouterLinkActive,
+    IconComponent,
+    RouterLink,
+    AngularSvgIconModule,
+    IconComponent,
+    CheckPermissionDirective,
+  ],
 })
 export class NavbarMobileSubmenuComponent implements OnInit {
   @Input() public submenu = <SubMenuItem>{};

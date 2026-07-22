@@ -2,8 +2,7 @@
   <ng-template app-slot="filters">
     <app-filters-table-module
       (searchCodeChange)="onSearchCodeChange($event)"
-      (searchNameChange)="onSearchNameChange($event)"
-    />
+      (searchNameChange)="onSearchNameChange($event)" />
   </ng-template>
   <ng-template app-slot="head">
     <tr>
@@ -26,16 +25,16 @@
     <td class="text-center">
       <div class="flex items-center justify-end gap-2">
         <app-button
+          *appCheckPermission="'modules:update-module'"
           size="small"
           icon="edit_document"
-          (click)="updateModule(item)"
-        ></app-button>
+          (click)="updateModule(item)"></app-button>
         <app-button
+          *appCheckPermission="'modules:delete-module'"
           size="small"
           icon="delete"
           tone="danger"
-          (click)="deleteModule(item)"
-        ></app-button>
+          (click)="deleteModule(item)"></app-button>
       </div>
     </td>
   </tr>
@@ -43,14 +42,7 @@
   <tr>
     <td class="py-4 text-center text-sm" colspan="7">
       No hay data
-      <app-button
-        full
-        impact="none"
-        tone="primary"
-        shape="rounded"
-        size="medium"
-        (buttonClick)="this.retry()"
-      >
+      <app-button full impact="none" tone="primary" shape="rounded" size="medium" (buttonClick)="this.retry()">
         <app-icon class="h-6 w-7"> refresh </app-icon>
       </app-button>
     </td>
@@ -64,9 +56,6 @@
   }
 
   <ng-template app-slot="footer">
-    <app-pagination-table
-      [pagination]="$pagination()"
-      (pageChange)="onChangePage($event)"
-    />
+    <app-pagination-table [pagination]="$pagination()" (pageChange)="onChangePage($event)" />
   </ng-template>
 </app-table>

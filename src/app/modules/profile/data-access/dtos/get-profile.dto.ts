@@ -1,0 +1,24 @@
+export type GetProfileDto = Readonly<{
+  rut: string;
+  name: string;
+  fatherLastName: string;
+  motherLastName: string;
+  email: string;
+  emailVerifyAt?: Date | null;
+  profilePhotoPath?: string | null;
+  restaurantId: number;
+  branchId: number;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date | null;
+  statusCode: string;
+  address: string;
+  phone: string;
+  cellphone: string;
+  city: string;
+  communeName: string;
+  provinceName: string;
+  regionOrdinal: string;
+  regionName: string;
+  typeUserCode: string;
+}>;

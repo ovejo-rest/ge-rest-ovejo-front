@@ -1,7 +1,7 @@
 @for (menu of menuService.pagesMenu; track $index) {
 <div class="dropdown relative inline-block">
   <!-- Button del navbar -->
-  <!-- <button
+  <button
     [ngClass]="
       menu.selected || menu.active
         ? 'bg-primary text-primary-foreground'
@@ -15,6 +15,5 @@
     class="dropdown-content absolute top-[100%] z-10 min-w-[200px] origin-top-left"
     navbar-submenu
     [submenu]="menu.items"></div>
-  -->
 </div>
 }
