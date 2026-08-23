@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { SubMenuItem } from 'src/app/core/models/menu.model';
@@ -9,6 +9,7 @@ import { IconComponent } from 'src/ui';
   selector: 'div[navbar-submenu]',
   templateUrl: './navbar-submenu.component.html',
   styleUrls: ['./navbar-submenu.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [NgTemplateOutlet, RouterLinkActive, RouterLink, AngularSvgIconModule, IconComponent],
 })
 export class NavbarSubmenuComponent implements OnInit {

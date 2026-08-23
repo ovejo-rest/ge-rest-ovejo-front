@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { debounceTime, filter, Subject } from 'rxjs';
 import { FilterTableDto } from 'src/ui/molecules/filters-table/dtos';
 import { ButtonComponent, FiltersTableComponent } from 'src/ui';
@@ -6,6 +6,7 @@ import { ButtonComponent, FiltersTableComponent } from 'src/ui';
 @Component({
   selector: 'app-filters-table-permission',
   imports: [FiltersTableComponent, ButtonComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './filters-table-permission.component.html',
 })
 export class FiltersTablePermissionComponent {

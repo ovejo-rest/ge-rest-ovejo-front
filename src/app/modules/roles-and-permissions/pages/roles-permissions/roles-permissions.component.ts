@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ButtonComponent, HeaderDashboardComponent, IconComponent, ToastService } from 'src/ui';
 import { GetAllPermissionsService } from '../permissions/data-access';
 import { GetRolePermissionsService, AssignPermissionsService } from './data-access';
@@ -17,6 +17,7 @@ import { CheckPermissionDirective } from 'src/app/shared/directives';
     RolesPermissionsCardComponent,
     CheckPermissionDirective,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './roles-permissions.component.html',
 })
 export class RolesPermissionsComponent {

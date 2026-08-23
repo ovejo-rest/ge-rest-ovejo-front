@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { debounceTime, filter, Subject } from 'rxjs';
 import { ButtonComponent, FiltersTableComponent } from 'src/ui';
 import { FilterTableDto } from 'src/ui/molecules/filters-table/dtos';
@@ -6,6 +6,7 @@ import { FilterTableDto } from 'src/ui/molecules/filters-table/dtos';
 @Component({
   selector: 'app-filters-table-module',
   imports: [ButtonComponent, FiltersTableComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './filters-table-module.component.html',
 })
 export class FiltersTableModuleComponent {

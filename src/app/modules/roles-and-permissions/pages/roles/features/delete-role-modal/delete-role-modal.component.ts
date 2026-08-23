@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DeleteRoleService, GetAllRolesService, RoleDto } from '../../data-access';
 import { ButtonComponent, CardComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
@@ -6,6 +6,7 @@ import { ButtonComponent, CardComponent, IconComponent, ModalCardComponent, Slot
 @Component({
   selector: 'app-delete-role-modal',
   imports: [IconComponent, SlotDirective, ButtonComponent, ModalCardComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './delete-role-modal.component.html',
 })
 export class DeleteRoleModalComponent {

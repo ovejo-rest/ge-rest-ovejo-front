@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ModulePermissionsDto } from '../../../permissions/data-access';
 import { CardComponent } from 'src/ui/templates/single-card';
 import { SlotDirective, IconComponent, ToggleComponent } from 'src/ui';
@@ -17,6 +17,7 @@ import { CheckPermissionDirective } from 'src/app/shared/directives';
     CheckPermissionDirective,
   ],
   templateUrl: './roles-permissions-card.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   animations: [
     trigger('expandCollapse', [
       transition(':enter', [

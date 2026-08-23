@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ButtonComponent, HeaderDashboardComponent, IconComponent } from 'src/ui';
 import { GetAllPermissionsService } from './data-access';
 import { FiltersTablePermissionComponent } from './ui';
@@ -18,6 +18,7 @@ import { CheckPermissionDirective } from 'src/app/shared/directives';
     CheckPermissionDirective,
   ],
   templateUrl: './permissions.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './permissions.component.css',
 })
 export class PermissionsComponent {

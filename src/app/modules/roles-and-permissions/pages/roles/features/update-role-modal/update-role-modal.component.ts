@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { GetAllRolesDto, GetAllRolesService, UpdateRoleService } from '../../data-access';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
@@ -7,6 +7,7 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 @Component({
   selector: 'app-update-role-modal',
   imports: [IconComponent, ModalCardComponent, ButtonComponent, FormsModule, ReactiveFormsModule, SlotDirective],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './update-role-modal.component.html',
 })
 export class UpdateRoleModalComponent {

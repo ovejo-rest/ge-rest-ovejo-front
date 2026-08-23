@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { BottomNavbarEnum } from './enums';
 import { IconComponent } from 'src/ui/atoms';
 
 @Component({
   selector: 'app-bottom-navbar',
   imports: [IconComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './bottom-navbar.component.html',
 })
 export class BottomNavbarComponent {

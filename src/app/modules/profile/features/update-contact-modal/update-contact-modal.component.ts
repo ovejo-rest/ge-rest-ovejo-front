@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit } from '@angular/core';
+import { Component, effect, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import {
@@ -19,6 +19,7 @@ import { GetCommunesByProvincesIdService } from 'src/app/core/services/address/g
   selector: 'app-update-contact-modal',
   imports: [ModalCardComponent, FormsModule, ReactiveFormsModule, ButtonComponent, SlotDirective, IconComponent],
   templateUrl: './update-contact-modal.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './update-contact-modal.component.css',
 })
 export class UpdateContactModalComponent implements OnInit {

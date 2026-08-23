@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { debounceTime, filter, Subject } from 'rxjs';
 import { FilterTableDto } from 'src/ui/molecules/filters-table/dtos';
 import { ButtonComponent, FiltersTableComponent } from 'src/ui';
@@ -7,6 +7,7 @@ import { CheckPermissionDirective } from 'src/app/shared/directives';
 @Component({
   selector: 'app-filters-table-user',
   imports: [FiltersTableComponent, ButtonComponent, CheckPermissionDirective],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './filters-table-user.component.html',
 })
 export class FiltersTableUserComponent {

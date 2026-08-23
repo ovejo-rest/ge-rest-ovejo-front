@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-permissions-list-skeleton',
   imports: [],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `<div class="grid grid-cols-1 gap-4 p-2 md:grid-cols-2">
     @for (skeleton of [1, 2, 3, 4]; track skeleton) {
     <div class="glass-card w-full animate-pulse rounded-lg p-4">
