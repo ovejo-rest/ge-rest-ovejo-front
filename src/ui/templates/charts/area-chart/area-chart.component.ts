@@ -103,7 +103,7 @@ export class AreaChartComponent {
     /** change chart theme */
     let primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary');
     this.$chartOptions.tooltip = {
-      theme: this.$themeService.theme().mode,
+      theme: this.$themeService.theme().mode as 'light' | 'dark',
     };
     this.$chartOptions.colors = [primaryColor];
     this.$chartOptions.stroke!.colors = [primaryColor];
