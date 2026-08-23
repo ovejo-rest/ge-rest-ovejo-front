@@ -1,0 +1,42 @@
+@let isLoading = $loading();
+
+<app-card>
+  @if (isLoading) {
+  <div class="flex items-center gap-4">
+    <app-skeleton size="lg" class="!h-12 !w-12 !rounded-full" />
+    <div class="flex flex-1 flex-col gap-2">
+      <app-skeleton size="sm" class="!h-4 !w-20" />
+      <app-skeleton size="md" class="!h-6 !w-28" />
+    </div>
+  </div>
+  } @else {
+  <div class="flex items-center gap-4">
+    <div class="bg-primary/10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full">
+      <app-icon class="text-primary h-6 w-6">{{ $icon() }}</app-icon>
+    </div>
+    <div class="min-w-0 flex-1">
+      <p class="text-muted-foreground truncate text-sm">{{ $title() }}</p>
+      <div class="flex items-baseline gap-2">
+        <span class="text-foreground text-2xl font-bold">
+          @switch ($format()) { @case ('currency') {
+          {{ $value() | currency: $currency() : 'symbol-narrow' : '1.0-0' : $locale() }}
+          } @case ('percentage') {
+          {{ $value() | percent: '1.1-1' : $locale() }}
+          } @default {
+          {{ $value() | number: '1.0-0' : $locale() }}
+          } }
+        </span>
+        @if ($trend() !== undefined) {
+        <span
+          class="inline-flex items-center text-xs font-medium"
+          [class.text-green-600]="$trend()! >= 0"
+          [class.text-red-600]="$trend()! < 0">
+          <app-icon class="h-3 w-3">{{ $trend()! >= 0 ? 'trending_up' : 'trending_down' }}</app-icon>
+          {{ $trend()! >= 0 ? '+' : '' }}{{ $trend() }}%
+        </span>
+        }
+      </div>
+    </div>
+  </div>
+  }
+</app-card>

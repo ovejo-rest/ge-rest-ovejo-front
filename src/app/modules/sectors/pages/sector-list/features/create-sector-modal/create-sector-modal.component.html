@@ -1,0 +1,21 @@
+@let isLoading = $isLoading();
+<app-modal-card>
+  <ng-template app-slot="header"><h1 class="text-primary dark:text-foreground">Nuevo sector</h1></ng-template>
+  <button mat-icon-button class="close-button" (click)="dialogRef.close()"><app-icon class="text-primary">close</app-icon></button>
+  <form [formGroup]="form">
+    <div class="grid grid-cols-3 gap-4 p-2">
+      <div class="w-full pt-1 text-end"><h3 class="text-foreground">Nombre</h3></div>
+      <div class="col-span-2"><input type="text" id="name" formControlName="name" /></div>
+      <div class="w-full pt-1 text-end"><h3 class="text-foreground">Descripción</h3></div>
+      <div class="col-span-2"><input type="text" id="description" formControlName="description" /></div>
+      <div class="w-full pt-1 text-end"><h3 class="text-foreground">Color</h3></div>
+      <div class="col-span-2 flex items-center gap-2"><input type="color" id="color" formControlName="color" class="h-9 w-14 cursor-pointer rounded border p-0" /></div>
+    </div>
+  </form>
+  <ng-template app-slot="footer">
+    <div class="grid grid-cols-2 gap-2">
+      <app-button full impact="light" (buttonClick)="dialogRef.close()">Cancelar</app-button>
+      <app-button full impact="bold" [disabled]="form.invalid" (buttonClick)="submitForm()" [isLoading]="isLoading">Crear</app-button>
+    </div>
+  </ng-template>
+</app-modal-card>

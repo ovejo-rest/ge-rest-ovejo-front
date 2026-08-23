@@ -1,4 +1,4 @@
-import { NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
@@ -9,7 +9,7 @@ import { IconComponent } from 'src/ui';
   selector: 'div[navbar-submenu]',
   templateUrl: './navbar-submenu.component.html',
   styleUrls: ['./navbar-submenu.component.css'],
-  imports: [NgFor, NgTemplateOutlet, RouterLinkActive, RouterLink, NgIf, AngularSvgIconModule, IconComponent],
+  imports: [NgTemplateOutlet, RouterLinkActive, RouterLink, AngularSvgIconModule, IconComponent],
 })
 export class NavbarSubmenuComponent implements OnInit {
   @Input() public submenu = <SubMenuItem[]>{};

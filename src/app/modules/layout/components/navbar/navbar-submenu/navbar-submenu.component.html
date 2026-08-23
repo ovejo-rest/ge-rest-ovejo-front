@@ -1,5 +1,6 @@
 <ul #submenuRef class="glass-overlay mt-2 space-y-0.5 rounded-md py-3">
-  <li class="flex font-semibold" *ngFor="let item of submenu">
+  @for (item of submenu; track item) {
+  <li class="flex font-semibold">
     <!-- Condition -->
     <ng-container
       [ngTemplateOutlet]="item.children ? childMenu : parentMenu"
@@ -14,11 +15,13 @@
         [routerLinkActiveOptions]="{ exact: true }"
           class="text-muted-foreground glass-row mx-3 flex w-full items-center justify-between rounded-md py-2 px-2 text-xs font-semibold">
         <div class="flex items-center justify-start">
-          <span class="text-muted-foreground/50 ltr:mr-2 rtl:ml-2" *ngIf="item.icon">
+          @if (item.icon) {
+          <span class="text-muted-foreground/50 ltr:mr-2 rtl:ml-2">
             <app-icon class="h-5 w-5">
               {{ item.icon}}
             </app-icon>
           </span>
+          }
           <span class="ml-1">{{ item.label }}</span>
         </div>
       </button>
@@ -30,11 +33,13 @@
         <button
         class="text-muted-foreground glass-row mx-3 flex w-full items-center justify-between rounded-md py-2 px-2 text-xs font-semibold">
           <div class="flex items-center justify-start">
-            <span class="text-muted-foreground/50 ltr:mr-2 rtl:ml-2" *ngIf="item.icon">
+            @if (item.icon) {
+            <span class="text-muted-foreground/50 ltr:mr-2 rtl:ml-2">
               <app-icon class="h-5 w-5">
                 {{ item.icon}}
               </app-icon>
             </span>
+            }
             <span class="ml-1">{{ item.label }}</span>
           </div>
           <span class="rtl:rotate-180">
@@ -51,4 +56,5 @@
       </div>
     </ng-template>
   </li>
+  }
 </ul>
