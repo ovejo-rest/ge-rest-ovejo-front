@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, input, Output, signal } from '@angular/core';
+import { Component, EventEmitter, inject, input, Output, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   ButtonComponent,
   IconComponent,
@@ -28,6 +28,7 @@ import { CheckPermissionDirective } from 'src/app/shared/directives';
     BadgeComponent,
     CheckPermissionDirective,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './roles-user-table.component.html',
 })
 export class RolesUserTableComponent {

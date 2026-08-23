@@ -1,8 +1,9 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-toggle',
   imports: [],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './toggle.component.html',
 })
 export class ToggleComponent {

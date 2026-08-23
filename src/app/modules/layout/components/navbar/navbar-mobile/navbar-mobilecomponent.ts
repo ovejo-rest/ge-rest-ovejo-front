@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MenuService } from '../../../services/menu.service';
 import { NavbarMobileMenuComponent } from './navbar-mobile-menu/navbar-mobile-menu.component';
 import { AngularSvgIconModule } from 'angular-svg-icon';
@@ -9,6 +9,7 @@ import { IconComponent } from 'src/ui';
   selector: 'app-navbar-mobile',
   templateUrl: './navbar-mobile.component.html',
   styleUrls: ['./navbar-mobile.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [NgClass, AngularSvgIconModule, NavbarMobileMenuComponent, IconComponent],
 })
 export class NavbarMobileComponent {

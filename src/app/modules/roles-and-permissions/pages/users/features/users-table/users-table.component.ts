@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, EventEmitter, inject, input, Output, signal } from '@angular/core';
+import { Component, EventEmitter, inject, input, Output, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   ButtonComponent,
   IconComponent,
@@ -30,6 +30,7 @@ import { CheckPermissionDirective } from 'src/app/shared/directives';
     FiltersTableUserComponent,
     CheckPermissionDirective,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './users-table.component.html',
 })
 export class UsersTableComponent {

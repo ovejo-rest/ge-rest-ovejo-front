@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ButtonComponent, IconComponent, SlotDirective, ToggleComponent } from 'src/ui';
 import { CardComponent } from 'src/ui/templates/single-card';
 import { MatDialog } from '@angular/material/dialog';
@@ -21,6 +21,7 @@ import { CheckPermissionDirective } from 'src/app/shared/directives';
     CheckPermissionDirective,
   ],
   templateUrl: './permissions-list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   animations: [
     trigger('expandCollapse', [
       transition(':enter', [

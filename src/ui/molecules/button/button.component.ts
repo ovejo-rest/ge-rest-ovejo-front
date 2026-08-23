@@ -8,6 +8,7 @@ import {
   booleanAttribute,
   computed,
   input,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { cx } from 'src/app/shared/utils/ckassnames';
 import { IconComponent } from 'src/ui/atoms';
@@ -24,6 +25,7 @@ type ButtonProps = {
 @Component({
   selector: 'app-button',
   imports: [CommonModule, IconComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './button.component.html',
 })
 export class ButtonComponent {

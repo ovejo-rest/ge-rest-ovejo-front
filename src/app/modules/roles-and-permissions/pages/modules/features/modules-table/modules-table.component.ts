@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { GetAllModulesDto } from 'src/app/modules/roles-and-permissions/pages/modules/data-access';
 import {
   ButtonComponent,
@@ -29,6 +29,7 @@ import { CheckPermissionDirective } from 'src/app/shared/directives';
     CheckPermissionDirective,
   ],
   templateUrl: './modules-table.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './modules-table.component.css',
 })
 export class ModulesTableComponent {

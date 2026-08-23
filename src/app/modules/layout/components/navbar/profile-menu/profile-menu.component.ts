@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { NgClass } from '@angular/common';
-import { Component, computed, OnInit } from '@angular/core';
+import { Component, computed, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
@@ -16,6 +16,7 @@ import { AvatarService } from 'src/app/core/services/avatar.service';
   templateUrl: './profile-menu.component.html',
   styleUrls: ['./profile-menu.component.css'],
   imports: [CdkConnectedOverlay, CdkOverlayOrigin, NgClass, RouterLink, AngularSvgIconModule, IconComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   animations: [
     trigger('openClose', [
       transition(':enter', [

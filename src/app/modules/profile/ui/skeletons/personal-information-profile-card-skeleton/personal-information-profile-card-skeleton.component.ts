@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CardComponent, SlotDirective } from 'src/ui';
 
 @Component({
   selector: 'app-personal-information-profile-card-skeleton',
   imports: [CardComponent, SlotDirective],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `<app-card>
     <ng-template app-slot="header">
       <div class="bg-muted w-65 mt-2 mb-2 h-7 animate-pulse rounded"></div>

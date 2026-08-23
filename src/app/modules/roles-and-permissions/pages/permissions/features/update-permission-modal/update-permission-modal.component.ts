@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { GetAllPermissionsDto, GetAllPermissionsService, UpdatePermissionService } from '../../data-access';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
@@ -7,6 +7,7 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 @Component({
   selector: 'app-update-permission-modal',
   imports: [IconComponent, ModalCardComponent, ButtonComponent, FormsModule, ReactiveFormsModule, SlotDirective],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './update-permission-modal.component.html',
 })
 export class UpdatePermissionModalComponent {

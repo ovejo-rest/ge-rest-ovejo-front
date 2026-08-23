@@ -5,7 +5,7 @@ import { AppComponent } from './app/app.component';
 import { AppRoutingModule } from './app/app-routing.module';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { AuthInterceptor } from './app/core/interceptor';
 
 if (environment.production) {
@@ -21,7 +21,7 @@ bootstrapApplication(AppComponent, {
     provideZoneChangeDetection(),
     importProvidersFrom(BrowserModule, AppRoutingModule),
     provideAnimations(),
-    provideHttpClient(withInterceptors([AuthInterceptor])),
+    provideHttpClient(withXhr(), withInterceptors([AuthInterceptor])),
   ],
 }).catch((err) => console.error(err));
 

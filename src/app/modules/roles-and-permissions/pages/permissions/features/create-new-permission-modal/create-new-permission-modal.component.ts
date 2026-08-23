@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnDestroy } from '@angular/core';
+import { Component, effect, inject, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import {
@@ -23,6 +23,7 @@ import { GetAllModulesService } from '../../../modules/data-access';
     ModalCardComponent,
     CaseTransformDirective,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './create-new-permission-modal.component.html',
 })
 export class CreateNewPermissionModalComponent implements OnDestroy {

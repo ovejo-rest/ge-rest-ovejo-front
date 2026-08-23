@@ -1,10 +1,11 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { FilterTableDto } from './dtos';
 
 @Component({
   selector: 'app-filters-table',
   imports: [],
   templateUrl: './filters-table.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './filters-table.component.css',
 })
 export class FiltersTableComponent {

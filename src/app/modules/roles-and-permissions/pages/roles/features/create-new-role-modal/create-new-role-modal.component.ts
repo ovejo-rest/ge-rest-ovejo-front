@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnDestroy } from '@angular/core';
+import { Component, effect, inject, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import {
@@ -22,6 +22,7 @@ import { CreateRoleService, GetAllRolesService } from '../../data-access';
     ModalCardComponent,
     CaseTransformDirective,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './create-new-role-modal.component.html',
 })
 export class CreateNewRoleModalComponent implements OnDestroy {

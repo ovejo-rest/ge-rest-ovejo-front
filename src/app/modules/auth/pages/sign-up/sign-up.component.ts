@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
@@ -10,6 +10,7 @@ import { SignUpTermsAndConditionsComponent } from 'src/ui/organisms/terms-and-co
 @Component({
   selector: 'app-sign-up',
   templateUrl: './sign-up.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     FormsModule,
     NgClass,
