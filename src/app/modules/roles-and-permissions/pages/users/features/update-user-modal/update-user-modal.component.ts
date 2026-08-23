@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, effect, inject, OnDestroy } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -7,15 +6,7 @@ import { UpdateUserService, GetAllUsersService, UserDto } from '../../data-acces
 
 @Component({
   selector: 'app-update-user-modal',
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    ButtonComponent,
-    IconComponent,
-    ModalCardComponent,
-    SlotDirective,
-  ],
+  imports: [FormsModule, ReactiveFormsModule, ButtonComponent, IconComponent, ModalCardComponent, SlotDirective],
   templateUrl: './update-user-modal.component.html',
 })
 export class UpdateUserModalComponent implements OnDestroy {

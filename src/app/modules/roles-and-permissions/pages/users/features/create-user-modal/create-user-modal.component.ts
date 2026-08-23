@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, effect, inject, OnDestroy } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
@@ -13,7 +12,6 @@ import { GetAllRolesService } from '../../../roles/data-access';
 @Component({
   selector: 'app-create-user-modal',
   imports: [
-    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     MatSelectModule,
