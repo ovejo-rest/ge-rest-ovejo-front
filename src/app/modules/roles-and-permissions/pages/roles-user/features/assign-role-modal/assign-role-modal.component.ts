@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, effect, inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -13,7 +12,6 @@ import { AssignRoleToUserService, UserRoleItemDto, GetAllUsersWithRolesService }
 @Component({
   selector: 'app-assign-role-modal',
   imports: [
-    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     MatSelectModule,

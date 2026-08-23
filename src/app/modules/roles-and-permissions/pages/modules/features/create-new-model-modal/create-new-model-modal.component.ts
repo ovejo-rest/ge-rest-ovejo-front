@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, effect, inject, OnDestroy } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
@@ -15,7 +14,6 @@ import {
     FormsModule,
     IconComponent,
     ReactiveFormsModule,
-    CommonModule,
     ButtonComponent,
     SlotDirective,
     ModalCardComponent,

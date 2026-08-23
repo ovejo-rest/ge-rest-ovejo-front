@@ -1,10 +1,9 @@
 import { Component, input, output } from '@angular/core';
 import { FilterTableDto } from './dtos';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-filters-table',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './filters-table.component.html',
   styleUrl: './filters-table.component.css',
 })
