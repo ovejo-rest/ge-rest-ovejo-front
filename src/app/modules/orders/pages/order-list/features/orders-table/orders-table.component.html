@@ -1,0 +1,34 @@
+<app-table>
+  <ng-template app-slot="filters">
+    <app-filters-order-table (searchTableChange)="onSearchTable($event)" (statusChange)="onStatusFilter($event)" />
+  </ng-template>
+  <ng-template app-slot="head">
+    <tr>@for (h of headerData; track $index) { <th class="h-8 text-center" [class.w-32]="$index===0" [class.w-24]="$index!==0">{{ h }}</th> }<th class="w-[90px]"></th></tr>
+  </ng-template>
+  @if (!isLoading()) {
+  @for (o of $orders(); track o.id) {
+  <tr class="glass-row h-10 cursor-pointer" (click)="viewDetail(o)">
+    <td class="text-center font-medium">#{{ o.id }}</td>
+    <td class="text-muted-foreground text-center">{{ o.tableName }}</td>
+    <td class="text-center">{{ o.itemCount }}</td>
+    <td class="text-center font-semibold">{{ o.total | currency:'CLP':'symbol-narrow':'1.0-0':'es-CL' }}</td>
+    <td class="text-center"><span class="inline-block rounded-full px-2 py-0.5 text-xs font-medium" [ngClass]="statusClasses(o.status)">{{ statusLabel(o.status) }}</span></td>
+    <td class="text-muted-foreground text-center text-xs">{{ o.createdAt | date:'shortTime' }}</td>
+    <td class="w-[90px] text-center">
+      <div class="flex items-center justify-center gap-1" (click)="$event.stopPropagation()">
+        <app-button size="small" icon="swap_horiz" tone="info" (click)="changeStatus(o)" />
+      </div>
+    </td>
+  </tr>
+  } @empty {
+  <tr><td class="py-4 text-center text-sm" colspan="8">No hay pedidos</td></tr>
+  } } @if (isLoading()) {
+  <tr><td colspan="8" class="px-2 py-4"><app-progress-bar /></td></tr>
+  }
+  <ng-template app-slot="footer">
+    <div class="glass-footer -mx-5 -mb-3 flex flex-wrap items-center justify-between gap-2 px-5 py-3">
+      <div class="flex items-center gap-2">Mostrar<select class="glass-input w-16 rounded-md p-2" [value]="perPage()" (change)="onPerPageChange($event)"><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="50">50</option></select>por página</div>
+      <app-pagination-table [pagination]="$pagination()" (pageChange)="onChangePage($event)" />
+    </div>
+  </ng-template>
+</app-table>

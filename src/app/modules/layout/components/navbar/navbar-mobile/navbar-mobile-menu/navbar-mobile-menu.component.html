@@ -1,4 +1,5 @@
-<div class="pt-4" *ngFor="let menu of menuService.pagesMenu">
+@for (menu of menuService.pagesMenu; track menu) {
+<div class="pt-4">
   <div class="mx-1 mb-2 flex items-center justify-between">
     <small class="text-muted-foreground/50 text-xs font-semibold">
       {{ menu.group }}
@@ -6,7 +7,8 @@
   </div>
   <ul class="flex flex-col">
     <!-- List items -->
-    <li *ngFor="let item of menu.items">
+    @for (item of menu.items; track item) {
+    <li>
       <!-- Menu List -->
       <div
         (click)="toggleMenu(item)"
@@ -48,8 +50,8 @@
         </ng-template>
 
         <!-- Arrow Icon -->
+        @if (item.children) {
         <button
-          *ngIf="item.children"
           [ngClass]="{ hidden: !menuService.showSideBar }"
           class="text-foreground/50 flex cursor-pointer items-center justify-end p-0 transition-all duration-500 ltr:right-0 rtl:left-0">
           @if(!item.expanded){
@@ -58,10 +60,13 @@
           <app-icon> remove </app-icon>
           }
         </button>
+        }
       </div>
 
       <!-- Submenu items -->
       <app-navbar-mobile-submenu [submenu]="item"></app-navbar-mobile-submenu>
     </li>
+    }
   </ul>
 </div>
+}
