@@ -1,7 +1,6 @@
-import { RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { ProfileComponent } from './profile.component';
 import { authGuard } from 'src/app/core';
-import { NgModule } from '@angular/core';
 
 const routes: Routes = [
   {
@@ -12,8 +11,4 @@ const routes: Routes = [
   },
 ];
 
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule],
-})
-export class ProfileRoutingModule {}
+export default routes;
