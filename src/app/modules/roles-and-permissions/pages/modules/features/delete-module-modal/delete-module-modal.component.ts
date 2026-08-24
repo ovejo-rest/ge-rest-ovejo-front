@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnDestroy } from '@angular/core';
+import { Component, effect, inject, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
 import { DeleteModuleService, GetAllModulesService, ModuleDto } from '../../data-access';
@@ -7,6 +7,7 @@ import { DeleteModuleService, GetAllModulesService, ModuleDto } from '../../data
   selector: 'app-delete-module-modal',
   imports: [ModalCardComponent, IconComponent, SlotDirective, ButtonComponent],
   templateUrl: './delete-module-modal.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './delete-module-modal.component.css',
 })
 export class DeleteModuleModalComponent implements OnDestroy {

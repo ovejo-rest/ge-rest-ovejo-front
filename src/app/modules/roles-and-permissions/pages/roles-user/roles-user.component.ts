@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ButtonComponent, HeaderDashboardComponent, IconComponent } from 'src/ui';
 import { GetAllUsersWithRolesService } from './data-access';
 import { RolesUserTableComponent } from './features';
@@ -13,6 +13,7 @@ import { CheckPermissionDirective } from 'src/app/shared/directives';
     RolesUserTableComponent,
     CheckPermissionDirective,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './roles-user.component.html',
 })
 export class RolesUserComponent {

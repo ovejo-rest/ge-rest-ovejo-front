@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, OnInit } from '@angular/core';
+import { Component, effect, inject, input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { GetProfileDto } from '../../data-access';
 import { CardComponent, SlotDirective, ButtonComponent } from 'src/ui';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -9,6 +9,7 @@ import { UpdateContactModalComponent } from '../../features';
   selector: 'app-contact-profile-card',
   imports: [CardComponent, SlotDirective, ButtonComponent, ButtonComponent, FormsModule, ReactiveFormsModule],
   templateUrl: './contact-profile-card.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './contact-profile-card.component.css',
 })
 export class ContactProfileCardComponent implements OnInit {

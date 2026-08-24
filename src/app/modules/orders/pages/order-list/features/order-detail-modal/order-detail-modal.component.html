@@ -1,0 +1,47 @@
+<app-modal-card>
+  <ng-template app-slot="header">
+    <div class="flex items-center gap-3">
+      <h1 class="text-primary dark:text-foreground">Pedido #{{ data.id }}</h1>
+      <span class="rounded-full px-2.5 py-0.5 text-xs font-medium" [class]="statusClasses(data.status)">{{ statusLabel(data.status) }}</span>
+    </div>
+  </ng-template>
+  <button mat-icon-button class="close-button" (click)="dialogRef.close()"><app-icon class="text-primary">close</app-icon></button>
+
+  <div class="space-y-4 p-2">
+    <div class="grid grid-cols-3 gap-2 text-sm">
+      <div><span class="text-muted-foreground">Mesa:</span> <span class="text-foreground font-medium">{{ data.tableName }}</span></div>
+      <div><span class="text-muted-foreground">Sector:</span> <span class="text-foreground">{{ data.sectorName }}</span></div>
+      <div><span class="text-muted-foreground">Fecha:</span> <span class="text-foreground">{{ data.createdAt | date:'short' }}</span></div>
+    </div>
+
+    @if (data.notes) {
+    <div class="bg-muted/20 rounded-lg p-3 text-sm">
+      <span class="text-muted-foreground">Notas:</span> <span class="text-foreground">{{ data.notes }}</span>
+    </div>
+    }
+
+    <div>
+      <h3 class="text-foreground mb-2 text-sm font-semibold">Items</h3>
+      <div class="divide-muted/20 divide-y">
+        @for (item of data.items; track item.id) {
+        <div class="flex items-center justify-between py-2">
+          <div>
+            <span class="text-foreground text-sm">{{ item.quantity }}x {{ item.productName }}</span>
+            @if (item.notes) { <p class="text-muted-foreground text-xs">{{ item.notes }}</p> }
+          </div>
+          <span class="text-foreground text-sm font-medium">{{ item.unitPrice * item.quantity | currency:'CLP':'symbol-narrow':'1.0-0':'es-CL' }}</span>
+        </div>
+        }
+      </div>
+    </div>
+
+    <div class="border-muted/20 flex justify-between border-t pt-3">
+      <span class="text-foreground font-semibold">Total</span>
+      <span class="text-foreground text-lg font-bold">{{ data.total | currency:'CLP':'symbol-narrow':'1.0-0':'es-CL' }}</span>
+    </div>
+  </div>
+
+  <ng-template app-slot="footer">
+    <app-button full impact="light" (buttonClick)="dialogRef.close()">Cerrar</app-button>
+  </ng-template>
+</app-modal-card>

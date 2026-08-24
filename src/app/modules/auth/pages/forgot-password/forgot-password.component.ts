@@ -1,4 +1,4 @@
-import { Component, Inject, inject } from '@angular/core';
+import { Component, Inject, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AlertComponent, ButtonComponent, ToastService } from 'src/ui';
@@ -10,6 +10,7 @@ import { ForgotPasswordService } from '../data-access';
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [FormsModule, RouterLink, ButtonComponent, ReactiveFormsModule, AlertComponent],
 })
 export class ForgotPasswordComponent {

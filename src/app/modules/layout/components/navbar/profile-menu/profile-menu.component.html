@@ -8,7 +8,11 @@
     <span class="sr-only">Open user menu</span>
     <img
       class="size-9 rounded-4xl shrink-0"
-      [src]="avatarService.getAvatarUrl(userData?.name + ' ' + userData?.fatherLastName)"
+      [src]="
+        avatarService.getAvatarUrl(
+          $safeNavigationMigration(userData?.name) + ' ' + $safeNavigationMigration(userData?.fatherLastName)
+        )
+      "
       alt="" />
   </button>
 
@@ -25,7 +29,11 @@
         <div class="w-10 shrink-0">
           <img
             class="rounded-4xl"
-            [src]="avatarService.getAvatarUrl(userData?.name + ' ' + userData?.fatherLastName)"
+            [src]="
+              avatarService.getAvatarUrl(
+                $safeNavigationMigration(userData?.name) + ' ' + $safeNavigationMigration(userData?.fatherLastName)
+              )
+            "
             alt="" />
         </div>
         <div class="text-foreground overflow-hidden px-2 text-sm font-semibold">

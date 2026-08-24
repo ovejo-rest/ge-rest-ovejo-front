@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common';
-import { Component, effect, inject, OnDestroy } from '@angular/core';
+import { Component, effect, inject, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { CaseTransformDirective } from 'src/ui';
@@ -15,13 +14,13 @@ import {
     FormsModule,
     IconComponent,
     ReactiveFormsModule,
-    CommonModule,
     ButtonComponent,
     SlotDirective,
     ModalCardComponent,
     CaseTransformDirective,
   ],
   templateUrl: './create-new-model-modal.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './create-new-model-modal.component.css',
 })
 export class CreateNewModelModalComponent implements OnDestroy {

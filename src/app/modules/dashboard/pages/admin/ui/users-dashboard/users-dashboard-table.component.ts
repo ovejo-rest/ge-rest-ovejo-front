@@ -1,29 +1,28 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Nft } from 'src/app/modules/dashboard/models/nft';
-import { ButtonComponent, ExpressTableComponent, HeaderDashboardComponent,  } from 'src/ui';
+import { ButtonComponent, ExpressTableComponent, HeaderDashboardComponent } from 'src/ui';
 import { SlotDirective } from 'src/ui/utils';
 export type HeaderActionsType = {
   item: string;
-}
+};
 
 @Component({
   selector: 'app-users-dashboard-table',
-  imports: [ExpressTableComponent, SlotDirective,HeaderDashboardComponent, ButtonComponent, ButtonComponent],
+  imports: [ExpressTableComponent, SlotDirective, HeaderDashboardComponent, ButtonComponent, ButtonComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './users-dashboard-table.component.html',
 })
 export class UsersDashboardTableComponent {
-
   public activeAuction: Nft[] = [];
 
   readonly $headerActions: HeaderActionsType[] = [
-    {item:'Item'},
-    {item:'Open Price'},
-    {item:'Price $'},
-    {item:'Recent Offer'},
-    {item:'Time Left'},
-    {item:'Acción'},
+    { item: 'Item' },
+    { item: 'Open Price' },
+    { item: 'Price $' },
+    { item: 'Recent Offer' },
+    { item: 'Time Left' },
+    { item: 'Acción' },
   ];
-
 
   constructor() {
     this.activeAuction = [
@@ -88,6 +87,5 @@ export class UsersDashboardTableComponent {
         instant_price: 0.35,
       },
     ];
-
   }
 }

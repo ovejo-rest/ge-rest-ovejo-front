@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MenuItem } from 'src/app/core/models/menu.model';
 import { MenuService } from '../../../services/menu.service';
 import { NavbarSubmenuComponent } from '../navbar-submenu/navbar-submenu.component';
@@ -8,6 +8,7 @@ import { NgClass } from '@angular/common';
   selector: 'app-navbar-menu',
   templateUrl: './navbar-menu.component.html',
   styleUrls: ['./navbar-menu.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [NavbarSubmenuComponent, NgClass],
 })
 export class NavbarMenuComponent implements OnInit {

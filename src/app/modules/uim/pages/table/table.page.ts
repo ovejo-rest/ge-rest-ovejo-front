@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { toast } from 'ngx-sonner';
 import { AvatarService } from 'src/app/core/services/avatar.service';
@@ -15,6 +15,7 @@ import { User } from '../../../uikit/pages/table/model/user.model';
   selector: 'app-table-page',
   imports: [FormsModule, BadgeComponent, TableComponent, PaginationTableComponent, SlotDirective],
   templateUrl: './table.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './table.page.css',
 })
 export class TablePage implements OnInit {
@@ -80,10 +81,7 @@ export class TablePage implements OnInit {
     };
   });
 
-  constructor(
-    private readonly http: HttpClient,
-    protected readonly avatarService: AvatarService,
-  ) {
+  constructor(private readonly http: HttpClient, protected readonly avatarService: AvatarService) {
     this.http.get<User[]>('https://freetestapi.com/api/v1/users?limit=8').subscribe({
       next: (data) => this.allUsers.set(data),
       error: (error) => {

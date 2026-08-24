@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ButtonComponent, HeaderDashboardComponent, IconComponent, CaseTransformDirective } from 'src/ui';
 import { GetAllUsersService } from './data-access';
 import { CreateUserModalComponent, UsersTableComponent } from './features';
@@ -8,6 +8,7 @@ import { CheckPermissionDirective } from 'src/app/shared/directives';
 @Component({
   selector: 'app-users',
   imports: [HeaderDashboardComponent, ButtonComponent, IconComponent, UsersTableComponent, CheckPermissionDirective],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './users.component.html',
 })
 export class UsersComponent {

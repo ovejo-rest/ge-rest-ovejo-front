@@ -1,14 +1,15 @@
-import { Component, OnDestroy, OnInit, effect } from '@angular/core';
+import { Component, OnDestroy, OnInit, effect, ChangeDetectionStrategy } from '@angular/core';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { ThemeService } from 'src/app/core/services/theme.service';
 import { ChartOptions } from '../../../../../shared/models/chart-options';
 import { BadgeComponent } from 'src/ui';
-import { IconComponent } from "../../../../../../ui/atoms/icon/icon.component";
+import { IconComponent } from '../../../../../../ui/atoms/icon/icon.component';
 
 @Component({
   selector: '[nft-chart-card]',
   templateUrl: './nft-chart-card.component.html',
-  imports: [ NgApexchartsModule, BadgeComponent, IconComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [NgApexchartsModule, BadgeComponent, IconComponent],
 })
 export class NftChartCardComponent implements OnInit, OnDestroy {
   public chartOptions: Partial<ChartOptions>;

@@ -1,0 +1,64 @@
+<app-card>
+  <ng-template app-slot="header">
+    <div class="flex items-center justify-between">
+      <h2 class="text-foreground text-xl font-bold">{{ business().name }}</h2>
+      <app-toggle [checked]="business().isActive" (changed)="onToggleChange($event)" />
+    </div>
+  </ng-template>
+
+  <div class="grid grid-cols-2 gap-4 p-4">
+    <div>
+      <p class="text-muted-foreground text-sm">Zona horaria</p>
+      <p class="text-foreground">{{ business().timeZone }}</p>
+    </div>
+    <div>
+      <p class="text-muted-foreground text-sm">Moneda</p>
+      <p class="text-foreground">ID: {{ business().currencyId }}</p>
+    </div>
+    <div>
+      <p class="text-muted-foreground text-sm">Formato de fecha</p>
+      <p class="text-foreground">{{ business().dateFormat }}</p>
+    </div>
+    <div>
+      <p class="text-muted-foreground text-sm">Formato de hora</p>
+      <p class="text-foreground">{{ business().timeFormat }}</p>
+    </div>
+    <div>
+      <p class="text-muted-foreground text-sm">Estado</p>
+      <p class="text-foreground">{{ business().isActive ? 'Activo' : 'Inactivo' }}</p>
+    </div>
+    @if (business().startDate) {
+    <div>
+      <p class="text-muted-foreground text-sm">Fecha de inicio</p>
+      <p class="text-foreground">{{ business().startDate | date : 'shortDate' }}</p>
+    </div>
+    }
+    <div>
+      <p class="text-muted-foreground text-sm">Creado</p>
+      <p class="text-foreground">{{ business().createdAt | date : 'shortDate' }}</p>
+    </div>
+    <div>
+      <p class="text-muted-foreground text-sm">Actualizado</p>
+      <p class="text-foreground">{{ business().updatedAt | date : 'shortDate' }}</p>
+    </div>
+  </div>
+
+  <ng-template app-slot="footer">
+    <div class="flex justify-evenly gap-2 xl:justify-end">
+      <app-button
+        full
+        impact="bold"
+        tone="primary"
+        [disabled]="business().isActive && !!business().startDate"
+        (buttonClick)="openSetupModal()">
+        <app-icon class="h-6 w-6">settings</app-icon>
+        Configurar
+      </app-button>
+
+      <app-button full impact="bold" tone="primary" (buttonClick)="navigateToLocations()">
+        <app-icon class="h-6 w-6">location_on</app-icon>
+        Ver Sucursales
+      </app-button>
+    </div>
+  </ng-template>
+</app-card>

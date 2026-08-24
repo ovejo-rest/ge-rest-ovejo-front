@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DeletePermissionService, GetAllPermissionsService, PermissionDto } from '../../data-access';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
@@ -6,6 +6,7 @@ import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, Toas
 @Component({
   selector: 'app-delete-permission-modal',
   imports: [IconComponent, SlotDirective, ButtonComponent, ModalCardComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './delete-permission-modal.component.html',
 })
 export class DeletePermissionModalComponent {

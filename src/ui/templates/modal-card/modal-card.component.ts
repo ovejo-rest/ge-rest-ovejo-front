@@ -1,11 +1,6 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { ViewEncapsulation } from '@angular/core';
-import {
-  booleanAttribute,
-  Component,
-  contentChildren,
-  input,
-} from '@angular/core';
+import { ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { booleanAttribute, Component, contentChildren, input } from '@angular/core';
 import { DividerComponent } from 'src/ui/atoms';
 import { SLOT, SlotAsRecordPipe } from 'src/ui/utils';
 
@@ -14,6 +9,7 @@ import { SLOT, SlotAsRecordPipe } from 'src/ui/utils';
   imports: [SlotAsRecordPipe, NgTemplateOutlet, DividerComponent],
   templateUrl: './modal-card.component.html',
   styleUrl: './modal-card.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
   encapsulation: ViewEncapsulation.None,
 })
 export class ModalCardComponent {
