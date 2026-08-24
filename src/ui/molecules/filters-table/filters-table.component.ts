@@ -1,11 +1,11 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { FilterTableDto } from './dtos';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-filters-table',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './filters-table.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './filters-table.component.css',
 })
 export class FiltersTableComponent {

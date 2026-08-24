@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { HttpErrorResponse, HttpStatusCode } from '@angular/common/module.d-CnjH8Dlt';
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, catchError, EMPTY, filter, map, Subject, switchMap, tap } from 'rxjs';

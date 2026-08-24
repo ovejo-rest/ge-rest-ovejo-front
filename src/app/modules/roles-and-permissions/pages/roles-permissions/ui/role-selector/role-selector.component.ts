@@ -1,8 +1,9 @@
-import { Component, inject, output } from '@angular/core';
+import { Component, inject, output, ChangeDetectionStrategy } from '@angular/core';
 import { GetAllRolesService } from '../../../roles/data-access';
 
 @Component({
   selector: 'app-role-selector',
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './role-selector.component.html',
 })
 export class RoleSelectorComponent {

@@ -1,16 +1,17 @@
-import { enableProdMode, importProvidersFrom } from '@angular/core';
+import { enableProdMode, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
 
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
-import { AppRoutingModule } from './app/app-routing.module';
-import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
+import { routes } from './app/app.routes';
+import { bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
 import { AuthInterceptor } from './app/core/interceptor';
+import { AngularSvgIconModule } from 'angular-svg-icon';
 
 if (environment.production) {
   enableProdMode();
-  //show this warning only on prod mode
   if (window) {
     selfXSSWarning();
   }
@@ -18,9 +19,11 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(BrowserModule, AppRoutingModule),
+    provideZoneChangeDetection(),
+    provideRouter(routes),
     provideAnimations(),
-    provideHttpClient(withInterceptors([AuthInterceptor])),
+    provideHttpClient(withXhr(), withInterceptors([AuthInterceptor])),
+    importProvidersFrom(AngularSvgIconModule.forRoot()),
   ],
 }).catch((err) => console.error(err));
 

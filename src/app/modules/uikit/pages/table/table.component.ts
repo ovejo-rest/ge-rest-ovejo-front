@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { toast } from 'ngx-sonner';
@@ -22,6 +22,7 @@ import { TableFilterService } from './services/table-filter.service';
     TableActionComponent,
   ],
   templateUrl: './table.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './table.component.css',
 })
 export class TableComponent implements OnInit {

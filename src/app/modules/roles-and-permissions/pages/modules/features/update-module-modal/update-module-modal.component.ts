@@ -1,8 +1,8 @@
-import { Component, effect, inject, OnDestroy } from '@angular/core';
+import { Component, effect, inject, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { GetAllModulesDto, GetAllModulesService, UpdateModuleService } from '../../data-access';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { CaseTransformDirective } from 'src/ui';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
@@ -11,7 +11,6 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    CommonModule,
     ButtonComponent,
     SlotDirective,
     ModalCardComponent,
@@ -19,6 +18,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
     IconComponent,
   ],
   templateUrl: './update-module-modal.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './update-module-modal.component.css',
 })
 export class UpdateModuleModalComponent implements OnDestroy {

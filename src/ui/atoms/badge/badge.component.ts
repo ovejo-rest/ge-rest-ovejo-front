@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { BadgeType } from './enums';
 
@@ -6,6 +6,7 @@ import { BadgeType } from './enums';
   selector: 'app-badge',
   imports: [NgClass],
   templateUrl: './badge.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './badge.component.css',
 })
 export class BadgeComponent {

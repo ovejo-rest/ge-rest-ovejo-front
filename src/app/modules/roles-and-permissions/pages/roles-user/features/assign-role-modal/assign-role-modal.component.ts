@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common';
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
@@ -13,7 +12,6 @@ import { AssignRoleToUserService, UserRoleItemDto, GetAllUsersWithRolesService }
 @Component({
   selector: 'app-assign-role-modal',
   imports: [
-    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     MatSelectModule,
@@ -25,6 +23,7 @@ import { AssignRoleToUserService, UserRoleItemDto, GetAllUsersWithRolesService }
     ModalCardComponent,
     SlotDirective,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './assign-role-modal.component.html',
 })
 export class AssignRoleModalComponent {

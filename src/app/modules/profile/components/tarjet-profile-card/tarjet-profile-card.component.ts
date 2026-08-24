@@ -1,4 +1,4 @@
-import { Component, Input, input } from '@angular/core';
+import { Component, Input, input, ChangeDetectionStrategy } from '@angular/core';
 import { ButtonComponent, CardComponent, SlotDirective, DividerComponent } from 'src/ui';
 import { GetProfileDto } from '../../data-access';
 
@@ -6,6 +6,7 @@ import { GetProfileDto } from '../../data-access';
   selector: 'app-tarjet-profile-card',
   imports: [CardComponent, SlotDirective, ButtonComponent, DividerComponent],
   templateUrl: './tarjet-profile-card.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tarjet-profile-card.component.css',
 })
 export class TarjetProfileCardComponent {

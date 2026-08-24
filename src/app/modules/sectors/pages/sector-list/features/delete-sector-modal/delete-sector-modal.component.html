@@ -1,0 +1,16 @@
+@let isLoading = $isLoading();
+<app-modal-card>
+  <ng-template app-slot="header"><h1 class="text-primary dark:text-foreground">Eliminar sector</h1></ng-template>
+  <button mat-icon-button class="close-button" (click)="dialogRef.close()"><app-icon class="text-primary">close</app-icon></button>
+  <div class="p-4 text-center">
+    <app-icon class="text-destructive mb-3 h-12 w-12">delete_forever</app-icon>
+    <p class="text-foreground text-sm">¿Estás seguro de eliminar <strong>{{ data.name }}</strong>?</p>
+    <p class="text-muted-foreground mt-1 text-xs">Esta acción no se puede deshacer.</p>
+  </div>
+  <ng-template app-slot="footer">
+    <div class="grid grid-cols-2 gap-2">
+      <app-button full impact="light" (buttonClick)="dialogRef.close()">Cancelar</app-button>
+      <app-button full impact="bold" tone="danger" (buttonClick)="confirm()" [isLoading]="isLoading">Eliminar</app-button>
+    </div>
+  </ng-template>
+</app-modal-card>

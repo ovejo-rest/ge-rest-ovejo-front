@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ButtonComponent, HeaderDashboardComponent, IconComponent } from 'src/ui';
 import { GetAllModulesService } from './data-access';
 import { ModulesTableComponent } from './features/modules-table/modules-table.component';
@@ -10,6 +10,7 @@ import { CheckPermissionDirective } from 'src/app/shared/directives';
   selector: 'app-modules',
   imports: [HeaderDashboardComponent, ButtonComponent, IconComponent, ModulesTableComponent, CheckPermissionDirective],
   templateUrl: './modules.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './modules.component.css',
 })
 export class ModulesComponent {

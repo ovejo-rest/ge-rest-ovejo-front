@@ -3,7 +3,8 @@
   [ngClass]="{ 'max-h-screen': submenu.expanded }">
   <ul
     class="border-border text-muted-foreground flex flex-col border-dashed ltr:border-l ltr:pl-2 rtl:border-r rtl:pr-2">
-    <li *ngFor="let sub of submenu.children">
+    @for (sub of submenu.children; track sub) {
+    <li>
       <div class="text-muted-foreground hover:text-primary relative flex rounded-sm" (click)="toggleMenu(sub)">
         <!-- Condition -->
         <ng-container
@@ -48,5 +49,6 @@
       <app-navbar-mobile-submenu [submenu]="sub"></app-navbar-mobile-submenu>
       }
     </li>
+    }
   </ul>
 </div>

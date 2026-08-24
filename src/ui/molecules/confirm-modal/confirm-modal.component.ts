@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { IconComponent } from '../../atoms/icon/icon.component';
 import { SlotDirective } from '../../utils/slot.directive';
@@ -16,6 +16,7 @@ export type ConfirmModalData = {
 @Component({
   selector: 'app-confirm-modal',
   imports: [ModalCardComponent, IconComponent, SlotDirective, ButtonComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './confirm-modal.component.html',
 })
 export class ConfirmModalComponent {

@@ -1,12 +1,12 @@
-import { NgFor } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Nft } from '../../../models/nft';
 import { NftAuctionsTableItemComponent } from '../nft-auctions-table-item/nft-auctions-table-item.component';
 
 @Component({
   selector: '[nft-auctions-table]',
   templateUrl: './nft-auctions-table.component.html',
-  imports: [NgFor, NftAuctionsTableItemComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [NftAuctionsTableItemComponent],
 })
 export class NftAuctionsTableComponent implements OnInit {
   public activeAuction: Nft[] = [];

@@ -1,10 +1,11 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { PaginationMeta } from 'src/app/core/standarized-response/standardized-pagination/pagination-meta.dto';
 import { IconComponent } from 'src/ui/atoms';
 
 @Component({
   selector: 'app-pagination-table',
   imports: [IconComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './pagination-table.component.html',
 })
 export class PaginationTableComponent {

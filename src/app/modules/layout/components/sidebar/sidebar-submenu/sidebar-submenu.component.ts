@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { SubMenuItem } from 'src/app/core/models/menu.model';
@@ -11,6 +11,7 @@ import { CheckPermissionDirective } from 'src/app/shared/directives';
   selector: 'app-sidebar-submenu',
   templateUrl: './sidebar-submenu.component.html',
   styleUrls: ['./sidebar-submenu.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [NgClass, RouterLinkActive, IconComponent, RouterLink, AngularSvgIconModule, CheckPermissionDirective],
 })
 export class SidebarSubmenuComponent implements OnInit {
