@@ -1,5 +1,6 @@
-export type CreateBusinessLocationDto = Readonly<{
-  name: string;
+export type UpdateBusinessLocationDto = Readonly<{
+  id: number;
+  name?: string;
   country?: string;
   state?: string;
   city?: string;
@@ -7,4 +8,5 @@ export type CreateBusinessLocationDto = Readonly<{
   address?: string;
   mobile?: string;
   email?: string;
+  website?: string;
 }>;

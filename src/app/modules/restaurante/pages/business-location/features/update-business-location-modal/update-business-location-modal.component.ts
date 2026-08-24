@@ -1,41 +1,42 @@
 import { Component, effect, inject, OnDestroy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
-import { CreateBusinessLocationService } from '../../data-access';
+import { BusinessLocationDto, UpdateBusinessLocationService } from '../../data-access';
 
 @Component({
-  selector: 'app-create-business-location-modal',
+  selector: 'app-update-business-location-modal',
   imports: [ReactiveFormsModule, ButtonComponent, IconComponent, SlotDirective, ModalCardComponent],
-  templateUrl: './create-business-location-modal.component.html',
-  styleUrl: './create-business-location-modal.component.css',
+  templateUrl: './update-business-location-modal.component.html',
 })
-export class CreateBusinessLocationModalComponent implements OnDestroy {
+export class UpdateBusinessLocationModalComponent implements OnDestroy {
   protected readonly dialogRef = inject(MatDialogRef);
-  protected readonly $service = inject(CreateBusinessLocationService);
+  protected readonly data = inject<BusinessLocationDto>(MAT_DIALOG_DATA);
+  protected readonly $service = inject(UpdateBusinessLocationService);
   private readonly $toast = inject(ToastService);
   protected readonly $isLoading = this.$service.$isLoading;
 
   private fb = inject(FormBuilder);
   form = this.fb.group({
-    name: ['', Validators.required],
-    country: ['Chile'],
-    state: [''],
-    city: [''],
-    zipCode: [''],
-    address: [''],
+    name: [this.data.name, Validators.required],
+    country: [this.data.country || ''],
+    state: [this.data.state || ''],
+    city: [this.data.city || ''],
+    zipCode: [this.data.zipCode || ''],
+    address: [this.data.landmark || ''],
     mobile: [''],
     email: ['', Validators.email],
+    website: [''],
   });
 
   constructor() {
     effect(() => {
       if (this.$service.$success()) {
-        this.$toast.show('Sucursal creada', 'success');
+        this.$toast.show('Sucursal actualizada', 'success');
         this.dialogRef.close({ success: true });
       }
       if (this.$service.$hasError()) {
-        this.$toast.show('Error al crear la sucursal', 'error');
+        this.$toast.show('Error al actualizar', 'error');
       }
     });
   }
@@ -45,9 +46,10 @@ export class CreateBusinessLocationModalComponent implements OnDestroy {
       this.form.markAllAsTouched();
       return;
     }
-    const { name, country, state, city, zipCode, address, mobile, email } = this.form.getRawValue();
-    this.$service.create({
-      name: name ?? '',
+    const { name, country, state, city, zipCode, address, mobile, email, website } = this.form.getRawValue();
+    this.$service.update({
+      id: this.data.id,
+      name: name || undefined,
       country: country || undefined,
       state: state || undefined,
       city: city || undefined,
@@ -55,6 +57,7 @@ export class CreateBusinessLocationModalComponent implements OnDestroy {
       address: address || undefined,
       mobile: mobile || undefined,
       email: email || undefined,
+      website: website || undefined,
     });
   }
 
