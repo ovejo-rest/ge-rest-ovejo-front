@@ -1,7 +1,6 @@
-import { RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { RestauranteComponent } from './restaurante.component';
 import { authGuard } from 'src/app/core';
-import { NgModule } from '@angular/core';
 import { BusinessComponent } from './pages';
 import { BusinessLocationComponent } from './pages/business-location/business-location.component';
 
@@ -26,8 +25,4 @@ const routes: Routes = [
   },
 ];
 
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule],
-})
-export class RestauranteRoutingModule {}
+export default routes;

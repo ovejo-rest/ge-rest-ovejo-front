@@ -13,6 +13,33 @@ export class Menu {
           children: [{ label: 'Admin', route: '/dashboard/admin' }],
         },
         {
+          icon: 'factory',
+          label: 'Negocio',
+          route: '/business',
+          children: [
+            { label: 'Restaurante', route: '/business' },
+            { label: 'Sucursales', route: '/business/location' },
+          ],
+        },
+        {
+          icon: 'chair',
+          label: 'Sectores',
+          route: '/sectors',
+          children: [{ label: 'Sectores', route: '/sectors' }],
+        },
+        {
+          icon: 'table_bar',
+          label: 'Mesas',
+          route: '/tables',
+          children: [{ label: 'Mesas', route: '/tables' }],
+        },
+        {
+          icon: 'receipt_long',
+          label: 'Pedidos',
+          route: '/orders',
+          children: [{ label: 'Pedidos', route: '/orders' }],
+        },
+        {
           icon: 'admin_panel_settings',
           label: 'Roles y permisos',
           route: '/roles-and-permissions',

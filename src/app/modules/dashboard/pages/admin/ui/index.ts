@@ -1,1 +1,1 @@
-export * from './users-dashboard';
+export * from './dashboard-skeleton';

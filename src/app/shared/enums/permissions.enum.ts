@@ -36,6 +36,13 @@ export const Permission = {
       SEE_MODULE: 'users:see-module',
       GET_ALL_USERS: 'users:get-all-users',
     },
+    SECTORS: {
+      SEE_MODULE: 'sectors:see-module',
+      GET_ALL: 'sectors:get-all',
+      CREATE: 'sectors:create',
+      UPDATE: 'sectors:update',
+      DELETE: 'sectors:delete',
+    },
   },
 } as const;
 

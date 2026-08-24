@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { HeaderDashboardComponent, ButtonComponent, IconComponent, CardComponent } from 'src/ui';
 import { BusinessLocationListComponent } from './features/business-location-list';
-import { MatDialog } from '@angular/material/dialog.d-Dvsbu-0E';
+import { MatDialog } from '@angular/material/dialog';
 import { CreateBusinessLocationModalComponent } from './features';
 
 @Component({

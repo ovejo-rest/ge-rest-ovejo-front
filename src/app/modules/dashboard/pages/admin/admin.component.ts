@@ -1,48 +1,21 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { PrincipalIndicatorsEnum } from './interface';
-import { RouterLink } from '@angular/router';
-import { AreaChartComponent, ButtonComponent, CardComponent, HeaderDashboardComponent, IconComponent } from 'src/ui';
-import { UsersDashboardTableComponent } from './ui';
-
+import { Component, inject } from '@angular/core';
+import { HeaderDashboardComponent, CardComponent, AreaChartComponent, ButtonComponent, IconComponent } from 'src/ui';
+import { KpiCardComponent, RecentOrdersTableComponent } from './features';
+import { DashboardSkeletonComponent } from './ui';
+import { GetDashboardMetricsService } from './data-access';
 @Component({
   selector: 'app-admin',
   imports: [
-    HeaderDashboardComponent,
-    CardComponent,
-    RouterLink,
-    ButtonComponent,
-    IconComponent,
-    UsersDashboardTableComponent,
-    AreaChartComponent,
+    HeaderDashboardComponent, CardComponent, AreaChartComponent,
+    ButtonComponent, IconComponent,
+    KpiCardComponent, RecentOrdersTableComponent, DashboardSkeletonComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './admin.component.html',
 })
 export class AdminComponent {
-  indicators: Array<PrincipalIndicatorsEnum>;
+  protected readonly $metricsService = inject(GetDashboardMetricsService);
 
-  constructor() {
-    this.indicators = [
-      {
-        name: 'Indicador 1',
-        action: 'action1',
-        numbers: 10009,
-      },
-      {
-        name: 'Indicador 2',
-        action: 'action3',
-        numbers: 200,
-      },
-      {
-        name: 'Indicador 3',
-        action: 'action3',
-        numbers: 300,
-      },
-      {
-        name: 'Indicador 4',
-        action: 'action4',
-        numbers: 400,
-      },
-    ];
-  }
+  protected readonly $metrics = this.$metricsService.$metrics;
+  protected readonly $isLoading = this.$metricsService.$isLoading;
+  protected readonly $hasError = this.$metricsService.$hasError;
 }

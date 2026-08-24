@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { SkeletonSize, SkeletonSizeClass } from './enums';
 
 @Component({
@@ -22,8 +22,22 @@ import { SkeletonSize, SkeletonSizeClass } from './enums';
     100% {
       background-color: hsla(240, 20%, 99%,1);
     }
+  }
+
+  .dark .skeleton {
+    animation: skeleton-loading-dark 1s linear infinite alternate;
+  }
+
+  @keyframes skeleton-loading-dark {
+    0% {
+      background-color: hsla(240, 10%, 20%, 1);
+    }
+    100% {
+      background-color: hsla(240, 10%, 30%, 1);
+    }
   }`,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
 export class SkeletonComponent {
   readonly $size = input<SkeletonSize>(SkeletonSize.XS, {

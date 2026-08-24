@@ -1,50 +1,65 @@
+@let metrics = $metrics(); @let isLoading = $isLoading(); @let hasError = $hasError();
+
 <div>
-    <app-header-dashboard 
-        title="Admin dashboard"
-        subtitle="Administración de backoffice"
-    >
-    <app-button  full impact="light" tone="primary" shape="rounded" size="medium" disabled="true" icon>
-        <app-icon class="h-6 w-7">
-          double_arrow
-        </app-icon>
-        hola mundo
-      </app-button>
-      <app-button full impact="bold" tone="primary" shape="rounded" size="medium" routerLink="/auth/sign-up">
-        <app-icon class="h-6 w-7">
-          double_arrow
-        </app-icon>
-        Hola mundo
-      </app-button>
-    </app-header-dashboard>
+  <app-header-dashboard title="Dashboard" subtitle="Resumen de la operación de hoy">
+    <app-button
+      full
+      impact="light"
+      tone="primary"
+      shape="rounded"
+      size="medium"
+      icon="refresh"
+      (buttonClick)="$metricsService.retry()">
+      Actualizar
+    </app-button>
+  </app-header-dashboard>
 
-    <div class="text-muted-foreground grid grid-cols-1 content-between gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
-        @for (item of indicators ; track $index) {
-          <a routerLink="{{item.action}}">
-            <app-card addBottomLine="true">
-                <div class=" grid grid-cols-2">
-                    <div class="w-13 h-13 content-center text-center rounded-full ring-2 ring-gray-300 dark:ring-gray-500">
-                        <span class="text-primary">{{ item.numbers }}</span>
-                    </div>
-                    <h2 class="w-full text-md mt-1 content-center font-semibold text-foreground ">{{ item.name }}</h2>
-                </div>
-            </app-card>
-          </a>
-        }
+  @if (hasError) {
+  <div class="flex flex-col items-center gap-4 py-16 text-center">
+    <app-icon class="text-destructive h-14 w-14">error_outline</app-icon>
+    <div>
+      <h2 class="text-foreground text-lg font-semibold">Error al cargar el dashboard</h2>
+      <p class="text-muted-foreground mt-1 text-sm">No se pudieron obtener las métricas. Intenta nuevamente.</p>
     </div>
+    <app-button impact="bold" tone="primary" shape="rounded" (buttonClick)="$metricsService.retry()">
+      Reintentar
+    </app-button>
+  </div>
+  } @else if (isLoading && !metrics) {
+  <app-dashboard-skeleton />
+  } @else {
 
-    <div class="mt-3 text-muted-foreground grid grid-cols-1 content-between gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
-        <div>
-            <app-card> 
-              <app-area-chart></app-area-chart>
-            </app-card>
-        </div>
-        <div class="md:col-span-3">
-            <app-card>
-                <app-users-dashboard-table/>
-            </app-card>
-        </div>
-        
-        
+  <div class="text-muted-foreground grid grid-cols-1 content-between gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <app-kpi-card
+      title="Ventas hoy"
+      [value]="metrics?.todaySales ?? 0"
+      icon="payments"
+      format="currency"
+      [loading]="isLoading" />
+    <app-kpi-card title="Pedidos hoy" [value]="metrics?.todayOrders ?? 0" icon="receipt_long" [loading]="isLoading" />
+    <app-kpi-card
+      title="Ticket promedio"
+      [value]="metrics?.averageTicket ?? 0"
+      icon="local_activity"
+      format="currency"
+      [loading]="isLoading" />
+    <app-kpi-card
+      title="Mesas ocupadas"
+      [value]="metrics?.occupiedTables ?? 0"
+      icon="table_bar"
+      [loading]="isLoading" />
+  </div>
+
+  <div class="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-4">
+    <div>
+      <app-card>
+        <app-area-chart />
+      </app-card>
     </div>
+    <div class="lg:col-span-3">
+      <app-recent-orders-table [orders]="[]" [loading]="false" [hasError]="false" />
+    </div>
+  </div>
 
+  }
 </div>
