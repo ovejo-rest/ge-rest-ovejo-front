@@ -1,11 +1,8 @@
 <app-table>
-  <ng-template app-slot="filters">
-    <app-filters-sector-table (searchNameChange)="onSearchNameChange($event)" />
-  </ng-template>
   <ng-template app-slot="head">
     <tr>
       @for (item of headerData; track $index) {
-      <th class="h-8 w-[20%] text-center">{{ item }}</th>
+      <th class="h-8 w-[33%] text-center">{{ item }}</th>
       }
       <th class="w-[90px]"></th>
     </tr>
@@ -13,20 +10,10 @@
   @if (!isLoading()) { @for (sector of $sectors(); track sector.id) {
   <tr class="glass-row h-10">
     <td class="text-center font-medium">{{ sector.name }}</td>
-    <td class="text-muted-foreground text-center text-sm">{{ sector.description || '—' }}</td>
+
     <td class="text-center">
-      @if (sector.color) {
-      <span class="inline-block h-4 w-4 rounded-full" [style.background-color]="sector.color"></span>
-      } @else { — }
-    </td>
-    <td class="text-center">
-      <span
-        class="inline-block rounded-full px-2 py-0.5 text-xs font-medium"
-        [ngClass]="{
-          'bg-green-500/20 text-green-600': sector.isActive,
-          'bg-red-500/20 text-red-600': !sector.isActive
-        }">
-        {{ sector.isActive ? 'Activo' : 'Inactivo' }}
+      <span class="inline-block rounded-full bg-green-500/20 px-2 py-0.5 text-xs font-medium text-green-600">
+        Activo
       </span>
     </td>
     <td class="w-[90px] text-center">

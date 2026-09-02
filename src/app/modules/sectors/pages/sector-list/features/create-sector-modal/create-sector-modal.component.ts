@@ -4,10 +4,20 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { MatDialogRef } from '@angular/material/dialog';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
 import { CreateSectorService, GetAllSectorsService } from '../../data-access';
+import { BusinessLocationSelector } from '../../ui';
 
 @Component({
   selector: 'app-create-sector-modal',
-  imports: [FormsModule, IconComponent, ReactiveFormsModule, CommonModule, ButtonComponent, SlotDirective, ModalCardComponent],
+  imports: [
+    FormsModule,
+    IconComponent,
+    ReactiveFormsModule,
+    CommonModule,
+    ButtonComponent,
+    SlotDirective,
+    ModalCardComponent,
+    BusinessLocationSelector,
+  ],
   templateUrl: './create-sector-modal.component.html',
 })
 export class CreateSectorModalComponent implements OnDestroy {
@@ -18,24 +28,38 @@ export class CreateSectorModalComponent implements OnDestroy {
   protected readonly $isLoading = this.$service.$isLoading;
 
   private fb = inject(FormBuilder);
-  form = this.fb.group({
+  form = this.fb.nonNullable.group({
     name: ['', Validators.required],
-    description: [''],
-    color: ['#6E56CF'],
+    locationId: [0, Validators.required],
   });
 
   constructor() {
     effect(() => {
-      if (this.$service.$success()) { this.$toast.show('Sector creado', 'success'); this.$getAll.retry(); this.dialogRef.close(); }
-      if (this.$service.$hasError()) { this.$toast.show('Error al crear el sector', 'error'); }
+      if (this.$service.$success()) {
+        this.$toast.show('Sector creado', 'success');
+        this.$getAll.retry();
+        this.dialogRef.close();
+      }
+      if (this.$service.$hasError()) {
+        this.$toast.show('Error al crear el sector', 'error');
+      }
     });
   }
 
   submitForm() {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-    const { name, description, color } = this.form.getRawValue();
-    this.$service.create({ name: name ?? '', description: description ?? undefined, color: color ?? undefined });
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    const { name, locationId } = this.form.getRawValue();
+    this.$service.create({ name: name ?? '', locationId });
   }
 
-  ngOnDestroy(): void { this.$service.reset(); }
+  ngOnDestroy(): void {
+    this.$service.reset();
+  }
+
+  onBusinessLocationSelected(id: number) {
+    this.form.controls.locationId.setValue(id);
+  }
 }

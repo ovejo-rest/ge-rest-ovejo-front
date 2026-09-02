@@ -2,36 +2,38 @@ import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/h
 import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, catchError, EMPTY, map, Subject, switchMap, tap } from 'rxjs';
-import { CreateSectorDto } from './dtos';
+import { SectorDto } from './dtos';
 import { ApiPathEnum } from 'src/environments';
 
 @Injectable({ providedIn: 'root' })
-export class CreateSectorService {
+export class FindSectorByIdService {
   readonly #httpClient = inject(HttpClient);
   readonly #isLoading$ = new BehaviorSubject(false);
   readonly #error$ = new Subject<HttpStatusCode | undefined>();
-  readonly #submit$ = new Subject<CreateSectorDto>();
-  readonly #success$ = new Subject<boolean>();
+  readonly #fetch$ = new Subject<number>();
+  readonly #sector$ = new BehaviorSubject<SectorDto | null>(null);
 
   readonly $isLoading = toSignal(this.#isLoading$);
   readonly $error = toSignal(this.#error$);
   readonly $hasError = toSignal(this.#error$.pipe(map((code) => code !== undefined)));
-  readonly $success = toSignal(this.#success$);
+  readonly $sector = toSignal(this.#sector$);
 
   constructor() {
-    this.#submit$
+    this.#fetch$
       .pipe(
-        tap(() => this.#isLoading$.next(true)),
-        tap(() => this.#error$.next(undefined)),
-        switchMap((input) =>
-          this.#httpClient.post(`${ApiPathEnum.RESTAURANT}/sectors`, input).pipe(
-            tap(() => {
-              this.#success$.next(true);
+        tap(() => {
+          this.#isLoading$.next(true);
+          this.#error$.next(undefined);
+        }),
+        switchMap((id) =>
+          this.#httpClient.get<SectorDto>(`${ApiPathEnum.RESTAURANT}/sectors/${id}`).pipe(
+            tap((sector) => {
+              this.#sector$.next(sector);
               this.#isLoading$.next(false);
             }),
             catchError((error: HttpErrorResponse) => {
               this.#error$.next(error.status);
-              this.#success$.next(false);
+              this.#sector$.next(null);
               this.#isLoading$.next(false);
               return EMPTY;
             }),
@@ -41,12 +43,13 @@ export class CreateSectorService {
       .subscribe();
   }
 
-  create(input: CreateSectorDto) {
-    this.#submit$.next(input);
+  fetch(id: number) {
+    this.#fetch$.next(id);
   }
+
   reset() {
+    this.#sector$.next(null);
     this.#error$.next(undefined);
-    this.#success$.next(false);
     this.#isLoading$.next(false);
   }
 }
