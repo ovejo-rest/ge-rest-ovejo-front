@@ -1,0 +1,42 @@
+<div class="p-6">
+  <app-header-dashboard
+    title="Pagos"
+    subtitle="Gestiona los pagos de tu negocio"
+  >
+    <app-button
+      impact="bold"
+      tone="primary"
+      icon="add"
+      (buttonClick)="onCreatePayment()"
+    >
+      Nuevo Pago
+    </app-button>
+  </app-header-dashboard>
+
+  <app-filters-payment-table
+    (filtersChange)="onFiltersChange($event)"
+  />
+
+  @if ($hasError()) {
+    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
+      <app-icon class="text-red-600 dark:text-red-400 text-4xl mb-2">error</app-icon>
+      <p class="text-red-800 dark:text-red-300 font-medium mb-2">Error al cargar los pagos</p>
+      <p class="text-red-600 dark:text-red-400 text-sm mb-4">
+        No se pudieron obtener los datos. Intenta nuevamente.
+      </p>
+      <app-button
+        impact="bold"
+        tone="primary"
+        (buttonClick)="onRetry()"
+      >
+        Reintentar
+      </app-button>
+    </div>
+  } @else {
+    <app-payments-table
+      [payments]="$payments() ?? []"
+      [loading]="$isLoading() ?? false"
+      (cancel)="onCancelPayment($event)"
+    />
+  }
+</div>

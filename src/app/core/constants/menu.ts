@@ -40,6 +40,12 @@ export class Menu {
           children: [{ label: 'Pedidos', route: '/orders' }],
         },
         {
+          icon: 'payments',
+          label: 'Pagos',
+          route: '/payments',
+          children: [{ label: 'Pagos', route: '/payments' }],
+        },
+        {
           icon: 'admin_panel_settings',
           label: 'Roles y permisos',
           route: '/roles-and-permissions',

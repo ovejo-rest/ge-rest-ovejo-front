@@ -43,6 +43,11 @@ const routes: Routes = [
     loadChildren: () => import('../sectors/sectors.routes'),
   },
   {
+    path: 'payments',
+    component: LayoutComponent,
+    loadChildren: () => import('../payments/payments.routes'),
+  },
+  {
     path: 'profile',
     component: LayoutComponent,
     loadChildren: () => import('../profile/profile.routes'),
