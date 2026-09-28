@@ -1,4 +1,4 @@
-# gc-backoffice-front
+# ge-rest-ovejo-backoffice-front
 Backoffice bas project for start new project
 <p align="center">
     <img src="src/assets/preview/logo.png" width="150">
