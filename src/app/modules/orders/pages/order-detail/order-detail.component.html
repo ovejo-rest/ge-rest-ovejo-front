@@ -1,0 +1,125 @@
+<div>
+  <a routerLink="/orders" class="text-muted-foreground hover:text-primary mb-3 inline-flex items-center gap-1 text-sm">
+    <app-icon class="h-4 w-4">arrow_back</app-icon>Pedidos
+  </a>
+
+  @if ($order(); as order) {
+  <!-- Encabezado -->
+  <div class="mb-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div>
+      <div class="flex flex-wrap items-center gap-2">
+        <h1 class="text-foreground font-mono text-xl font-semibold">{{ order.invoiceNo }}</h1>
+        <app-status-badge [map]="orderStatus" [status]="order.status" />
+        <app-status-badge [map]="paymentStatus" [status]="order.paymentStatus" />
+        @if (order.isKitchenOrder) {
+        <app-status-badge [map]="kitchenStatus" [status]="order.resOrderStatus" fallback="Sin cocina" />
+        }
+      </div>
+      <div class="text-muted-foreground mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm">
+        <span class="inline-flex items-center gap-1"><app-icon class="h-4 w-4">table_bar</app-icon>{{ order.tableName ?? 'Sin mesa' }}</span>
+        <span class="inline-flex items-center gap-1"><app-icon class="h-4 w-4">badge</app-icon>{{ order.waiterName ?? 'Sin mesero' }}</span>
+        @if (order.contactId && order.customerName) {
+        <a [routerLink]="['/customers', order.contactId]" class="hover:text-primary inline-flex items-center gap-1"><app-icon class="h-4 w-4">person</app-icon>{{ order.customerName }}</a>
+        } @else {
+        <span class="inline-flex items-center gap-1"><app-icon class="h-4 w-4">person</app-icon>Sin cliente</span>
+        }
+        <span class="inline-flex items-center gap-1" [title]="formatDateTime(order.transactionDate)">
+          <app-icon class="h-4 w-4">schedule</app-icon>{{ formatRelative(order.transactionDate) }}
+        </span>
+      </div>
+    </div>
+
+    @if ($isOpen()) {
+    <div class="flex flex-wrap gap-2">
+      @if ($canCollect()) {
+      <app-button impact="bold" tone="primary" shape="rounded" icon="point_of_sale" (buttonClick)="handleCollect(order)">
+        Cobrar
+      </app-button>
+      }
+      @if ($canServe() && $hasPendingLines()) {
+      <app-button impact="light" tone="primary" shape="rounded" icon="room_service" [disabled]="$isMarkingOrder()" [isLoading]="$isMarkingOrder()" (buttonClick)="handleServeAll(order)">
+        Marcar todo servido
+      </app-button>
+      }
+      <app-button impact="light" tone="primary" shape="rounded" icon="receipt" (buttonClick)="handlePrintBill(order)">Precuenta</app-button>
+      <app-button impact="light" tone="primary" shape="rounded" icon="add" (buttonClick)="handleAddItems(order)">Agregar productos</app-button>
+      <app-button impact="light" tone="primary" shape="rounded" icon="edit" (buttonClick)="handleEdit(order)">Editar</app-button>
+      <span [title]="$hasPayments() ? 'Anula los pagos del pedido antes de cancelarlo' : ''">
+        <app-button impact="light" tone="danger" shape="rounded" icon="block" [disabled]="$hasPayments()" (buttonClick)="handleCancelOrder(order)">
+          Cancelar pedido
+        </app-button>
+      </span>
+    </div>
+    }
+  </div>
+
+  <!-- Contenido -->
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <div class="space-y-4 lg:col-span-2">
+      <app-order-lines-table
+        [lines]="order.lines"
+        [canServe]="$canServe()"
+        [showKitchenStatus]="order.isKitchenOrder"
+        [pendingLineId]="$pendingLineId()"
+        (serveLine)="handleServeLine($event)" />
+
+      @if (order.additionalNotes || order.staffNote) {
+      <div class="glass space-y-3 rounded-[1rem] p-4 text-sm">
+        @if (order.staffNote) {
+        <div>
+          <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider">Nota para cocina</p>
+          <p class="text-foreground mt-1 whitespace-pre-line">{{ order.staffNote }}</p>
+        </div>
+        }
+        @if (order.additionalNotes) {
+        <div>
+          <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider">Nota general</p>
+          <p class="text-foreground mt-1 whitespace-pre-line">{{ order.additionalNotes }}</p>
+        </div>
+        }
+      </div>
+      }
+    </div>
+
+    <app-order-totals [order]="order" />
+  </div>
+
+  <!-- Pagos del pedido -->
+  <section class="mt-6">
+    <h2 class="text-foreground mb-3 font-semibold">Pagos</h2>
+    <app-payments-table
+      [payments]="$payments()"
+      [loading]="$isLoadingPayments() && !$payments().length"
+      [showOrder]="false"
+      [canVoid]="order.status !== 'CANCELLED'"
+      (voidPayment)="handleVoidPayment($event)" />
+  </section>
+  } @else if ($isLoading()) {
+  <div class="space-y-4">
+    <app-skeleton size="xs" style="width: 220px" />
+    <app-skeleton size="xs" style="width: 420px" />
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div class="lg:col-span-2"><app-skeleton size="2xl" style="width: 100%" /></div>
+      <app-skeleton size="2xl" style="width: 100%" />
+    </div>
+  </div>
+  } @else if ($notFound()) {
+  <div class="flex flex-col items-center gap-4 py-16 text-center">
+    <app-icon class="text-muted-foreground h-14 w-14">search_off</app-icon>
+    <div>
+      <h2 class="text-foreground text-lg font-semibold">Pedido no encontrado</h2>
+      <p class="text-muted-foreground mt-1 text-sm">No existe o no pertenece a tu negocio.</p>
+    </div>
+    <a routerLink="/orders" class="text-primary text-sm font-medium hover:underline">Volver a pedidos</a>
+  </div>
+  } @else if ($errorMessage(); as errorMessage) {
+  <div class="flex flex-col items-center gap-4 py-16 text-center">
+    <app-icon class="text-destructive h-14 w-14">error_outline</app-icon>
+    <div>
+      <h2 class="text-foreground text-lg font-semibold">Error al cargar el pedido</h2>
+      <p class="text-muted-foreground mt-1 text-sm">{{ errorMessage }}</p>
+    </div>
+    <app-button impact="bold" tone="primary" shape="rounded" (buttonClick)="handleRetry()">Reintentar</app-button>
+  </div>
+  }
+</div>

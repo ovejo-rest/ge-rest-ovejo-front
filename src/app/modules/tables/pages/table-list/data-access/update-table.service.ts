@@ -10,7 +10,7 @@ export class UpdateTableService {
   readonly #httpClient = inject(HttpClient);
   readonly #isLoading$ = new BehaviorSubject(false);
   readonly #error$ = new Subject<HttpStatusCode | undefined>();
-  readonly #submit$ = new Subject<{ id: number; data: UpdateTableDto }>();
+  readonly #submit$ = new Subject<UpdateTableDto>();
   readonly #success$ = new Subject<boolean>();
 
   readonly $isLoading = toSignal(this.#isLoading$);
@@ -22,13 +22,13 @@ export class UpdateTableService {
     this.#submit$.pipe(
       tap(() => this.#isLoading$.next(true)),
       tap(() => this.#error$.next(undefined)),
-      switchMap(({ id, data }) => this.#httpClient.patch(`${ApiPathEnum.RESTAURANT}/tables/${id}`, data).pipe(
+      switchMap((data) => this.#httpClient.put(`${ApiPathEnum.RESTAURANT}/tables/${data.id}`, data).pipe(
         tap(() => { this.#success$.next(true); this.#isLoading$.next(false); }),
         catchError((e: HttpErrorResponse) => { this.#error$.next(e.status); this.#success$.next(false); this.#isLoading$.next(false); return EMPTY; }),
       )),
     ).subscribe();
   }
 
-  update(id: number, data: UpdateTableDto) { this.#submit$.next({ id, data }); }
+  update(data: UpdateTableDto) { this.#submit$.next(data); }
   reset() { this.#error$.next(undefined); this.#success$.next(false); this.#isLoading$.next(false); }
 }

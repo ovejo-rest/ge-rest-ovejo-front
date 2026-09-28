@@ -1,0 +1,49 @@
+@let f = form();
+<div [formGroup]="f" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+  <div class="sm:col-span-2">
+    <span class="text-foreground mb-1 block text-sm font-medium">Tipo *</span>
+    <div class="grid grid-cols-2 gap-2 sm:grid-cols-4" role="radiogroup" aria-label="Tipo de estación">
+      @for (option of types; track option.value) {
+      <label class="flex cursor-pointer flex-col items-center gap-1 rounded-lg border-2 px-2 py-3 text-sm" [class]="f.controls.type.value === option.value ? 'border-primary bg-primary/10 text-primary' : 'glass-row border-transparent'">
+        <input type="radio" class="sr-only" formControlName="type" [value]="option.value" />
+        <app-icon class="h-6 w-6">{{ option.icon }}</app-icon>{{ option.label }}
+      </label>
+      }
+    </div>
+  </div>
+
+  <div class="sm:col-span-2">
+    <label class="text-foreground mb-1 block text-sm font-medium">Nombre *</label>
+    <input formControlName="name" placeholder="Ej: Cocina caliente" [class]="inputClass" [ngClass]="{ 'border-red-500': f.controls.name.invalid && f.controls.name.touched }" />
+  </div>
+
+  <div>
+    <label class="text-foreground mb-1 block text-sm font-medium">Impresora</label>
+    <select formControlName="printerId" [class]="inputClass">
+      <option [ngValue]="null">Sin impresora (solo pantalla)</option>
+      @for (printer of printers(); track printer.id) {
+      <option [ngValue]="printer.id">{{ printer.name }}{{ printer.status !== 'ACTIVE' ? ' (inactiva)' : '' }}</option>
+      }
+    </select>
+  </div>
+
+  <div>
+    <label class="text-foreground mb-1 block text-sm font-medium">Sucursal</label>
+    <select formControlName="locationId" [class]="inputClass">
+      <option [ngValue]="null">Todas / sin asignar</option>
+      @for (location of $locations() ?? []; track location.id) {
+      <option [ngValue]="location.id">{{ location.name }}</option>
+      }
+    </select>
+  </div>
+
+  @if (showStatus()) {
+  <label class="flex cursor-pointer items-center justify-between gap-4 rounded-md border border-[var(--border)] px-3 py-3 sm:col-span-2">
+    <span>
+      <span class="text-foreground block text-sm font-medium">Activa</span>
+      <span class="text-muted-foreground block text-xs">Si la desactivas, no aparece en la pantalla de cocina.</span>
+    </span>
+    <input type="checkbox" formControlName="isActive" class="h-5 w-5 accent-[var(--primary)]" />
+  </label>
+  }
+</div>

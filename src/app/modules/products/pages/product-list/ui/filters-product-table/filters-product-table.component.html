@@ -1,0 +1,24 @@
+<form [formGroup]="form" class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+  <div class="relative flex-1">
+    <app-icon class="text-muted-foreground pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2">search</app-icon>
+    <input
+      type="search"
+      formControlName="search"
+      placeholder="Buscar por nombre…"
+      aria-label="Buscar productos por nombre"
+      class="glass-input w-full rounded-md py-2 pl-10 pr-3" />
+  </div>
+
+  <select formControlName="categoryId" aria-label="Filtrar por categoría" class="glass-input rounded-md px-3 py-2 sm:w-60">
+    <option [ngValue]="null">Todas las categorías</option>
+    @for (category of categories(); track category.id) {
+    <option [ngValue]="category.id">{{ category.name }}</option>
+    @for (subcategory of category.subcategories ?? []; track subcategory.id) {
+    <option [ngValue]="subcategory.id">&nbsp;&nbsp;└ {{ subcategory.name }}</option>
+    } }
+  </select>
+
+  @if (hasFilters) {
+  <button type="button" class="text-primary text-sm font-medium hover:underline" (click)="clear()">Limpiar filtros</button>
+  }
+</form>

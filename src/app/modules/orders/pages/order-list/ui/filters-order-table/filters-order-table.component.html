@@ -1,0 +1,11 @@
+<div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+  <select aria-label="Filtrar por mesero" class="glass-input rounded-md px-3 py-2 sm:w-64" (change)="onWaiterChange($event)">
+    <option value="" [selected]="!waiter()">Todos los meseros</option>
+    @for (member of staff(); track member.code) {
+    <option [value]="member.code" [selected]="member.code === waiter()">{{ member.name }} {{ member.fatherLastName }}</option>
+    }
+  </select>
+  @if (waiter()) {
+  <button type="button" class="text-primary text-sm font-medium hover:underline" (click)="waiterChange.emit(null)">Limpiar filtros</button>
+  }
+</div>

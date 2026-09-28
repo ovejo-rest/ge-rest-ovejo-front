@@ -1,0 +1,58 @@
+<div class="glass overflow-hidden rounded-[1rem]">
+  <div class="overflow-x-auto">
+    <table class="min-w-full">
+      <thead>
+        <tr class="text-muted-foreground border-b border-[var(--border)] text-left text-xs font-medium uppercase tracking-wider">
+          <th class="px-4 py-3">Cliente</th>
+          <th class="px-4 py-3">Teléfono</th>
+          <th class="hidden px-4 py-3 md:table-cell">Email</th>
+          <th class="px-4 py-3"><span class="sr-only">Ver detalle</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading()) { @for (row of skeletonRows; track row) {
+        <tr class="border-b border-[var(--border)] last:border-0">
+          <td class="px-4 py-3"><app-skeleton size="xs" style="width: 180px" /></td>
+          <td class="px-4 py-3"><app-skeleton size="xs" style="width: 110px" /></td>
+          <td class="hidden px-4 py-3 md:table-cell"><app-skeleton size="xs" style="width: 160px" /></td>
+          <td class="px-4 py-3"><div class="flex justify-end"><app-skeleton size="xs" style="width: 36px" /></div></td>
+        </tr>
+        } } @else { @for (customer of customers(); track customer.id) {
+        <tr class="glass-row border-b border-[var(--border)] last:border-0">
+          <td class="px-4 py-3">
+            <a [routerLink]="['/customers', customer.id]" class="flex items-center gap-3">
+              <span class="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold">{{ initials(customer.name) }}</span>
+              <span class="text-foreground hover:text-primary font-medium">{{ customer.name }}</span>
+            </a>
+          </td>
+          <td class="px-4 py-3">
+            <a [href]="'tel:' + customer.mobile" class="text-foreground hover:text-primary text-sm tabular-nums">{{ customer.mobile }}</a>
+          </td>
+          <td class="text-muted-foreground hidden px-4 py-3 text-sm md:table-cell">{{ customer.email ?? '—' }}</td>
+          <td class="px-4 py-3 text-right">
+            <a [routerLink]="['/customers', customer.id]" [attr.aria-label]="'Ver ' + customer.name" class="text-muted-foreground hover:text-primary inline-flex h-9 w-9 items-center justify-center rounded-md">
+              <app-icon class="h-5 w-5">chevron_right</app-icon>
+            </a>
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="4" class="px-4 py-12 text-center">
+            <p class="text-foreground font-medium">{{ searching() ? 'Sin coincidencias' : 'Sin clientes' }}</p>
+            <p class="text-muted-foreground mt-1 text-sm">
+              {{ searching() ? 'No hay clientes con ese nombre o teléfono.' : 'Todavía no hay clientes registrados.' }}
+            </p>
+            <button type="button" class="text-primary mt-3 text-sm font-medium hover:underline" (click)="create.emit()">Crear cliente</button>
+          </td>
+        </tr>
+        } }
+      </tbody>
+    </table>
+  </div>
+
+  @if (pagination(); as meta) { @if (meta.totalItems > 0) {
+  <div class="border-t border-[var(--border)] px-4 pb-3">
+    <app-pagination-table [pagination]="meta" (pageChange)="pageChange.emit($event)" />
+  </div>
+  } }
+</div>

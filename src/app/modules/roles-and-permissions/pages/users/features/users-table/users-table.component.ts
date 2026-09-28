@@ -15,6 +15,7 @@ import { PaginationMeta } from 'src/app/core/standarized-response/standardized-p
 import { CreateUserModalComponent } from '../create-user-modal';
 import { UpdateUserModalComponent } from '../update-user-modal';
 import { DeleteUserModalComponent } from '../delete-user-modal';
+import { SetServicePinModalComponent } from '../set-service-pin-modal';
 import { CheckPermissionDirective } from 'src/app/shared/directives';
 
 @Component({
@@ -57,6 +58,14 @@ export class UsersTableComponent {
   updateUser(item: UserDto) {
     this.dialog.open(UpdateUserModalComponent, {
       width: '90%',
+      data: item,
+    });
+  }
+
+  setServicePin(item: UserDto) {
+    this.dialog.open(SetServicePinModalComponent, {
+      width: '440px',
+      maxWidth: '95vw',
       data: item,
     });
   }

@@ -1,0 +1,49 @@
+@let o = order();
+<article
+  class="glass flex h-full flex-col overflow-hidden rounded-xl border-t-4"
+  [class.border-green-500]="$tone() === 'ok'"
+  [class.border-amber-500]="$tone() === 'warning'"
+  [class.border-red-500]="$tone() === 'late'"
+  [attr.aria-label]="'Comanda ' + o.invoiceNo + ', ' + (o.tableName ?? 'sin mesa')">
+  <header class="flex items-start justify-between gap-2 border-b border-[var(--border)] px-4 py-3">
+    <div class="min-w-0">
+      <p class="text-foreground truncate text-xl font-bold">{{ o.tableName ?? 'Sin mesa' }}</p>
+      <p class="text-muted-foreground truncate text-xs">
+        <span class="font-mono">{{ o.invoiceNo }}</span>{{ o.waiterName ? ' · ' + o.waiterName : '' }}
+      </p>
+    </div>
+    <span
+      class="inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-sm font-semibold tabular-nums"
+      [class]="$tone() === 'late' ? 'bg-red-500/15 text-red-600' : $tone() === 'warning' ? 'bg-amber-500/15 text-amber-700' : 'bg-green-500/15 text-green-700'">
+      <app-icon class="h-4 w-4">schedule</app-icon>{{ $elapsed() }}
+    </span>
+  </header>
+
+  <ul class="flex-1 space-y-2 px-4 py-3">
+    @for (line of o.lineOrders; track line.lineId) {
+    <li class="flex items-start gap-3">
+      <span class="bg-primary/15 text-primary flex h-8 min-w-8 items-center justify-center rounded-md px-1.5 text-lg font-bold tabular-nums">
+        {{ line.quantity }}
+      </span>
+      <div class="min-w-0 pt-0.5">
+        <p class="text-foreground text-base font-semibold leading-tight">{{ line.productName }}</p>
+        @if (variationLabel(line.variationName); as variation) {
+        <p class="text-muted-foreground text-sm">{{ variation }}</p>
+        }
+      </div>
+    </li>
+    }
+  </ul>
+
+  <footer class="border-t border-[var(--border)] p-3">
+    <button
+      type="button"
+      class="flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-green-600 text-lg font-semibold text-white active:scale-[0.98] disabled:opacity-50"
+      [disabled]="busy()"
+      [title]="stationSelected() ? 'Marca listo todo el pedido, incluidos productos de otras estaciones' : ''"
+      (click)="markReady.emit(o)">
+      <app-icon class="h-6 w-6">{{ busy() ? 'hourglass_empty' : 'check' }}</app-icon>
+      Listo · {{ $itemCount() }} {{ $itemCount() === 1 ? 'ítem' : 'ítems' }}
+    </button>
+  </footer>
+</article>

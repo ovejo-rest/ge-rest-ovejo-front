@@ -1,0 +1,108 @@
+<div class="glass overflow-hidden rounded-[1rem]">
+  <div class="overflow-x-auto">
+    <table class="min-w-full">
+      <thead>
+        <tr class="text-muted-foreground border-b border-[var(--border)] text-left text-xs font-medium uppercase tracking-wider">
+          <th class="px-4 py-3">Producto</th>
+          <th class="hidden px-4 py-3 md:table-cell">Categoría</th>
+          <th class="px-4 py-3 text-right">Precio</th>
+          <th class="hidden px-4 py-3 text-center lg:table-cell">Preparación</th>
+          <th class="px-4 py-3 text-center">Estado</th>
+          <th class="px-4 py-3"><span class="sr-only">Acciones</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading()) {
+        @for (row of skeletonRows; track row) {
+        <tr class="border-b border-[var(--border)] last:border-0">
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-3">
+              <app-skeleton size="sm" style="width: 40px" />
+              <div class="space-y-1"><app-skeleton size="xs" style="width: 160px" /><app-skeleton size="xs" style="width: 90px" /></div>
+            </div>
+          </td>
+          <td class="hidden px-4 py-3 md:table-cell"><app-skeleton size="xs" style="width: 110px" /></td>
+          <td class="px-4 py-3"><div class="flex justify-end"><app-skeleton size="xs" style="width: 70px" /></div></td>
+          <td class="hidden px-4 py-3 lg:table-cell"><div class="flex justify-center"><app-skeleton size="xs" style="width: 50px" /></div></td>
+          <td class="px-4 py-3"><div class="flex justify-center"><app-skeleton size="xs" style="width: 80px" /></div></td>
+          <td class="px-4 py-3"><div class="flex justify-end"><app-skeleton size="xs" style="width: 72px" /></div></td>
+        </tr>
+        } } @else {
+        @for (product of products(); track product.id) {
+        <tr class="glass-row border-b border-[var(--border)] transition-colors last:border-0" [class.opacity-60]="product.isInactive">
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-3">
+              @if (product.image) {
+              <img [src]="product.image" [alt]="product.name" loading="lazy" class="h-10 w-10 shrink-0 rounded-lg object-cover" />
+              } @else {
+              <div class="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg font-semibold">
+                {{ initial(product) }}
+              </div>
+              }
+              <div class="min-w-0">
+                <p class="text-foreground truncate font-medium">{{ product.name }}</p>
+                <p class="text-muted-foreground font-mono text-xs">{{ product.sku }}</p>
+                <p class="text-muted-foreground text-xs md:hidden">{{ categoryLabel(product) }}</p>
+              </div>
+            </div>
+          </td>
+          <td class="text-muted-foreground hidden px-4 py-3 text-sm md:table-cell">{{ categoryLabel(product) }}</td>
+          <td class="text-foreground whitespace-nowrap px-4 py-3 text-right font-semibold tabular-nums">{{ price(product) }}</td>
+          <td class="text-muted-foreground hidden px-4 py-3 text-center text-sm lg:table-cell">
+            {{ product.preparationTimeInMinutes ? product.preparationTimeInMinutes + ' min' : '—' }}
+          </td>
+          <td class="px-4 py-3 text-center">
+            @if (product.isInactive) {
+            <span class="inline-flex items-center gap-1 rounded-full bg-gray-500/15 px-2.5 py-0.5 text-xs font-medium text-gray-500">
+              <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>No disponible
+            </span>
+            } @else {
+            <span class="inline-flex items-center gap-1 rounded-full bg-green-500/15 px-2.5 py-0.5 text-xs font-medium text-green-600">
+              <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>Disponible
+            </span>
+            }
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex justify-end gap-1">
+              <button
+                type="button"
+                title="Editar"
+                [attr.aria-label]="'Editar ' + product.name"
+                class="text-muted-foreground hover:text-primary inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors hover:bg-[var(--muted)]/30"
+                (click)="edit.emit(product)">
+                <app-icon class="h-5 w-5">edit</app-icon>
+              </button>
+              <button
+                type="button"
+                title="Eliminar"
+                [attr.aria-label]="'Eliminar ' + product.name"
+                class="text-muted-foreground inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors hover:bg-red-500/10 hover:text-red-600"
+                (click)="delete.emit(product)">
+                <app-icon class="h-5 w-5">delete</app-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="6" class="px-4 py-12 text-center">
+            <p class="text-foreground font-medium">Sin resultados</p>
+            <p class="text-muted-foreground mt-1 text-sm">No hay productos que coincidan con los filtros.</p>
+            @if (hasFilters()) {
+            <button type="button" class="text-primary mt-3 text-sm font-medium hover:underline" (click)="clearFilters.emit()">
+              Limpiar filtros
+            </button>
+            }
+          </td>
+        </tr>
+        } }
+      </tbody>
+    </table>
+  </div>
+
+  @if (pagination(); as meta) { @if (meta.totalItems > 0) {
+  <div class="border-t border-[var(--border)] px-4 pb-3">
+    <app-pagination-table [pagination]="meta" (pageChange)="pageChange.emit($event)" />
+  </div>
+  } }
+</div>

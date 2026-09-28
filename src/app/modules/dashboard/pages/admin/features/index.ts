@@ -1,2 +1,3 @@
 export * from './kpi-card';
-export * from './recent-orders-table';
+export * from './top-products-card';
+export * from './recent-orders-card';

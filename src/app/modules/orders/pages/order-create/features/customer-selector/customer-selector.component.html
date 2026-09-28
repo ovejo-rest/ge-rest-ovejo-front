@@ -1,0 +1,60 @@
+<div>
+  <label class="text-foreground mb-1 block text-sm font-medium">Cliente <span class="text-muted-foreground font-normal">(opcional)</span></label>
+
+  @if (selected(); as customer) {
+  <div class="glass-row flex items-center gap-3 rounded-lg px-3 py-2">
+    <app-icon class="text-primary h-5 w-5">person</app-icon>
+    <div class="min-w-0 flex-1">
+      <p class="text-foreground truncate text-sm font-medium">{{ customer.name }}</p>
+      <p class="text-muted-foreground text-xs">{{ customer.mobile }}</p>
+    </div>
+    <button type="button" class="text-primary text-sm font-medium hover:underline" (click)="clear()">Quitar</button>
+  </div>
+  } @else if ($mode() === 'search') {
+  <div class="relative">
+    <input
+      type="search"
+      [value]="$query()"
+      placeholder="Buscar por nombre o teléfono…"
+      aria-label="Buscar cliente"
+      class="glass-input w-full rounded-md px-3 py-2"
+      (input)="onSearch($event)" />
+
+    @if ($query().trim().length >= 2) {
+    <div class="glass absolute z-10 mt-1 w-full overflow-hidden rounded-lg shadow-lg">
+      @for (customer of $results(); track customer.id) {
+      <button type="button" class="glass-row block w-full px-3 py-2 text-left" (click)="select(customer)">
+        <span class="text-foreground block text-sm font-medium">{{ customer.name }}</span>
+        <span class="text-muted-foreground block text-xs">{{ customer.mobile }}</span>
+      </button>
+      } @empty {
+      @if (!$isSearching()) {
+      <p class="text-muted-foreground px-3 py-2 text-sm">Sin coincidencias.</p>
+      }
+      }
+      <button type="button" class="text-primary flex w-full items-center gap-1 border-t border-[var(--border)] px-3 py-2 text-sm font-medium" (click)="openCreate()">
+        <app-icon class="h-4 w-4">person_add</app-icon>Crear cliente nuevo
+      </button>
+    </div>
+    }
+  </div>
+  } @else {
+  <form [formGroup]="createForm" class="glass-row space-y-2 rounded-lg p-3" (ngSubmit)="create()">
+    <input formControlName="name" placeholder="Nombre" aria-label="Nombre del cliente" class="glass-input w-full rounded-md px-3 py-2" [class.border-red-500]="createForm.controls.name.invalid && createForm.controls.name.touched" />
+    <input formControlName="mobile" type="tel" inputmode="tel" placeholder="Teléfono" aria-label="Teléfono del cliente" class="glass-input w-full rounded-md px-3 py-2" [class.border-red-500]="createForm.controls.mobile.invalid && createForm.controls.mobile.touched" />
+
+    @if ($existing(); as existing) {
+    <button type="button" class="w-full rounded-md bg-amber-500/15 px-3 py-2 text-left text-sm text-amber-700" (click)="select(existing)">
+      Ya existe <span class="font-semibold">{{ existing.name }}</span> con ese teléfono. <span class="font-semibold underline">Usar ese cliente</span>
+    </button>
+    }
+
+    <div class="flex justify-end gap-2 pt-1">
+      <button type="button" class="text-muted-foreground px-3 py-2 text-sm" (click)="cancelCreate()">Cancelar</button>
+      <button type="submit" class="bg-primary rounded-md px-3 py-2 text-sm font-medium text-white disabled:opacity-50" [disabled]="$isCreating()">
+        {{ $isCreating() ? 'Creando…' : 'Crear y usar' }}
+      </button>
+    </div>
+  </form>
+  }
+</div>

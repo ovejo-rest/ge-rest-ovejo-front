@@ -19,18 +19,34 @@ export class CreateSectorService {
   readonly $success = toSignal(this.#success$);
 
   constructor() {
-    this.#submit$.pipe(
-      tap(() => this.#isLoading$.next(true)),
-      tap(() => this.#error$.next(undefined)),
-      switchMap((input) =>
-        this.#httpClient.post(`${ApiPathEnum.RESTAURANT}/sectors`, input).pipe(
-          tap(() => { this.#success$.next(true); this.#isLoading$.next(false); }),
-          catchError((error: HttpErrorResponse) => { this.#error$.next(error.status); this.#success$.next(false); this.#isLoading$.next(false); return EMPTY; }),
+    this.#submit$
+      .pipe(
+        tap(() => this.#isLoading$.next(true)),
+        tap(() => this.#error$.next(undefined)),
+        switchMap((input) =>
+          this.#httpClient.post(`${ApiPathEnum.RESTAURANT}/sectors`, input).pipe(
+            tap(() => {
+              this.#success$.next(true);
+              this.#isLoading$.next(false);
+            }),
+            catchError((error: HttpErrorResponse) => {
+              this.#error$.next(error.status);
+              this.#success$.next(false);
+              this.#isLoading$.next(false);
+              return EMPTY;
+            }),
+          ),
         ),
-      ),
-    ).subscribe();
+      )
+      .subscribe();
   }
 
-  create(input: CreateSectorDto) { this.#submit$.next(input); }
-  reset() { this.#error$.next(undefined); this.#success$.next(false); this.#isLoading$.next(false); }
+  create(input: CreateSectorDto) {
+    this.#submit$.next(input);
+  }
+  reset() {
+    this.#error$.next(undefined);
+    this.#success$.next(false);
+    this.#isLoading$.next(false);
+  }
 }

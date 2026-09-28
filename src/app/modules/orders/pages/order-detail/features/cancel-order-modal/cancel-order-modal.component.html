@@ -1,0 +1,27 @@
+<app-modal-card>
+  <ng-template app-slot="header">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Cancelar pedido</h2>
+  </ng-template>
+
+  <div class="flex items-start gap-3 py-2">
+    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-500/15 text-red-600">
+      <app-icon class="h-5 w-5">block</app-icon>
+    </div>
+    <div>
+      <p class="text-foreground text-sm">
+        ¿Cancelar el pedido <span class="font-mono font-semibold">{{ order.invoiceNo }}</span>
+        {{ order.tableName ? 'de ' + order.tableName : '' }} por {{ formatCurrency(order.finalTotal) }}?
+      </p>
+      <p class="text-muted-foreground mt-1 text-sm">El pedido quedará registrado como cancelado y la mesa se liberará. Esta acción no se puede deshacer.</p>
+    </div>
+  </div>
+
+  <ng-template app-slot="footer">
+    <div class="flex justify-end gap-3">
+      <app-button type="button" impact="light" [disabled]="!!$isLoading()" (buttonClick)="handleCancel()"> Volver </app-button>
+      <app-button type="button" impact="bold" tone="danger" [disabled]="!!$isLoading()" [isLoading]="!!$isLoading()" (buttonClick)="handleConfirm()">
+        Cancelar pedido
+      </app-button>
+    </div>
+  </ng-template>
+</app-modal-card>

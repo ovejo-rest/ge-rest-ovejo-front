@@ -1,0 +1,29 @@
+<div class="glass overflow-x-auto rounded-[1rem]">
+  <div class="grid min-w-[720px] grid-cols-7 divide-x divide-[var(--border)]">
+    @for (column of $columns(); track column.key) {
+    <div class="flex min-h-[320px] flex-col">
+      <button
+        type="button"
+        class="border-b border-[var(--border)] px-2 py-2 text-center hover:bg-[var(--muted)]/20"
+        [attr.aria-label]="'Ver agenda del ' + column.weekday + ' ' + column.day"
+        (click)="selectDay.emit(column.key)">
+        <p class="text-muted-foreground text-xs uppercase">{{ column.weekday }}</p>
+        <p class="text-lg font-semibold" [class]="column.isToday ? 'bg-primary mx-auto flex h-8 w-8 items-center justify-center rounded-full text-white' : 'text-foreground'">{{ column.day }}</p>
+        <p class="text-muted-foreground text-[11px]">{{ column.bookings.length }} {{ column.bookings.length === 1 ? 'reserva' : 'reservas' }}</p>
+      </button>
+      <div class="flex-1 space-y-1 p-1.5">
+        @for (booking of column.bookings; track booking.id) {
+        <button
+          type="button"
+          class="block w-full rounded-md px-2 py-1 text-left text-xs"
+          [class]="booking.status === 'completed' ? 'bg-green-500/15 text-green-800' : booking.status === 'waiting' ? 'bg-amber-500/15 text-amber-800' : 'bg-blue-500/15 text-blue-800'"
+          (click)="edit.emit(booking)">
+          <span class="font-semibold tabular-nums">{{ timeOf(booking.start) }}</span> {{ booking.customerName }}
+          <span class="block opacity-80">{{ booking.partySize }} pers.{{ booking.tableName ? ' · ' + booking.tableName : '' }}</span>
+        </button>
+        }
+      </div>
+    </div>
+    }
+  </div>
+</div>

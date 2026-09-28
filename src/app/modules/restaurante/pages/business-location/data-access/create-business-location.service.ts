@@ -25,7 +25,7 @@ export class CreateBusinessLocationService {
         tap(() => this.#isLoading$.next(true)),
         tap(() => this.#error$.next(undefined)),
         switchMap((input) =>
-          this.#httpClient.post(`${ApiPathEnum.RESTAURANT}/business-location`, input).pipe(
+          this.#httpClient.post(`${ApiPathEnum.RESTAURANT}/business-locations`, input).pipe(
             tap(() => {
               this.#success$.next(true);
               this.#isLoading$.next(false);

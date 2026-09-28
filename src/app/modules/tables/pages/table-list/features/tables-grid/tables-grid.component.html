@@ -7,22 +7,26 @@
 </div>
 } @else {
 <div class="space-y-6">
-  @for (sector of $sectors(); track sector.name) {
+  @for (group of $groups(); track group.sectorId) {
   <div>
     <div class="mb-3 flex items-center gap-2">
-      <span class="inline-block h-4 w-4 rounded-full" [style.background-color]="sector.color"></span>
-      <h3 class="text-foreground text-lg font-semibold">{{ sector.name }}</h3>
-      <span class="text-muted-foreground text-sm">{{ sector.tables.length }} mesas</span>
+      <h3 class="text-foreground text-lg font-semibold">{{ group.name }}</h3>
+      <span class="text-muted-foreground text-sm">{{ group.tables.length }} mesas</span>
     </div>
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-      @for (table of sector.tables; track table.id) {
-      <div
-        class="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all hover:scale-105"
-        [class]="statusClasses(table.status)">
-        <app-icon class="h-8 w-8">{{ statusIcon(table.status) }}</app-icon>
+      @for (table of group.tables; track table.id) {
+      <button
+        type="button"
+        class="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all hover:scale-105 active:scale-95"
+        [class]="statusClasses(table.status)"
+        [attr.aria-label]="table.name + ', ' + statusLabel(table.status) + ', ' + table.capacity + ' personas'"
+        [class.animate-pulse]="openingTableId() === table.id"
+        [attr.aria-busy]="openingTableId() === table.id"
+        (click)="tableSelect.emit(table)">
+        <app-icon class="h-8 w-8">{{ openingTableId() === table.id ? 'hourglass_empty' : statusIcon(table.status) }}</app-icon>
         <span class="text-sm font-semibold">{{ table.name }}</span>
-        <span class="text-xs">{{ table.capacity }} pers.</span>
-      </div>
+        <span class="text-xs">{{ table.capacity }} pers. · {{ statusLabel(table.status) }}</span>
+      </button>
       }
     </div>
   </div>

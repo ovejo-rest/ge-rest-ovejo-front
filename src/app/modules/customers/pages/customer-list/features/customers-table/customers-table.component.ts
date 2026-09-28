@@ -1,0 +1,33 @@
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { PaginationMeta } from 'src/app/core/standarized-response/standardized-pagination/pagination-meta.dto';
+import { IconComponent, PaginationTableComponent, SkeletonComponent } from 'src/ui';
+import { CustomerListItemDto } from '../../data-access';
+
+@Component({
+  selector: 'app-customers-table',
+  standalone: true,
+  imports: [RouterLink, IconComponent, SkeletonComponent, PaginationTableComponent],
+  templateUrl: './customers-table.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class CustomersTableComponent {
+  readonly customers = input.required<CustomerListItemDto[]>();
+  readonly loading = input(false);
+  readonly pagination = input<PaginationMeta | null>(null);
+  readonly searching = input(false);
+
+  readonly pageChange = output<number>();
+  readonly create = output<void>();
+
+  readonly skeletonRows = [1, 2, 3, 4, 5];
+
+  initials(name: string): string {
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((word) => word.charAt(0).toUpperCase())
+      .join('');
+  }
+}

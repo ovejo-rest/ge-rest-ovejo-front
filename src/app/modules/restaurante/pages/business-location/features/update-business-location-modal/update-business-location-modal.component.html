@@ -1,0 +1,39 @@
+@let isLoading = $isLoading();
+<app-modal-card>
+  <ng-template app-slot="header">
+    <h1 class="text-primary dark:text-foreground">Editar sucursal</h1>
+  </ng-template>
+  <button mat-icon-button class="close-button" (click)="dialogRef.close()">
+    <app-icon class="text-primary">close</app-icon>
+  </button>
+  <form [formGroup]="form">
+    <div class="grid grid-cols-3 gap-4 p-2">
+      <div class="w-full pt-1 text-end"><h3 class="text-foreground">Nombre</h3></div>
+      <div class="col-span-2"><input type="text" formControlName="name" /></div>
+      <div class="w-full pt-1 text-end"><h3 class="text-foreground">País</h3></div>
+      <div class="col-span-2"><input type="text" formControlName="country" /></div>
+      <div class="w-full pt-1 text-end"><h3 class="text-foreground">Estado/Región</h3></div>
+      <div class="col-span-2"><input type="text" formControlName="state" /></div>
+      <div class="w-full pt-1 text-end"><h3 class="text-foreground">Ciudad</h3></div>
+      <div class="col-span-2"><input type="text" formControlName="city" /></div>
+      <div class="w-full pt-1 text-end"><h3 class="text-foreground">Código postal</h3></div>
+      <div class="col-span-2"><input type="text" formControlName="zipCode" /></div>
+      <div class="w-full pt-1 text-end"><h3 class="text-foreground">Dirección</h3></div>
+      <div class="col-span-2"><input type="text" formControlName="address" /></div>
+      <div class="w-full pt-1 text-end"><h3 class="text-foreground">Teléfono</h3></div>
+      <div class="col-span-2"><input type="text" formControlName="mobile" /></div>
+      <div class="w-full pt-1 text-end"><h3 class="text-foreground">Email</h3></div>
+      <div class="col-span-2"><input type="email" formControlName="email" /></div>
+      <div class="w-full pt-1 text-end"><h3 class="text-foreground">Website</h3></div>
+      <div class="col-span-2"><input type="text" formControlName="website" /></div>
+    </div>
+  </form>
+  <ng-template app-slot="footer">
+    <div class="grid grid-cols-2 gap-2">
+      <app-button full impact="light" (buttonClick)="dialogRef.close()">Cancelar</app-button>
+      <app-button full impact="bold" [disabled]="form.invalid" (buttonClick)="submitForm()" [isLoading]="isLoading">
+        Guardar
+      </app-button>
+    </div>
+  </ng-template>
+</app-modal-card>

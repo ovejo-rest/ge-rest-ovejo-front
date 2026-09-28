@@ -1,0 +1,48 @@
+<div>
+  <app-header-dashboard title="Productos" subtitle="Gestiona los productos de tu carta">
+    @if (!$isEmpty()) {
+    <app-button full impact="bold" tone="primary" shape="rounded" size="medium" icon="add" (buttonClick)="handleCreate()">
+      Crear producto
+    </app-button>
+    <app-button full impact="light" tone="primary" shape="rounded" size="medium" icon="refresh" (buttonClick)="handleRetry()">
+      Actualizar
+    </app-button>
+    }
+  </app-header-dashboard>
+
+  @if ($errorMessage(); as errorMessage) {
+  <div class="flex flex-col items-center gap-4 py-16 text-center">
+    <app-icon class="text-destructive h-14 w-14">error_outline</app-icon>
+    <div>
+      <h2 class="text-foreground text-lg font-semibold">Error al cargar los productos</h2>
+      <p class="text-muted-foreground mt-1 text-sm">{{ errorMessage }}</p>
+    </div>
+    <app-button impact="bold" tone="primary" shape="rounded" (buttonClick)="handleRetry()">Reintentar</app-button>
+  </div>
+  } @else if ($isEmpty()) {
+  <app-empty-state
+    icon="restaurant_menu"
+    title="Aún no tienes productos"
+    description="Agrega los productos de tu carta para poder venderlos en el POS y recibir pedidos.">
+    <app-button impact="bold" tone="primary" shape="rounded" icon="add" (buttonClick)="handleCreate()">
+      Crear producto
+    </app-button>
+  </app-empty-state>
+  } @else {
+  <app-filters-product-table
+    [categories]="$categories()"
+    [initialFilters]="initialFilters"
+    (filtersChange)="handleFiltersChange($event)" />
+
+  <app-products-table
+    [products]="$products()"
+    [loading]="$isLoading()"
+    [pagination]="$pagination()"
+    [categoryNames]="$categoryNames()"
+    [hasFilters]="$hasFilters()"
+    (edit)="handleUpdate($event)"
+    (delete)="handleDelete($event)"
+    (pageChange)="handlePageChange($event)"
+    (clearFilters)="handleClearFilters()" />
+  }
+</div>

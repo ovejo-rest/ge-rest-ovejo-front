@@ -1,19 +1,26 @@
+@let locations = $locations(); @let isLoading = $isLoading(); @let hasError = $hasError();
+
 <app-header-dashboard title="Sucursales" subtitle="Gestiona las sucursales de tu negocio">
-  <app-button full impact="none" tone="primary" shape="rounded" size="medium">
-    <app-icon class="h-6 w-7"> refresh </app-icon>
+  <app-button full impact="none" tone="primary" shape="rounded" size="medium" icon="refresh" (buttonClick)="retry()">
   </app-button>
-  <app-button full impact="bold" tone="primary" shape="rounded" size="medium" (buttonClick)="createBusinessLocation()">
-    <app-icon class="h-6 w-7"> add </app-icon>
+  <app-button full impact="bold" tone="primary" shape="rounded" size="medium" icon="add" (buttonClick)="createBusinessLocation()">
     Nueva sucursal
   </app-button>
 </app-header-dashboard>
 
-<app-business-location-list />
-<!-- <app-card
-  ><div class="flex flex-col items-center justify-center py-8 text-center">
-    <app-icon class="text-muted-foreground mb-4 h-16 w-16">store</app-icon>
-    <h3 class="text-foreground mb-2 text-lg font-semibold">No tienes una sucursal creada</h3>
-    <p class="text-muted-foreground mb-4 text-sm">Crea tu primer sucursal para comenzar a configurar tu local.</p>
-    <app-button full impact="bold" tone="primary" icon="add"> Crear sucursal </app-button>
-  </div></app-card
-> -->
+@if (hasError) {
+<div class="flex flex-col items-center gap-4 py-16 text-center">
+  <app-icon class="text-destructive h-14 w-14">error_outline</app-icon>
+  <div>
+    <h2 class="text-foreground text-lg font-semibold">Error al cargar las sucursales</h2>
+    <p class="text-muted-foreground mt-1 text-sm">No se pudieron obtener los datos. Intenta nuevamente.</p>
+  </div>
+  <app-button impact="bold" tone="primary" shape="rounded" (buttonClick)="retry()">Reintentar</app-button>
+</div>
+} @else {
+<app-business-location-list
+  [locations]="locations ?? []"
+  [isLoading]="isLoading ?? false"
+  (update)="updateBusinessLocation($event)"
+  (delete)="deleteBusinessLocation($event)" />
+}

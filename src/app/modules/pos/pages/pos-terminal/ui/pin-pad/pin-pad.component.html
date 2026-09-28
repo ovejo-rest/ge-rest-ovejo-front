@@ -1,0 +1,22 @@
+<div class="mx-auto w-full max-w-xs" [class.pin-glass]="appearance() === 'glass'">
+  <div
+    class="mb-6 flex justify-center gap-4"
+    [class.pin-shake]="$error()"
+    aria-live="polite"
+    [attr.aria-label]="$error() ? 'PIN incorrecto' : $pin().length + ' de ' + pinLength + ' dígitos'">
+    @for (slot of slots; track slot) {
+    <span class="pin-dot h-3.5 w-3.5 rounded-full border-2 transition-all duration-200" [class.pin-dot--filled]="slot < $pin().length" [class.pin-dot--error]="$error()"></span>
+    }
+  </div>
+
+  <div class="grid grid-cols-3 justify-items-center gap-x-6 gap-y-4">
+    @for (key of keys; track key) {
+    <button type="button" class="pin-key" [disabled]="disabled()" (click)="press(key)">{{ key }}</button>
+    }
+    <button type="button" class="pin-key pin-key--ghost text-sm" aria-label="Borrar todo" [disabled]="disabled()" (click)="clear()">Borrar</button>
+    <button type="button" class="pin-key" [disabled]="disabled()" (click)="press('0')">0</button>
+    <button type="button" class="pin-key pin-key--ghost" aria-label="Borrar un dígito" [disabled]="disabled() || !$pin().length" (click)="backspace()">
+      <app-icon class="h-6 w-6">backspace</app-icon>
+    </button>
+  </div>
+</div>

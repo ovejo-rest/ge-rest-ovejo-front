@@ -1,0 +1,114 @@
+<div class="glass overflow-hidden rounded-[1rem]">
+  <div class="overflow-x-auto">
+    <table class="min-w-full">
+      <thead>
+        <tr class="text-muted-foreground border-b border-[var(--border)] text-left text-xs font-medium uppercase tracking-wider">
+          <th class="px-4 py-3">Fecha</th>
+          @if (showOrder()) {
+          <th class="px-4 py-3">Pedido</th>
+          }
+          <th class="px-4 py-3">Método</th>
+          <th class="px-4 py-3 text-right">Monto</th>
+          <th class="hidden px-4 py-3 text-right sm:table-cell">Propina</th>
+          <th class="hidden px-4 py-3 text-right md:table-cell">Vuelto</th>
+          <th class="px-4 py-3 text-center">Estado</th>
+          @if (canVoid()) {
+          <th class="px-4 py-3"><span class="sr-only">Acciones</span></th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading()) { @for (row of skeletonRows; track row) {
+        <tr class="border-b border-[var(--border)] last:border-0">
+          <td class="px-4 py-3"><app-skeleton size="xs" style="width: 110px" /></td>
+          @if (showOrder()) {
+          <td class="px-4 py-3"><app-skeleton size="xs" style="width: 110px" /></td>
+          }
+          <td class="px-4 py-3"><app-skeleton size="xs" style="width: 90px" /></td>
+          <td class="px-4 py-3"><div class="flex justify-end"><app-skeleton size="xs" style="width: 70px" /></div></td>
+          <td class="hidden px-4 py-3 sm:table-cell"><div class="flex justify-end"><app-skeleton size="xs" style="width: 50px" /></div></td>
+          <td class="hidden px-4 py-3 md:table-cell"><div class="flex justify-end"><app-skeleton size="xs" style="width: 50px" /></div></td>
+          <td class="px-4 py-3"><div class="flex justify-center"><app-skeleton size="xs" style="width: 70px" /></div></td>
+          @if (canVoid()) {
+          <td class="px-4 py-3"><div class="flex justify-end"><app-skeleton size="xs" style="width: 36px" /></div></td>
+          }
+        </tr>
+        } } @else { @for (payment of payments(); track payment.id) {
+        <tr class="glass-row border-b border-[var(--border)] transition-colors last:border-0" [class.opacity-60]="payment.cancelled">
+          <td class="text-foreground whitespace-nowrap px-4 py-3 text-sm">{{ formatDateTime(payment.createdAt) }}</td>
+          @if (showOrder()) {
+          <td class="px-4 py-3">
+            <a [routerLink]="['/orders', payment.transactionId]" class="text-foreground hover:text-primary font-mono text-sm font-semibold">
+              {{ payment.invoiceNo ?? '#' + payment.transactionId }}
+            </a>
+          </td>
+          }
+          <td class="px-4 py-3">
+            <span class="text-foreground inline-flex items-center gap-1.5 text-sm">
+              <app-icon class="text-muted-foreground h-4 w-4">{{ methodIcon(payment.method) }}</app-icon>{{ methodLabel(payment.method) }}
+            </span>
+            @if (payment.note) {
+            <p class="text-muted-foreground max-w-[14rem] truncate text-xs" [title]="payment.note">{{ payment.note }}</p>
+            }
+          </td>
+          <td class="text-foreground whitespace-nowrap px-4 py-3 text-right font-semibold tabular-nums" [class.line-through]="payment.cancelled">
+            {{ formatCurrency(payment.amount) }}
+          </td>
+          <td class="text-muted-foreground hidden whitespace-nowrap px-4 py-3 text-right text-sm tabular-nums sm:table-cell">
+            {{ payment.tipAmount ? formatCurrency(payment.tipAmount) : '—' }}
+          </td>
+          <td class="text-muted-foreground hidden whitespace-nowrap px-4 py-3 text-right text-sm tabular-nums md:table-cell">
+            {{ payment.changeAmount ? formatCurrency(payment.changeAmount) : '—' }}
+          </td>
+          <td class="px-4 py-3 text-center">
+            @if (payment.cancelled) {
+            <span class="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2.5 py-0.5 text-xs font-medium text-red-600" [title]="payment.cancellationReason ?? ''">
+              <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>Anulado
+            </span>
+            @if (payment.cancellationReason) {
+            <p class="text-muted-foreground mt-0.5 max-w-[12rem] truncate text-xs" [title]="payment.cancellationReason">{{ payment.cancellationReason }}</p>
+            }
+            } @else {
+            <span class="inline-flex items-center gap-1 rounded-full bg-green-500/15 px-2.5 py-0.5 text-xs font-medium text-green-600">
+              <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>Vigente
+            </span>
+            }
+          </td>
+          @if (canVoid()) {
+          <td class="px-4 py-3 text-right">
+            @if (!payment.cancelled) {
+            <button
+              type="button"
+              title="Anular pago"
+              [attr.aria-label]="'Anular pago de ' + formatCurrency(payment.amount)"
+              class="text-muted-foreground inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors hover:bg-red-500/10 hover:text-red-600"
+              (click)="voidPayment.emit(payment)">
+              <app-icon class="h-5 w-5">block</app-icon>
+            </button>
+            }
+          </td>
+          }
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="8" class="px-4 py-12 text-center">
+            <p class="text-foreground font-medium">Sin pagos</p>
+            <p class="text-muted-foreground mt-1 text-sm">
+              {{ hasFilters() ? 'No hay pagos que coincidan con los filtros.' : 'Todavía no hay pagos registrados.' }}
+            </p>
+            @if (hasFilters()) {
+            <button type="button" class="text-primary mt-3 text-sm font-medium hover:underline" (click)="clearFilters.emit()">Limpiar filtros</button>
+            }
+          </td>
+        </tr>
+        } }
+      </tbody>
+    </table>
+  </div>
+
+  @if (pagination(); as meta) { @if (meta.totalItems > 0) {
+  <div class="border-t border-[var(--border)] px-4 pb-3">
+    <app-pagination-table [pagination]="meta" (pageChange)="pageChange.emit($event)" />
+  </div>
+  } }
+</div>

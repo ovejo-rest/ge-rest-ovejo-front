@@ -3,24 +3,29 @@ export type TableStatus = 'available' | 'occupied' | 'reserved' | 'blocked';
 export type TableDto = Readonly<{
   id: number;
   name: string;
+  location: string;
+  description: string | null;
   capacity: number;
-  sectorId: number;
-  sectorName: string;
-  sectorColor: string;
   status: TableStatus;
-  isActive: boolean;
+  qrCode: string | null;
+  // URL que se codifica en el QR (null si el backend no tiene QR_BASE_URL configurado).
+  qrUrl: string | null;
+  sectorId: number | null;
 }>;
 
 export type CreateTableDto = Readonly<{
   name: string;
-  capacity: number;
-  sectorId: number;
+  description?: string;
+  locationId: number;
+  capacity?: number;
+  sectorId?: number;
 }>;
 
 export type UpdateTableDto = Readonly<{
+  id: number;
   name?: string;
+  description?: string;
   capacity?: number;
-  sectorId?: number;
   status?: TableStatus;
-  isActive?: boolean;
+  sectorId?: number;
 }>;

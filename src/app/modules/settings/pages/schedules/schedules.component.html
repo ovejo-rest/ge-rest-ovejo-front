@@ -1,0 +1,48 @@
+<div class="space-y-4">
+  <app-header-dashboard title="Horarios" subtitle="Horario de atención. Se usa para validar las reservas." />
+
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <label for="schedule-scope" class="text-foreground text-sm font-medium">Horario de</label>
+    <select id="schedule-scope" class="glass-input rounded-md px-3 py-2 sm:w-72" (change)="selectScope($event)">
+      <option value="" [selected]="$locationId() === null">General del negocio</option>
+      @for (location of $locations(); track location.id) {
+      <option [value]="location.id" [selected]="$locationId() === location.id">{{ location.name }}</option>
+      }
+    </select>
+  </div>
+
+  <p class="text-muted-foreground flex items-start gap-2 text-sm">
+    <app-icon class="mt-0.5 h-4 w-4 shrink-0">info</app-icon>
+    @if ($locationId() === null) {
+    El horario general aplica a las sucursales que no tengan uno propio. Puedes definir varios tramos por día (por ejemplo, almuerzo y cena) y un tramo puede pasar la medianoche.
+    } @else if (!$scoped().length) {
+    {{ $scopeLabel() }} no tiene horario propio{{ $hasGeneral() ? ': usa el horario general del negocio' : '' }}. Si agregas tramos aquí, reemplazarán al general para esta sucursal.
+    } @else {
+    {{ $scopeLabel() }} usa su propio horario, que reemplaza al general.
+    }
+  </p>
+
+  @if ($hasError() && !$scoped().length) {
+  <div class="flex flex-col items-center gap-4 py-16 text-center">
+    <app-icon class="text-destructive h-14 w-14">error_outline</app-icon>
+    <p class="text-foreground font-semibold">No se pudieron cargar los horarios</p>
+    <app-button impact="bold" tone="primary" shape="rounded" (buttonClick)="handleRetry()">Reintentar</app-button>
+  </div>
+  } @else if ($isLoading()) {
+  <p class="text-muted-foreground py-10 text-center text-sm">Cargando horarios…</p>
+  } @else {
+  <div class="glass overflow-hidden rounded-[1rem]">
+    @for (day of days; track day.dayOfWeek) {
+    <app-day-schedule-row
+      [day]="day"
+      [schedules]="$byDay().get(day.dayOfWeek) ?? []"
+      [isToday]="day.dayOfWeek === today"
+      [busy]="$busyDays().has(day.dayOfWeek)"
+      (addRange)="handleAdd(day, $event)"
+      (updateRange)="handleUpdate(day, $event)"
+      (removeRange)="handleRemove(day, $event)"
+      (setClosed)="handleSetClosed(day, $event)" />
+    }
+  </div>
+  }
+</div>

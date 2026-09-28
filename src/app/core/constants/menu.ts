@@ -10,7 +10,73 @@ export class Menu {
           icon: 'dashboard',
           label: 'Dashboard',
           route: '/dashboard',
-          children: [{ label: 'Admin', route: '/dashboard/admin' }],
+          children: [{ label: 'Resumen', route: '/dashboard/admin' }],
+        },
+        {
+          icon: 'factory',
+          label: 'Negocio',
+          route: '/business',
+          children: [
+            { label: 'Restaurante', route: '/business' },
+            { label: 'Sucursales', route: '/business/location' },
+          ],
+        },
+        {
+          icon: 'point_of_sale',
+          label: 'POS',
+          route: '/pos',
+          children: [{ label: 'Tomar pedidos', route: '/pos' }],
+        },
+        {
+          icon: 'restaurant',
+          label: 'Cocina',
+          route: '/kitchen',
+          children: [{ label: 'Comandas', route: '/kitchen' }],
+        },
+        {
+          icon: 'groups',
+          label: 'Clientes',
+          route: '/customers',
+          children: [{ label: 'Clientes', route: '/customers' }],
+        },
+        {
+          icon: 'event',
+          label: 'Reservas',
+          route: '/bookings',
+          children: [{ label: 'Agenda', route: '/bookings' }],
+        },
+        {
+          icon: 'chair',
+          label: 'Sectores',
+          route: '/sectors',
+          children: [{ label: 'Sectores', route: '/sectors' }],
+        },
+        {
+          icon: 'table_bar',
+          label: 'Mesas',
+          route: '/tables',
+          children: [{ label: 'Mesas', route: '/tables' }],
+        },
+        {
+          icon: 'receipt_long',
+          label: 'Pedidos',
+          route: '/orders',
+          children: [{ label: 'Pedidos', route: '/orders' }],
+        },
+        {
+          icon: 'payments',
+          label: 'Pagos',
+          route: '/payments',
+          children: [{ label: 'Pagos', route: '/payments' }],
+        },
+        {
+          icon: 'inventory_2',
+          label: 'Productos',
+          route: '/products',
+          children: [
+            { label: 'Productos', route: '/products' },
+            { label: 'Categorías', route: '/products/categories' },
+          ],
         },
         {
           icon: 'admin_panel_settings',
@@ -82,8 +148,15 @@ export class Menu {
       items: [
         {
           icon: 'settings',
-          label: 'Settings',
+          label: 'Configuración',
           route: '/settings',
+          children: [
+            { label: 'Horarios', route: '/settings/schedules' },
+            { label: 'Estaciones', route: '/settings/stations' },
+            { label: 'Impresoras', route: '/settings/printers' },
+            { label: 'Estación de impresión', route: '/settings/print-station' },
+            { label: 'Terminal de salón', route: '/settings/terminal' },
+          ],
         },
         {
           icon: 'notifications',

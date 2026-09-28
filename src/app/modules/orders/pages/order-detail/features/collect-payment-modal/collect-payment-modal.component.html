@@ -1,0 +1,157 @@
+<app-modal-card>
+  <ng-template app-slot="header">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Cobrar {{ order.invoiceNo }}</h2>
+      <span class="text-muted-foreground text-sm font-normal">{{ order.tableName ?? 'Sin mesa' }}</span>
+    </div>
+  </ng-template>
+
+  <!-- Resumen de la cuenta -->
+  <div class="mb-4 grid grid-cols-3 gap-2 text-center">
+    <div class="glass-row rounded-lg p-2">
+      <p class="text-muted-foreground text-xs">Total</p>
+      <p class="text-foreground font-semibold tabular-nums">{{ formatCurrency(order.finalTotal) }}</p>
+    </div>
+    <div class="glass-row rounded-lg p-2">
+      <p class="text-muted-foreground text-xs">Pagado</p>
+      <p class="text-foreground font-semibold tabular-nums">{{ formatCurrency(order.finalTotal - $remaining()) }}</p>
+    </div>
+    <div class="rounded-lg p-2" [class]="$isPaid() ? 'bg-green-500/15 text-green-700' : 'bg-amber-500/15 text-amber-700'">
+      <p class="text-xs">Saldo</p>
+      <p class="font-bold tabular-nums">{{ formatCurrency($remaining()) }}</p>
+    </div>
+  </div>
+
+  @if ($lastChange(); as last) {
+  <!-- Vuelto destacado -->
+  <div class="mb-4 rounded-xl bg-green-500/15 p-5 text-center" role="status" aria-live="polite">
+    <p class="text-sm font-medium text-green-700">Vuelto a entregar</p>
+    <p class="text-4xl font-bold tabular-nums text-green-700">{{ formatCurrency(last.change) }}</p>
+    <p class="text-muted-foreground mt-1 text-xs">Pago en efectivo de {{ formatCurrency(last.amount + last.tip) }}{{ last.tip ? ' (incluye propina)' : '' }}</p>
+    @if (!$isPaid()) {
+    <button type="button" class="text-primary mt-3 text-sm font-medium hover:underline" (click)="dismissChange()">Continuar con el siguiente pago</button>
+    }
+  </div>
+  }
+
+  @if ($isPaid()) {
+  <div class="mb-2 flex flex-col items-center gap-2 py-4 text-center">
+    <div class="flex h-14 w-14 items-center justify-center rounded-full bg-green-500/15 text-green-600">
+      <app-icon class="h-8 w-8">check_circle</app-icon>
+    </div>
+    <p class="text-foreground text-lg font-semibold">Cuenta pagada</p>
+    <p class="text-muted-foreground text-sm">El pedido se cerró automáticamente.</p>
+  </div>
+  } @else if (!$lastChange()) {
+  <form [formGroup]="form" class="space-y-4">
+    <!-- Método -->
+    <div class="grid grid-cols-3 gap-2 sm:grid-cols-5" role="radiogroup" aria-label="Método de pago">
+      @for (method of methods; track method.value) {
+      <button
+        type="button"
+        role="radio"
+        class="flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-lg border-2 p-2 text-xs font-medium transition-colors"
+        [class]="$value().method === method.value ? 'border-primary bg-primary/10 text-primary' : 'glass-row text-foreground border-transparent'"
+        [attr.aria-checked]="$value().method === method.value"
+        (click)="selectMethod(method.value)">
+        <app-icon class="h-6 w-6">{{ method.icon }}</app-icon>{{ method.label }}
+      </button>
+      }
+    </div>
+
+    <!-- Monto -->
+    <div>
+      <div class="mb-1 flex items-center justify-between">
+        <label for="pay-amount" class="text-foreground text-sm font-medium">Monto a pagar</label>
+        <div class="flex gap-1">
+          <button type="button" class="glass-row rounded-full px-3 py-1 text-xs" (click)="setAmount($remaining())">Todo el saldo</button>
+          <button type="button" class="glass-row rounded-full px-3 py-1 text-xs" (click)="setHalf()">Mitad</button>
+        </div>
+      </div>
+      <div class="relative">
+        <span class="text-muted-foreground pointer-events-none absolute inset-y-0 left-3 flex items-center">$</span>
+        <input id="pay-amount" type="number" formControlName="amount" min="1" [max]="$remaining()" inputmode="numeric" class="glass-input w-full rounded-md py-2.5 pl-7 pr-3 text-lg font-semibold tabular-nums" [class.border-red-500]="$amount() > $remaining()" />
+      </div>
+      @if ($amount() > 0 && $amount() < $remaining()) {
+      <p class="text-muted-foreground mt-1 text-xs">Pago parcial: quedará un saldo de {{ formatCurrency($remaining() - $amount()) }}.</p>
+      }
+    </div>
+
+    <!-- Propina -->
+    <div>
+      <div class="mb-1 flex items-center justify-between">
+        <label for="pay-tip" class="text-foreground text-sm font-medium">Propina <span class="text-muted-foreground font-normal">(no suma al total)</span></label>
+        <div class="flex gap-1">
+          @for (percentage of tipPercentages; track percentage) {
+          <button type="button" class="glass-row rounded-full px-3 py-1 text-xs" (click)="setTipPercentage(percentage)">
+            {{ percentage === 0 ? 'Sin propina' : percentage + '%' }}
+          </button>
+          }
+        </div>
+      </div>
+      <div class="relative">
+        <span class="text-muted-foreground pointer-events-none absolute inset-y-0 left-3 flex items-center">$</span>
+        <input id="pay-tip" type="number" formControlName="tipAmount" min="0" inputmode="numeric" class="glass-input w-full rounded-md py-2 pl-7 pr-3 tabular-nums" />
+      </div>
+    </div>
+
+    <!-- Efectivo recibido -->
+    @if ($isCash()) {
+    <div>
+      <label for="pay-tendered" class="text-foreground mb-1 block text-sm font-medium">Efectivo recibido <span class="text-muted-foreground font-normal">(opcional, para calcular el vuelto)</span></label>
+      <div class="mb-2 flex flex-wrap gap-2">
+        @for (option of $cashOptions(); track option) {
+        <button type="button" class="glass-row rounded-md px-3 py-2 text-sm font-medium tabular-nums" (click)="setTendered(option)">
+          {{ $index === 0 ? 'Exacto' : formatCurrency(option) }}
+        </button>
+        }
+      </div>
+      <div class="relative">
+        <span class="text-muted-foreground pointer-events-none absolute inset-y-0 left-3 flex items-center">$</span>
+        <input id="pay-tendered" type="number" formControlName="amountTendered" min="0" inputmode="numeric" placeholder="0" class="glass-input w-full rounded-md py-2 pl-7 pr-3 tabular-nums" [class.border-red-500]="$change() < 0" />
+      </div>
+      @if ($tendered() > 0 && $change() >= 0) {
+      <p class="mt-1 text-sm font-medium text-green-700">Vuelto: {{ formatCurrency($change()) }}</p>
+      }
+    </div>
+    }
+
+    <input formControlName="note" placeholder="Nota (opcional)" aria-label="Nota del pago" maxlength="191" class="glass-input w-full rounded-md px-3 py-2 text-sm" />
+
+    @if ($validationError(); as error) {
+    <p class="text-muted-foreground text-center text-xs">{{ error }}</p>
+    }
+  </form>
+  }
+
+  @if ($registered().length) {
+  <div class="mt-4 border-t border-[var(--border)] pt-3">
+    <p class="text-muted-foreground mb-2 text-xs font-medium uppercase tracking-wider">Pagos registrados</p>
+    <ul class="space-y-1 text-sm">
+      @for (payment of $registered(); track $index) {
+      <li class="flex justify-between">
+        <span class="text-foreground">{{ methodLabel(payment.method) }}{{ payment.tip ? ' + propina ' + formatCurrency(payment.tip) : '' }}</span>
+        <span class="text-foreground font-medium tabular-nums">{{ formatCurrency(payment.amount) }}</span>
+      </li>
+      }
+    </ul>
+  </div>
+  }
+
+  <ng-template app-slot="footer">
+    <div class="flex justify-end gap-3">
+      @if ($isPaid()) {
+      <app-button type="button" impact="bold" tone="primary" (buttonClick)="handleClose()">Listo</app-button>
+      } @else {
+      <app-button type="button" impact="light" [disabled]="$isLoading()" (buttonClick)="handleClose()">
+        {{ $registered().length ? 'Terminar' : 'Cancelar' }}
+      </app-button>
+      @if (!$lastChange()) {
+      <app-button type="button" impact="bold" tone="primary" [disabled]="$isLoading() || !!$validationError()" [isLoading]="$isLoading()" (buttonClick)="handleSubmit()">
+        Registrar {{ formatCurrency($due()) }}
+      </app-button>
+      }
+      }
+    </div>
+  </ng-template>
+</app-modal-card>

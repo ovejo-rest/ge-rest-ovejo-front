@@ -32,20 +32,23 @@ export class UpdateTableModalComponent implements OnDestroy {
   private fb = inject(FormBuilder);
   form = this.fb.group({
     name: [this.data.name, Validators.required],
+    description: [this.data.description || ''],
     capacity: [this.data.capacity, [Validators.required, Validators.min(1)]],
-    sectorId: [this.data.sectorId, Validators.required],
-    status: [this.data.status as TableStatus],
+    sectorId: [this.data.sectorId],
+    status: [{ value: this.data.status as TableStatus, disabled: this.data.status === 'occupied' }],
   });
 
-  readonly statusOptions: { value: TableStatus; label: string }[] = [
-    { value: 'available', label: 'Disponible' },
-    { value: 'occupied', label: 'Ocupada' },
-    { value: 'reserved', label: 'Reservada' },
-    { value: 'blocked', label: 'Bloqueada' },
-  ];
+  // "Ocupada" y "Disponible" cambian solas con los pedidos; a mano solo se reserva o bloquea.
+  readonly isOccupied = this.data.status === 'occupied';
+  readonly statusOptions: { value: TableStatus; label: string }[] = this.isOccupied
+    ? [{ value: 'occupied', label: 'Ocupada (tiene un pedido abierto)' }]
+    : [
+        { value: 'available', label: 'Disponible' },
+        { value: 'reserved', label: 'Reservada' },
+        { value: 'blocked', label: 'Bloqueada' },
+      ];
 
   constructor() {
-    this.$sectorsService.setParams({ perPage: 100 });
     effect(() => {
       if (this.$service.$success()) {
         this.$toast.show('Mesa actualizada', 'success');
@@ -63,12 +66,14 @@ export class UpdateTableModalComponent implements OnDestroy {
       this.form.markAllAsTouched();
       return;
     }
-    const { name, capacity, sectorId, status } = this.form.getRawValue();
-    this.$service.update(this.data.id, {
+    const { name, description, capacity, sectorId, status } = this.form.getRawValue();
+    this.$service.update({
+      id: this.data.id,
       name: name ?? undefined,
+      description: description || undefined,
       capacity: capacity ?? undefined,
       sectorId: sectorId ?? undefined,
-      status: status ?? undefined,
+      status: status && status !== this.data.status ? status : undefined,
     });
   }
 

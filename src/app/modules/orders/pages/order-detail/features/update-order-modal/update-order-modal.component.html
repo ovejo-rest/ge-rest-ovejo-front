@@ -1,0 +1,81 @@
+<app-modal-card>
+  <ng-template app-slot="header">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Editar pedido {{ order.invoiceNo }}</h2>
+  </ng-template>
+
+  <form [formGroup]="form" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div>
+      <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Mesa</label>
+      <select formControlName="resTableId" [class]="inputClass">
+        @if (order.resTableId === null) {
+        <option [ngValue]="null">Sin mesa</option>
+        }
+        @for (table of $tables(); track table.id) {
+        <option [ngValue]="table.id" [disabled]="table.status === 'blocked' && table.id !== order.resTableId">
+          {{ table.name }}{{ table.status === 'blocked' ? ' (bloqueada)' : '' }}
+        </option>
+        }
+      </select>
+    </div>
+
+    <div>
+      <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Mesero</label>
+      <select formControlName="resWaiterId" [class]="inputClass">
+        @if (order.resWaiterId === null) {
+        <option [ngValue]="null">Sin mesero</option>
+        }
+        @for (member of $staff(); track member.code) {
+        <option [ngValue]="member.code">{{ member.name }} {{ member.fatherLastName }}</option>
+        }
+      </select>
+    </div>
+
+    <div>
+      <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Descuento</label>
+      <select formControlName="discountType" [class]="inputClass">
+        <option [ngValue]="'none'">Sin descuento</option>
+        <option [ngValue]="'fixed'">Monto fijo ($)</option>
+        <option [ngValue]="'percentage'">Porcentaje (%)</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        {{ $discountType() === 'percentage' ? 'Porcentaje' : 'Monto' }}
+      </label>
+      <input
+        type="number"
+        formControlName="discountAmount"
+        min="0"
+        [max]="$maxDiscount()"
+        inputmode="numeric"
+        [readonly]="$discountType() === 'none'"
+        [class]="inputClass"
+        [ngClass]="{ 'border-red-500': form.controls.discountAmount.invalid, 'opacity-50': $discountType() === 'none' }" />
+      @if ($discountType() !== 'none') {
+      <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        Máximo {{ $discountType() === 'percentage' ? '100%' : formatCurrency(order.totalBeforeTax) }}
+      </p>
+      }
+    </div>
+
+    <div class="sm:col-span-2">
+      <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Nota para cocina</label>
+      <textarea formControlName="staffNote" rows="3" placeholder="Se imprime en la comanda. Ej: 1x Completo: sin palta" [class]="inputClass"></textarea>
+    </div>
+
+    <div class="sm:col-span-2">
+      <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Nota general</label>
+      <textarea formControlName="additionalNotes" rows="2" placeholder="No se imprime en la comanda" [class]="inputClass"></textarea>
+    </div>
+  </form>
+
+  <ng-template app-slot="footer">
+    <div class="flex justify-end gap-3">
+      <app-button type="button" impact="light" [disabled]="!!$isLoading()" (buttonClick)="handleCancel()"> Cancelar </app-button>
+      <app-button type="button" impact="bold" [disabled]="!!$isLoading()" [isLoading]="!!$isLoading()" (buttonClick)="handleSubmit()">
+        Guardar cambios
+      </app-button>
+    </div>
+  </ng-template>
+</app-modal-card>
