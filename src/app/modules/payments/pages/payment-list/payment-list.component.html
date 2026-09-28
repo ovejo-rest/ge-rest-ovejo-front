@@ -1,42 +1,40 @@
-<div class="p-6">
-  <app-header-dashboard
-    title="Pagos"
-    subtitle="Gestiona los pagos de tu negocio"
-  >
-    <app-button
-      impact="bold"
-      tone="primary"
-      icon="add"
-      (buttonClick)="onCreatePayment()"
-    >
-      Nuevo Pago
+<div>
+  <app-header-dashboard title="Pagos" subtitle="Revisa los cobros de tu negocio. Para cobrar, abre el pedido.">
+    @if (!$isEmpty()) {
+    <app-button full impact="light" tone="primary" shape="rounded" size="medium" icon="refresh" (buttonClick)="handleRetry()">
+      Actualizar
     </app-button>
+    }
   </app-header-dashboard>
 
-  <app-filters-payment-table
-    (filtersChange)="onFiltersChange($event)"
-  />
-
-  @if ($hasError()) {
-    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
-      <app-icon class="text-red-600 dark:text-red-400 text-4xl mb-2">error</app-icon>
-      <p class="text-red-800 dark:text-red-300 font-medium mb-2">Error al cargar los pagos</p>
-      <p class="text-red-600 dark:text-red-400 text-sm mb-4">
-        No se pudieron obtener los datos. Intenta nuevamente.
-      </p>
-      <app-button
-        impact="bold"
-        tone="primary"
-        (buttonClick)="onRetry()"
-      >
-        Reintentar
-      </app-button>
+  @if ($errorMessage(); as errorMessage) {
+  <div class="flex flex-col items-center gap-4 py-16 text-center">
+    <app-icon class="text-destructive h-14 w-14">error_outline</app-icon>
+    <div>
+      <h2 class="text-foreground text-lg font-semibold">Error al cargar los pagos</h2>
+      <p class="text-muted-foreground mt-1 text-sm">{{ errorMessage }}</p>
     </div>
+    <app-button impact="bold" tone="primary" shape="rounded" (buttonClick)="handleRetry()">Reintentar</app-button>
+  </div>
+  } @else if ($isEmpty()) {
+  <app-empty-state
+    icon="payments"
+    title="Aún no hay pagos"
+    description="Los cobros que registres desde el detalle de cada pedido aparecerán aquí." />
   } @else {
-    <app-payments-table
-      [payments]="$payments() ?? []"
-      [loading]="$isLoading() ?? false"
-      (cancel)="onCancelPayment($event)"
-    />
+  <app-filters-payment-table
+    [filters]="$query()"
+    [hasFilters]="$hasFilters()"
+    (filtersChange)="handleFiltersChange($event)"
+    (clear)="handleClearFilters()" />
+
+  <app-payments-table
+    [payments]="$payments()"
+    [loading]="$isLoading()"
+    [pagination]="$pagination()"
+    [hasFilters]="$hasFilters()"
+    (voidPayment)="handleVoid($event)"
+    (pageChange)="handlePageChange($event)"
+    (clearFilters)="handleClearFilters()" />
   }
 </div>

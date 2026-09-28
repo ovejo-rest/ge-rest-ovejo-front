@@ -28,6 +28,16 @@ const routes: Routes = [
     loadChildren: () => import('../restaurante/restaurante.routes'),
   },
   {
+    path: 'pos',
+    component: LayoutComponent,
+    loadChildren: () => import('../pos/pos.routes'),
+  },
+  {
+    path: 'kitchen',
+    component: LayoutComponent,
+    loadChildren: () => import('../kitchen/kitchen.routes'),
+  },
+  {
     path: 'orders',
     component: LayoutComponent,
     loadChildren: () => import('../orders/orders.routes'),
@@ -46,6 +56,26 @@ const routes: Routes = [
     path: 'payments',
     component: LayoutComponent,
     loadChildren: () => import('../payments/payments.routes'),
+  },
+  {
+    path: 'products',
+    component: LayoutComponent,
+    loadChildren: () => import('../products/products.routes'),
+  },
+  {
+    path: 'customers',
+    component: LayoutComponent,
+    loadChildren: () => import('../customers/customers.routes'),
+  },
+  {
+    path: 'bookings',
+    component: LayoutComponent,
+    loadChildren: () => import('../bookings/bookings.routes'),
+  },
+  {
+    path: 'settings',
+    component: LayoutComponent,
+    loadChildren: () => import('../settings/settings.routes'),
   },
   {
     path: 'profile',

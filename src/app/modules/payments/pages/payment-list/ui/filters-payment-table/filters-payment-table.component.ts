@@ -1,58 +1,36 @@
-import { Component, EventEmitter, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { ButtonComponent } from 'src/ui';
+import { Component, input, output } from '@angular/core';
 import { PaymentMethod } from '../../data-access';
+import { PAYMENT_METHODS } from '../payment-methods';
+
+export type PaymentTableFilters = Readonly<{
+  method: PaymentMethod | null;
+  from: string | null;
+  to: string | null;
+  includeCancelled: boolean;
+}>;
 
 @Component({
   selector: 'app-filters-payment-table',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonComponent],
   templateUrl: './filters-payment-table.component.html',
 })
 export class FiltersPaymentTableComponent {
-  @Output() filtersChange = new EventEmitter<{
-    method?: string;
-    startDate?: string;
-    endDate?: string;
-  }>();
+  readonly filters = input.required<PaymentTableFilters>();
+  readonly hasFilters = input(false);
+  readonly filtersChange = output<Partial<PaymentTableFilters>>();
+  readonly clear = output<void>();
 
-  readonly paymentMethods = Object.values(PaymentMethod);
+  readonly methods = PAYMENT_METHODS;
 
-  form = this.fb.group({
-    method: [''],
-    startDate: [''],
-    endDate: [''],
-  });
-
-  constructor(private readonly fb: FormBuilder) {}
-
-  onApply() {
-    const value = this.form.getRawValue();
-    this.filtersChange.emit({
-      method: value.method || undefined,
-      startDate: value.startDate || undefined,
-      endDate: value.endDate || undefined,
-    });
+  onMethod(event: Event) {
+    const value = (event.target as HTMLSelectElement).value as PaymentMethod | '';
+    this.filtersChange.emit({ method: value || null });
   }
 
-  onClear() {
-    this.form.reset({
-      method: '',
-      startDate: '',
-      endDate: '',
-    });
-    this.filtersChange.emit({});
+  onDate(field: 'from' | 'to', event: Event) {
+    this.filtersChange.emit({ [field]: (event.target as HTMLInputElement).value || null });
   }
 
-  getMethodLabel(method: string): string {
-    const labels: Record<string, string> = {
-      cash: 'Efectivo',
-      debit: 'Débito',
-      credit: 'Crédito',
-      transfer: 'Transferencia',
-      other: 'Otro',
-    };
-    return labels[method] || method;
+  onIncludeCancelled(event: Event) {
+    this.filtersChange.emit({ includeCancelled: (event.target as HTMLInputElement).checked });
   }
 }

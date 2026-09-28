@@ -28,6 +28,9 @@
           <option [ngValue]="opt.value">{{ opt.label }}</option>
           }
         </select>
+        @if (isOccupied) {
+        <p class="text-muted-foreground mt-1 text-xs">Cambia sola cuando el pedido se cierra o se cancela.</p>
+        }
       </div>
     </div>
   </form>

@@ -1,0 +1,23 @@
+<app-modal-card>
+  <ng-template app-slot="header">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Editar reserva</h2>
+  </ng-template>
+
+  <div class="space-y-4">
+    <div class="glass-row flex items-center gap-3 rounded-lg px-3 py-2">
+      <app-icon class="text-primary h-5 w-5">person</app-icon>
+      <div>
+        <p class="text-foreground text-sm font-medium">{{ booking.customerName }}</p>
+        <p class="text-muted-foreground text-xs">{{ booking.locationName }}</p>
+      </div>
+    </div>
+    <app-booking-form-fields [form]="form" [tables]="$tables()" [showStatus]="true" />
+  </div>
+
+  <ng-template app-slot="footer">
+    <div class="flex justify-end gap-3">
+      <app-button type="button" impact="light" [disabled]="$isSaving()" (buttonClick)="handleCancel()">Cancelar</app-button>
+      <app-button type="button" impact="bold" [disabled]="$isSaving()" [isLoading]="$isSaving()" (buttonClick)="handleSubmit()">Guardar cambios</app-button>
+    </div>
+  </ng-template>
+</app-modal-card>

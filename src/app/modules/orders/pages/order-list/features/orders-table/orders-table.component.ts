@@ -1,66 +1,28 @@
-import { Component, EventEmitter, input, Output, signal, inject } from '@angular/core';
-import { CurrencyPipe, DatePipe, NgClass } from '@angular/common';
-import { MatDialog } from '@angular/material/dialog';
-import {
-  ButtonComponent, PaginationTableComponent,
-  ProgressBarComponent, SlotDirective, TableComponent,
-} from 'src/ui';
-import { FiltersOrderTableComponent } from '../../ui';
-import { OrderDto, OrderStatus } from '../../data-access';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { PaginationMeta } from 'src/app/core/standarized-response/standardized-pagination/pagination-meta.dto';
-import { OrderDetailModalComponent } from '../order-detail-modal';
-import { UpdateOrderStatusModalComponent } from '../update-order-status-modal';
+import { IconComponent, PaginationTableComponent, SkeletonComponent } from 'src/ui';
+import { OrderSummaryDto } from '../../data-access';
+import { formatDateTime, formatRelative, KITCHEN_STATUS, StatusBadgeComponent } from '../../ui';
 
 @Component({
   selector: 'app-orders-table',
-  imports: [
-    NgClass, TableComponent, SlotDirective, ButtonComponent,
-    PaginationTableComponent, ProgressBarComponent, FiltersOrderTableComponent,
-    CurrencyPipe, DatePipe,
-  ],
+  standalone: true,
+  imports: [RouterLink, IconComponent, SkeletonComponent, PaginationTableComponent, StatusBadgeComponent],
   templateUrl: './orders-table.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrdersTableComponent {
-  private readonly dialog = inject(MatDialog);
-  readonly $orders = input.required<OrderDto[]>({ alias: 'orders' });
-  readonly isLoading = input(false, { alias: 'isLoading' });
-  readonly $pagination = input.required<PaginationMeta>({ alias: 'pagination' });
+  readonly orders = input.required<OrderSummaryDto[]>();
+  readonly loading = input(false);
+  readonly pagination = input<PaginationMeta | null>(null);
+  readonly hasFilters = input(false);
 
-  @Output() pageChange = new EventEmitter<number>();
-  @Output() perPageChange = new EventEmitter<number>();
-  @Output() searchTableChange = new EventEmitter<string>();
-  @Output() statusFilterChange = new EventEmitter<string>();
-  @Output() retryData = new EventEmitter<void>();
+  readonly pageChange = output<number>();
+  readonly clearFilters = output<void>();
 
-  readonly headerData = ['Pedido', 'Mesa', 'Items', 'Total', 'Estado', 'Fecha'];
-  readonly perPage = signal(10);
-
-  viewDetail(item: OrderDto) { this.dialog.open(OrderDetailModalComponent, { width: '90%', data: item }); }
-  changeStatus(item: OrderDto) { this.dialog.open(UpdateOrderStatusModalComponent, { width: '90%', data: item }); }
-  onChangePage(p: number) { this.pageChange.emit(p); }
-  onSearchTable(v: string) { this.searchTableChange.emit(v); }
-  onStatusFilter(v: string) { this.statusFilterChange.emit(v); }
-  onPerPageChange(e: Event) { const v = Number((e.target as HTMLSelectElement).value); this.perPage.set(v); this.perPageChange.emit(v); }
-  retry() { this.retryData.emit(); }
-
-  statusClasses(s: OrderStatus) {
-    const m: Record<OrderStatus, string> = {
-      received: 'bg-purple-500/20 text-purple-600',
-      pending: 'bg-yellow-500/20 text-yellow-600',
-      in_progress: 'bg-blue-500/20 text-blue-600',
-      ready: 'bg-green-500/20 text-green-600',
-      delivered: 'bg-teal-500/20 text-teal-600',
-      completed: 'bg-green-600/20 text-green-700',
-      cancelled: 'bg-red-500/20 text-red-600',
-    };
-    return m[s];
-  }
-
-  statusLabel(s: OrderStatus) {
-    const m: Record<OrderStatus, string> = {
-      received: 'Recibido', pending: 'Pendiente', in_progress: 'En preparación',
-      ready: 'Listo', delivered: 'Entregado', completed: 'Completado', cancelled: 'Cancelado',
-    };
-    return m[s];
-  }
+  readonly kitchenStatus = KITCHEN_STATUS;
+  readonly skeletonRows = [1, 2, 3, 4, 5];
+  readonly formatDateTime = formatDateTime;
+  readonly formatRelative = formatRelative;
 }

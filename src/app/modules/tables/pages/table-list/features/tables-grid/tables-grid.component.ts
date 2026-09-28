@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { IconComponent, ProgressBarComponent } from 'src/ui';
 import { TableDto, TableStatus } from '../../data-access';
 import { SectorDto } from 'src/app/modules/sectors/pages/sector-list/data-access';
@@ -18,6 +18,8 @@ export class TablesGridComponent {
   readonly $tables = input.required<TableDto[]>({ alias: 'tables' });
   readonly $sectors = input<SectorDto[]>([], { alias: 'sectors' });
   readonly isLoading = input(false, { alias: 'isLoading' });
+  readonly openingTableId = input<number | null>(null);
+  readonly tableSelect = output<TableDto>();
 
   readonly $groups = computed<SectorGroup[]>(() => {
     const sectors = this.$sectors();
@@ -44,6 +46,16 @@ export class TablesGridComponent {
       occupied: 'border-red-500 bg-red-500/10 text-red-600',
       reserved: 'border-blue-500 bg-blue-500/10 text-blue-600',
       blocked: 'border-muted bg-muted/20 text-muted-foreground',
+    };
+    return map[status];
+  }
+
+  statusLabel(status: TableStatus): string {
+    const map: Record<TableStatus, string> = {
+      available: 'Disponible',
+      occupied: 'Ocupada',
+      reserved: 'Reservada',
+      blocked: 'Bloqueada',
     };
     return map[status];
   }

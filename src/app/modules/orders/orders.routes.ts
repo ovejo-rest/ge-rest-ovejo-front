@@ -1,9 +1,19 @@
 import { Routes } from '@angular/router';
-import { OrderListComponent } from './pages';
+import { OrderCreateComponent, OrderDetailComponent, OrderListComponent } from './pages';
 import { authGuard } from 'src/app/core';
 
 const routes: Routes = [
-  { path: '', component: OrderListComponent, canActivate: [authGuard], canActivateChild: [authGuard] },
+  {
+    path: '',
+    canActivate: [authGuard],
+    canActivateChild: [authGuard],
+    children: [
+      { path: '', component: OrderListComponent },
+      { path: 'new', component: OrderCreateComponent, data: { mode: 'create' } },
+      { path: ':id/add', component: OrderCreateComponent, data: { mode: 'add' } },
+      { path: ':id', component: OrderDetailComponent },
+    ],
+  },
 ];
 
 export default routes;

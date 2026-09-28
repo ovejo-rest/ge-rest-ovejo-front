@@ -14,6 +14,8 @@ import { UpdateTableModalComponent } from '../update-table-modal';
 
 import { DeleteTableModalComponent } from '../delete-table-modal';
 
+import { TableQrModalComponent, TableQrModalResult } from '../table-qr-modal';
+
 @Component({
   selector: 'app-tables-table',
 
@@ -47,6 +49,19 @@ export class TablesTableComponent {
       width: '90%',
       data: item,
     });
+  }
+
+  showQr(item: TableDto) {
+    this.dialog
+      .open<TableQrModalComponent, TableDto, TableQrModalResult>(TableQrModalComponent, {
+        width: '560px',
+        maxWidth: '95vw',
+        data: item,
+      })
+      .afterClosed()
+      .subscribe((result) => {
+        if (result === 'regenerated') this.retryData.emit();
+      });
   }
 
   deleteTable(item: TableDto) {

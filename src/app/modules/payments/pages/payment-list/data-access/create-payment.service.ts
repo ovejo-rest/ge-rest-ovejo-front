@@ -1,53 +1,43 @@
 import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, catchError, EMPTY, map, Subject, switchMap, tap } from 'rxjs';
-import { CreatePaymentDto } from './dtos';
+import { BehaviorSubject, catchError, EMPTY, Subject, tap } from 'rxjs';
 import { ApiPathEnum } from 'src/environments';
+import { CreatePaymentDto, CreatePaymentResponseDto } from './dtos';
 
 @Injectable({ providedIn: 'root' })
 export class CreatePaymentService {
   readonly #httpClient = inject(HttpClient);
+
   readonly #isLoading$ = new BehaviorSubject(false);
   readonly #error$ = new Subject<HttpStatusCode | undefined>();
-  readonly #submit$ = new Subject<CreatePaymentDto>();
-  readonly #success$ = new Subject<boolean>();
+  readonly #result$ = new Subject<(CreatePaymentResponseDto & { request: CreatePaymentDto }) | null>();
 
   readonly $isLoading = toSignal(this.#isLoading$);
   readonly $error = toSignal(this.#error$);
-  readonly $hasError = toSignal(this.#error$.pipe(map((code) => code !== undefined)));
-  readonly $success = toSignal(this.#success$);
+  // Resultado del último pago junto con lo enviado (para mostrar el vuelto y el resumen).
+  readonly $result = toSignal(this.#result$);
 
-  constructor() {
-    this.#submit$
+  create(dto: CreatePaymentDto) {
+    this.#isLoading$.next(true);
+    this.#error$.next(undefined);
+
+    this.#httpClient
+      .post<CreatePaymentResponseDto>(`${ApiPathEnum.RESTAURANT}/payments`, dto)
       .pipe(
-        tap(() => this.#isLoading$.next(true)),
-        tap(() => this.#error$.next(undefined)),
-        switchMap((input) =>
-          this.#httpClient.post(`${ApiPathEnum.RESTAURANT}/payments`, input).pipe(
-            tap(() => {
-              this.#success$.next(true);
-              this.#isLoading$.next(false);
-            }),
-            catchError((error: HttpErrorResponse) => {
-              this.#error$.next(error.status);
-              this.#success$.next(false);
-              this.#isLoading$.next(false);
-              return EMPTY;
-            }),
-          ),
-        ),
+        tap(() => this.#isLoading$.next(false)),
+        catchError((error: HttpErrorResponse) => {
+          this.#error$.next(error.status);
+          this.#isLoading$.next(false);
+          return EMPTY;
+        }),
       )
-      .subscribe();
-  }
-
-  create(input: CreatePaymentDto) {
-    this.#submit$.next(input);
+      .subscribe((response) => this.#result$.next({ ...response, request: dto }));
   }
 
   reset() {
     this.#error$.next(undefined);
-    this.#success$.next(false);
+    this.#result$.next(null);
     this.#isLoading$.next(false);
   }
 }

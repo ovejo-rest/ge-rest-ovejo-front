@@ -1,6 +1,7 @@
 import { Component, effect, inject, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GetAllBusinessLocationsService } from 'src/app/modules/restaurante/pages/business-location/data-access';
+import { WhoamiService } from 'src/app/core/services/whoami/whoami.service';
 
 @Component({
   selector: 'app-business-location-selector',
@@ -29,6 +30,8 @@ export class BusinessLocationSelector {
   protected readonly $getAll = inject(GetAllBusinessLocationsService);
 
   protected readonly $locations = this.$getAll.$locations;
+  private readonly $branchId = inject(WhoamiService).$branchId;
+  #changedByUser = false;
 
   protected readonly $isLoading = this.$getAll.$isLoading;
 
@@ -39,21 +42,23 @@ export class BusinessLocationSelector {
   selectedLocationChange = output<number>();
 
   constructor() {
+    // Por defecto, la sucursal del usuario; si no tiene (o ya no existe), la primera.
     effect(() => {
       const locations = this.$locations();
-
-      if (locations?.length && this.selectedLocationId === null) {
-        const firstLocation = locations[0];
-
-        this.selectedLocationId = firstLocation.id;
-
-        this.selectedLocationChange.emit(firstLocation.id);
-      }
+      if (!locations?.length || this.#changedByUser) return;
+      const branchId = this.$branchId();
+      const preferred = locations.find((location) => location.id === branchId)?.id ?? locations[0].id;
+      // Si todavía no se sabe quién es el usuario, se muestra la primera y se corrige al llegar el dato.
+      if (this.selectedLocationId === preferred) return;
+      if (this.selectedLocationId !== null && branchId === undefined) return;
+      this.selectedLocationId = preferred;
+      this.selectedLocationChange.emit(preferred);
     });
   }
 
   onLocationChange(id: number) {
     if (id) {
+      this.#changedByUser = true;
       this.selectedLocationId = id;
       this.selectedLocationChange.emit(id);
     }

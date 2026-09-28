@@ -1,0 +1,79 @@
+@if (!$isReady()) {
+<app-waiter-login
+  [allowAnonymous]="!terminalMode()"
+  [variant]="terminalMode() ? 'screen' : 'card'"
+  [locationName]="locationName()"
+  (loggedIn)="handleLogin($event)" (continueWithoutWaiter)="handleAnonymous()" />
+} @else {
+<div class="flex flex-col gap-3">
+  <!-- Barra superior: sucursal y mesero -->
+  <div class="flex flex-wrap items-center gap-3">
+    <h1 class="text-foreground flex items-center gap-2 text-lg font-semibold">
+      <app-icon class="text-primary h-6 w-6">point_of_sale</app-icon>POS
+    </h1>
+    @if (!terminalMode()) {
+    <div class="w-52">
+      <app-business-location-selector (selectedLocationChange)="handleLocationChange($event)" />
+    </div>
+    }
+    <div class="ml-auto flex items-center gap-2">
+      <span class="glass-row inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm">
+        <app-icon class="h-4 w-4">badge</app-icon>{{ $waiter()?.name ?? 'Sin mesero' }}
+      </span>
+      @if (terminalMode()) {
+      <button type="button" class="glass-row inline-flex h-10 items-center gap-1 rounded-full px-4 text-sm font-medium" (click)="handleChangeWaiter()">
+        <app-icon class="h-4 w-4">logout</app-icon>Salir
+      </button>
+      } @else {
+      <button type="button" class="text-primary text-sm font-medium hover:underline" (click)="handleChangeWaiter()">Cambiar</button>
+      }
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-3 lg:grid-cols-12">
+    <div class="lg:col-span-3">
+      <app-pos-tables-panel
+        [tables]="$tables()"
+        [sectors]="$sectors()"
+        [loading]="$isLoadingTables()"
+        [selectedTableId]="$table()?.id ?? null"
+        [openingTableId]="$openingTableId()"
+        (selectTable)="handleSelectTable($event)"
+        (selectCounter)="selectCounter()" />
+    </div>
+
+    <div class="lg:col-span-6">
+      <app-product-picker
+        [products]="$products()"
+        [categories]="$categories()"
+        [loading]="$isLoadingProducts()"
+        [selectedCategoryId]="$selectedCategoryId()"
+        [quantities]="$quantities()"
+        (categoryChange)="handleCategoryChange($event)"
+        (searchChange)="handleSearchChange($event)"
+        (add)="handleAdd($event)" />
+    </div>
+
+    <div class="lg:sticky lg:top-4 lg:col-span-3 lg:self-start">
+      <app-pos-order-panel
+        [title]="$panelTitle()"
+        [order]="$order()"
+        [loadingOrder]="$isLoadingOrder()"
+        [cart]="$cart()"
+        [customer]="$customer()"
+        [sendToKitchen]="$sendToKitchen()"
+        [saving]="$isSaving()"
+        (increment)="handleIncrement($event)"
+        (decrement)="handleDecrement($event)"
+        (remove)="handleRemove($event)"
+        (noteChange)="handleNote($event)"
+        [kitchenNote]="$kitchenNote()"
+        (kitchenNoteChange)="$kitchenNote.set($event)"
+        (customerChange)="$customer.set($event)"
+        (sendToKitchenChange)="$sendToKitchen.set($event)"
+        (submitOrder)="handleSubmit()"
+        (collect)="handleCollect()" />
+    </div>
+  </div>
+</div>
+}

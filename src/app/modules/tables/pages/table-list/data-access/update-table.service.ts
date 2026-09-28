@@ -22,7 +22,7 @@ export class UpdateTableService {
     this.#submit$.pipe(
       tap(() => this.#isLoading$.next(true)),
       tap(() => this.#error$.next(undefined)),
-      switchMap((data) => this.#httpClient.put(`${ApiPathEnum.RESTAURANT}/tables`, data).pipe(
+      switchMap((data) => this.#httpClient.put(`${ApiPathEnum.RESTAURANT}/tables/${data.id}`, data).pipe(
         tap(() => { this.#success$.next(true); this.#isLoading$.next(false); }),
         catchError((e: HttpErrorResponse) => { this.#error$.next(e.status); this.#success$.next(false); this.#isLoading$.next(false); return EMPTY; }),
       )),

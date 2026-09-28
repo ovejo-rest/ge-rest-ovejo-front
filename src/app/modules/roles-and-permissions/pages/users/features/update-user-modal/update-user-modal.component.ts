@@ -1,8 +1,9 @@
-import { Component, effect, inject, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, effect, inject, OnDestroy, ChangeDetectionStrategy, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
-import { UpdateUserService, GetAllUsersService, UserDto } from '../../data-access';
+import { UpdateUserService, GetAllUsersService, UserBranchService, UserDto } from '../../data-access';
+import { GetAllBusinessLocationsService } from 'src/app/modules/restaurante/pages/business-location/data-access';
 
 @Component({
   selector: 'app-update-user-modal',
@@ -17,6 +18,10 @@ export class UpdateUserModalComponent implements OnDestroy {
   protected readonly $getAllUsersService = inject(GetAllUsersService);
 
   protected readonly $isLoading = this.$updateUserService.$isLoading;
+  private readonly branchService = inject(UserBranchService);
+  protected readonly $locations = inject(GetAllBusinessLocationsService).$locations;
+  // Sucursal actual del usuario (se carga del perfil); null = sin sucursal.
+  protected readonly $originalBranchId = signal<number | null>(null);
 
   protected readonly data = inject(MAT_DIALOG_DATA) as UserDto;
 
@@ -27,7 +32,7 @@ export class UpdateUserModalComponent implements OnDestroy {
     fatherLastName: [''],
     motherLastName: [''],
     email: [''],
-    branchId: [0],
+    branchId: [null as number | null],
   });
 
   constructor() {
@@ -38,6 +43,14 @@ export class UpdateUserModalComponent implements OnDestroy {
       fatherLastName: this.data.fatherLastName,
       motherLastName: this.data.motherLastName,
       email: this.data.email,
+    });
+
+    this.branchService.getBranchId(this.data.code).subscribe({
+      next: (branchId) => {
+        this.$originalBranchId.set(branchId);
+        this.form.patchValue({ branchId });
+      },
+      error: () => undefined,
     });
 
     effect(() => {
@@ -66,6 +79,8 @@ export class UpdateUserModalComponent implements OnDestroy {
     if (motherLastName) body['motherLastName'] = motherLastName;
     const email = this.form.get('email')!.value;
     if (email) body['email'] = email;
+    const branchId = this.form.get('branchId')!.value;
+    if (branchId && branchId !== this.$originalBranchId()) body['branchId'] = branchId;
     this.$updateUserService.update({ userId: this.data.code, ...(body as any) });
   }
 

@@ -1,12 +1,21 @@
 import { Component, computed, effect, inject, OnDestroy, signal } from '@angular/core';
 
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 
-import { HeaderDashboardComponent, ButtonComponent, IconComponent, CardComponent } from 'src/ui';
+import { HeaderDashboardComponent, ButtonComponent, IconComponent, CardComponent, ToastService } from 'src/ui';
 
 import { TablesTableComponent, TablesGridComponent, CreateTableModalComponent, SectorTabsComponent } from './features';
 
-import { GetAllTablesService, CreateTableService, UpdateTableService, DeleteTableService } from './data-access';
+import {
+  GetAllTablesService,
+  CreateTableService,
+  UpdateTableService,
+  DeleteTableService,
+  FindTableOpenOrderService,
+  TableDto,
+} from './data-access';
+import { printTableQrs } from './ui';
 
 import { BusinessLocationSelector } from 'src/app/modules/sectors/pages/sector-list/ui';
 import { GetAllSectorsService } from 'src/app/modules/sectors/pages/sector-list/data-access';
@@ -29,6 +38,9 @@ import { GetAllSectorsService } from 'src/app/modules/sectors/pages/sector-list/
 })
 export class TableListComponent implements OnDestroy {
   private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
+  private readonly findOpenOrderService = inject(FindTableOpenOrderService);
 
   protected readonly $getAll = inject(GetAllTablesService);
   protected readonly $sectorsService = inject(GetAllSectorsService);
@@ -45,6 +57,7 @@ export class TableListComponent implements OnDestroy {
 
   protected readonly $viewMode = signal<'table' | 'grid'>('grid');
   protected readonly $selectedSectorId = signal<number | null>(null);
+  protected readonly $openingTableId = signal<number | null>(null);
 
   protected readonly $filteredTables = computed(() => {
     const tables = this.$tables();
@@ -85,12 +98,56 @@ export class TableListComponent implements OnDestroy {
     this.$selectedSectorId.set(null);
   }
 
+  onTableSelected(table: TableDto) {
+    if (table.status === 'blocked') {
+      this.toast.show(`${table.name} está bloqueada`, 'warning');
+      return;
+    }
+    if (table.status === 'occupied') {
+      this.openTableOrder(table);
+      return;
+    }
+    this.router.navigate(['/orders/new'], {
+      queryParams: { location: this.$getAll.getCurrentLocationId(), table: table.id },
+    });
+  }
+
+  private openTableOrder(table: TableDto) {
+    if (this.$openingTableId() !== null) return;
+    this.$openingTableId.set(table.id);
+    this.findOpenOrderService.find(table).subscribe((orderId) => {
+      this.$openingTableId.set(null);
+      if (orderId) {
+        this.router.navigate(['/orders', orderId]);
+        return;
+      }
+      this.toast.show(`No se encontró el pedido abierto de ${table.name}. Búscalo en Pedidos.`, 'warning');
+    });
+  }
+
   onSectorSelected(sectorId: number | null) {
     this.$selectedSectorId.set(sectorId);
   }
 
   retry() {
     this.$getAll.retry();
+  }
+
+  async printAllQrs() {
+    const sectorNames = new Map(this.$sectors().map((sector) => [sector.id, sector.name]));
+    const printable = this.$filteredTables()
+      .filter((table) => table.qrUrl)
+      .map((table) => ({
+        name: table.name,
+        detail: [table.sectorId ? sectorNames.get(table.sectorId) : null, `${table.capacity} personas`].filter(Boolean).join(' · '),
+        url: table.qrUrl!,
+      }));
+    if (!printable.length) {
+      this.toast.show('No hay mesas con QR disponible para imprimir', 'warning');
+      return;
+    }
+    const opened = await printTableQrs(printable);
+    if (!opened) this.toast.show('Permite las ventanas emergentes para imprimir', 'warning');
   }
 
   ngOnDestroy(): void {

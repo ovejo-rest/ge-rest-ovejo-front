@@ -15,13 +15,18 @@
     </div>
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
       @for (table of group.tables; track table.id) {
-      <div
-        class="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all hover:scale-105"
-        [class]="statusClasses(table.status)">
-        <app-icon class="h-8 w-8">{{ statusIcon(table.status) }}</app-icon>
+      <button
+        type="button"
+        class="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all hover:scale-105 active:scale-95"
+        [class]="statusClasses(table.status)"
+        [attr.aria-label]="table.name + ', ' + statusLabel(table.status) + ', ' + table.capacity + ' personas'"
+        [class.animate-pulse]="openingTableId() === table.id"
+        [attr.aria-busy]="openingTableId() === table.id"
+        (click)="tableSelect.emit(table)">
+        <app-icon class="h-8 w-8">{{ openingTableId() === table.id ? 'hourglass_empty' : statusIcon(table.status) }}</app-icon>
         <span class="text-sm font-semibold">{{ table.name }}</span>
-        <span class="text-xs">{{ table.capacity }} pers.</span>
-      </div>
+        <span class="text-xs">{{ table.capacity }} pers. · {{ statusLabel(table.status) }}</span>
+      </button>
       }
     </div>
   </div>

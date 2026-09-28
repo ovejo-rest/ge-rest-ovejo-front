@@ -1,30 +1,88 @@
-import { Component, effect, inject, OnDestroy } from '@angular/core';
-import { HeaderDashboardComponent, ButtonComponent, IconComponent } from 'src/ui';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { map } from 'rxjs';
+import { ButtonComponent, EmptyStateComponent, HeaderDashboardComponent, IconComponent } from 'src/ui';
+import { GetAllOrdersService, getOrderErrorMessage, GetServiceStaffService } from './data-access';
 import { OrdersTableComponent } from './features';
-import { GetAllOrdersService, UpdateOrderStatusService } from './data-access';
+import { FiltersOrderTableComponent } from './ui';
+
+const PER_PAGE = 10;
+
+type OrderListQuery = Readonly<{ page: number; waiter: string | null }>;
+
+function toQuery(params: ParamMap): OrderListQuery {
+  const page = Number(params.get('page'));
+  return { page: Number.isInteger(page) && page > 0 ? page : 1, waiter: params.get('waiter') };
+}
 
 @Component({
   selector: 'app-order-list',
-  imports: [HeaderDashboardComponent, ButtonComponent, IconComponent, OrdersTableComponent],
+  standalone: true,
+  imports: [
+    HeaderDashboardComponent,
+    ButtonComponent,
+    IconComponent,
+    EmptyStateComponent,
+    OrdersTableComponent,
+    FiltersOrderTableComponent,
+  ],
   templateUrl: './order-list.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OrderListComponent implements OnDestroy {
-  protected readonly $getAll = inject(GetAllOrdersService);
-  protected readonly $updateStatus = inject(UpdateOrderStatusService);
+export class OrderListComponent implements OnInit {
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly getAllService = inject(GetAllOrdersService);
+  private readonly staffService = inject(GetServiceStaffService);
 
-  protected readonly $orders = this.$getAll.$orders;
-  protected readonly $isLoading = this.$getAll.$isLoading;
-  protected readonly $hasError = this.$getAll.$hasError;
+  readonly $query = toSignal(this.route.queryParamMap.pipe(map(toQuery)), {
+    initialValue: toQuery(this.route.snapshot.queryParamMap),
+  });
+  readonly $staff = this.staffService.$staff;
+  readonly $isLoading = computed(() => this.getAllService.$isLoading() ?? false);
+  readonly $response = this.getAllService.$orders;
+  readonly $orders = computed(() => this.$response()?.data ?? []);
+  readonly $pagination = computed(() => this.$response()?.pagination ?? null);
+  readonly $errorMessage = computed(() => {
+    const status = this.getAllService.$error();
+    return status ? getOrderErrorMessage(status) : null;
+  });
 
-  constructor() {
-    effect(() => { if (this.$updateStatus.$success()) this.$getAll.retry(); });
+  readonly $hasFilters = computed(() => this.$query().waiter !== null);
+  readonly $isEmpty = computed(
+    () =>
+      !this.$isLoading() &&
+      !this.$errorMessage() &&
+      !this.$hasFilters() &&
+      this.$response() !== undefined &&
+      this.$pagination()?.totalItems === 0,
+  );
+
+  ngOnInit(): void {
+    this.staffService.load();
+
+    this.route.queryParamMap
+      .pipe(map(toQuery), takeUntilDestroyed(this.destroyRef))
+      .subscribe(({ page, waiter }) =>
+        this.getAllService.load({ page, perPage: PER_PAGE, serviceStaff: waiter ?? undefined }),
+      );
   }
 
-  onPageChange(p: number) { this.$getAll.setParams({ page: p }); }
-  onPerPageChange(pp: number) { this.$getAll.setParams({ perPage: pp, page: 1 }); }
-  onSearchTable(v: string) { this.$getAll.setParams({ tableName: v, page: 1 }); }
-  onStatusFilter(v: string) { this.$getAll.setParams({ status: v || undefined, page: 1 }); }
-  retry() { this.$getAll.retry(); }
+  handleWaiterChange(waiter: string | null) {
+    this.navigate({ page: null, waiter });
+  }
 
-  ngOnDestroy(): void { this.$updateStatus.reset(); }
+  handlePageChange(page: number) {
+    this.navigate({ page: page > 1 ? page : null });
+  }
+
+  handleRetry() {
+    this.getAllService.retry();
+  }
+
+  private navigate(queryParams: Record<string, string | number | null>) {
+    this.router.navigate([], { relativeTo: this.route, queryParams, queryParamsHandling: 'merge' });
+  }
 }

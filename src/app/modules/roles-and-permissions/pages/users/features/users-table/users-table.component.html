@@ -8,7 +8,7 @@
       @for (item of headerData; track $index) {
       <th class="h-8 w-[25%] text-center">{{ item }}</th>
       }
-      <th class="w-[90px]"></th>
+      <th class="w-[130px]"></th>
     </tr>
   </ng-template>
 
@@ -26,13 +26,19 @@
         {{ user.statusCode }}
       </span>
     </td>
-    <td class="w-[90px] text-center">
+    <td class="w-[130px] text-center">
       <div class="flex items-center justify-center gap-1">
         <app-button
           *appCheckPermission="'users:update-user'"
           size="small"
           icon="edit_document"
           (click)="updateUser(user)"></app-button>
+        <app-button
+          *appCheckPermission="'users:update-user'"
+          size="small"
+          icon="dialpad"
+          [attr.aria-label]="'Asignar PIN del POS a ' + user.name"
+          (click)="setServicePin(user)"></app-button>
         <app-button
           *appCheckPermission="'users:delete-user'"
           size="small"

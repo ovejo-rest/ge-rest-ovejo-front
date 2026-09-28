@@ -8,6 +8,8 @@ export type TableDto = Readonly<{
   capacity: number;
   status: TableStatus;
   qrCode: string | null;
+  // URL que se codifica en el QR (null si el backend no tiene QR_BASE_URL configurado).
+  qrUrl: string | null;
   sectorId: number | null;
 }>;
 

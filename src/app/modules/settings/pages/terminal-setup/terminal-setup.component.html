@@ -1,0 +1,46 @@
+<div class="space-y-4">
+  <app-header-dashboard title="Terminal de salón" subtitle="Convierte este equipo en una pantalla compartida para tomar pedidos" />
+
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <section class="glass space-y-4 rounded-[1rem] p-4 lg:col-span-1">
+      <h2 class="text-foreground font-semibold">Configurar este equipo</h2>
+
+      <div>
+        <label for="terminal-location" class="text-foreground mb-1 block text-sm font-medium">Sucursal *</label>
+        <select id="terminal-location" class="glass-input w-full rounded-md px-3 py-2" (change)="selectLocation($event)">
+          <option value="" [selected]="$locationId() === null">Elegir sucursal…</option>
+          @for (location of $locations(); track location.id) {
+          <option [value]="location.id" [selected]="$locationId() === location.id">{{ location.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div>
+        <label for="terminal-inactivity" class="text-foreground mb-1 block text-sm font-medium">Bloquear tras inactividad</label>
+        <select id="terminal-inactivity" class="glass-input w-full rounded-md px-3 py-2" (change)="selectInactivity($event)">
+          @for (option of inactivityOptions; track option.value) {
+          <option [value]="option.value" [selected]="$inactivity() === option.value">{{ option.label }}</option>
+          }
+        </select>
+        <p class="text-muted-foreground mt-1 text-xs">Además, vuelve al PIN después de enviar cada pedido o cobrar.</p>
+      </div>
+
+      <app-button full impact="bold" tone="primary" shape="rounded" icon="tablet" (buttonClick)="activate()">Activar en este equipo</app-button>
+    </section>
+
+    <section class="glass rounded-[1rem] p-4 lg:col-span-2">
+      <h2 class="text-foreground mb-3 font-semibold">Cómo funciona</h2>
+      <ul class="text-foreground space-y-3 text-sm">
+        <li class="flex gap-3"><app-icon class="text-primary h-5 w-5 shrink-0">touch_app</app-icon><span>La pantalla muestra solo la toma de pedidos, sin el menú del backoffice. Cada mesero toca su nombre e ingresa su <b>PIN</b>.</span></li>
+        <li class="flex gap-3"><app-icon class="text-primary h-5 w-5 shrink-0">lock_clock</app-icon><span>Al enviar un pedido, al cobrar o tras el tiempo de inactividad, vuelve a la pantalla de PIN. Así cada pedido queda a nombre de quien lo tomó.</span></li>
+        <li class="flex gap-3"><app-icon class="text-primary h-5 w-5 shrink-0">block</app-icon><span>Mientras esté activa, cualquier otra página del backoffice en este equipo redirige a la terminal.</span></li>
+        <li class="flex gap-3"><app-icon class="text-primary h-5 w-5 shrink-0">admin_panel_settings</app-icon><span>Para salir, toca el engranaje de la esquina e ingresa email y contraseña de un usuario.</span></li>
+        <li class="flex gap-3"><app-icon class="text-primary h-5 w-5 shrink-0">badge</app-icon><span>Los meseros necesitan un PIN: asígnalo en <b>Roles y permisos → Usuarios</b> con el botón de teclado.</span></li>
+      </ul>
+      <p class="mt-4 rounded-md bg-amber-500/10 p-3 text-xs text-amber-700">
+        La terminal usa la sesión del usuario que la activa. Para una pantalla que queda encendida todo el día, conviene abrir Chrome en modo kiosco
+        (<code class="font-mono">--kiosk</code>) y no cerrar sesión en este equipo.
+      </p>
+    </section>
+  </div>
+</div>

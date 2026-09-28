@@ -1,0 +1,109 @@
+@let f = form();
+<div [formGroup]="f" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+  <div class="sm:col-span-2">
+    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre *</label>
+    <input
+      type="text"
+      formControlName="name"
+      placeholder="Ej: Hamburguesa clásica"
+      [class]="inputClass"
+      [ngClass]="{ 'border-red-500': isInvalid('name') }" />
+  </div>
+
+  <div>
+    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">SKU *</label>
+    <div class="flex gap-2">
+      <input
+        type="text"
+        formControlName="sku"
+        maxlength="30"
+        placeholder="Se sugiere según el nombre"
+        [class]="inputClass + ' font-mono uppercase'"
+        [ngClass]="{ 'border-red-500': isInvalid('sku') }" />
+      <button
+        type="button"
+        title="Sugerir otro SKU"
+        aria-label="Sugerir otro SKU"
+        class="glass-row inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md"
+        (click)="regenerateSku()">
+        <app-icon class="h-5 w-5">autorenew</app-icon>
+      </button>
+    </div>
+  </div>
+
+  <div>
+    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Precio (IVA incluido) *</label>
+    <div class="relative">
+      <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-500">$</span>
+      <input
+        type="number"
+        formControlName="price"
+        min="0"
+        step="1"
+        inputmode="numeric"
+        placeholder="0"
+        [class]="inputClass + ' pl-7'"
+        [ngClass]="{ 'border-red-500': isInvalid('price') }" />
+    </div>
+  </div>
+
+  <div>
+    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Categoría</label>
+    <select formControlName="categoryId" [class]="inputClass">
+      <option [ngValue]="null">Sin categoría</option>
+      @for (category of categories(); track category.id) {
+      <option [ngValue]="category.id">{{ category.name }}</option>
+      }
+    </select>
+  </div>
+
+  <div>
+    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Subcategoría</label>
+    <select formControlName="subCategoryId" [class]="inputClass">
+      <option [ngValue]="null">{{ $subcategories().length ? 'Ninguna' : 'Sin subcategorías' }}</option>
+      @for (subcategory of $subcategories(); track subcategory.id) {
+      <option [ngValue]="subcategory.id">{{ subcategory.name }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="sm:col-span-2">
+    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
+    <textarea
+      formControlName="productDescription"
+      rows="2"
+      placeholder="Opcional. Se mostrará en la carta"
+      [class]="inputClass"></textarea>
+  </div>
+
+  <div>
+    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Imagen (URL)</label>
+    <input
+      type="url"
+      formControlName="image"
+      placeholder="https://..."
+      [class]="inputClass"
+      [ngClass]="{ 'border-red-500': isInvalid('image') }" />
+  </div>
+
+  <div>
+    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Tiempo de preparación (min)</label>
+    <input
+      type="number"
+      formControlName="preparationTimeInMinutes"
+      min="0"
+      max="600"
+      inputmode="numeric"
+      placeholder="Opcional"
+      [class]="inputClass"
+      [ngClass]="{ 'border-red-500': isInvalid('preparationTimeInMinutes') }" />
+  </div>
+
+  <label class="flex cursor-pointer items-center justify-between gap-4 rounded-md border border-gray-300 px-3 py-3 dark:border-gray-600 sm:col-span-2">
+    <span>
+      <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">Disponible para la venta</span>
+      <span class="block text-xs text-gray-500 dark:text-gray-400">Si lo desactivas, no aparecerá en el POS ni en la carta.</span>
+    </span>
+    <input type="checkbox" formControlName="available" class="h-5 w-5 accent-[var(--primary)]" />
+  </label>
+</div>

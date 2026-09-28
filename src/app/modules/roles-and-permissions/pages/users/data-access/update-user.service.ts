@@ -31,6 +31,7 @@ export class UpdateUserService {
           if (input.motherLastName !== undefined) body['motherLastName'] = input.motherLastName;
           if (input.email !== undefined) body['email'] = input.email;
           if (input.statusId !== undefined) body['statusId'] = input.statusId;
+          if (input.branchId !== undefined) body['branchId'] = input.branchId;
 
           return this.#httpClient.patch<{ message: string }>(`${ApiPathEnum.AUTH}/users/${input.userId}`, body).pipe(
             tap(() => {

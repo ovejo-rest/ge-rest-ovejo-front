@@ -6,7 +6,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
-import { CreateUserService, GetAllUsersService } from '../../data-access';
+import { CreateUserService, GetAllUsersService, UserBranchService } from '../../data-access';
+import { GetAllBusinessLocationsService } from 'src/app/modules/restaurante/pages/business-location/data-access';
 import { GetAllRolesService } from '../../../roles/data-access';
 
 @Component({
@@ -36,6 +37,8 @@ export class CreateUserModalComponent implements OnDestroy {
   protected readonly $isLoading = this.$createUserService.$isLoading;
   protected readonly allRoles = this.$allRolesService.$roles;
   protected readonly $loadingRoles = this.$allRolesService.$isLoading;
+  private readonly branchService = inject(UserBranchService);
+  protected readonly $locations = inject(GetAllBusinessLocationsService).$locations;
 
   private fb = inject(FormBuilder);
 
@@ -46,6 +49,7 @@ export class CreateUserModalComponent implements OnDestroy {
     motherLastName: [''],
     email: ['', [Validators.required, Validators.email]],
     roleIds: [[] as number[]],
+    branchId: [null as number | null],
   });
 
   constructor() {
@@ -54,9 +58,7 @@ export class CreateUserModalComponent implements OnDestroy {
 
     effect(() => {
       if (this.$createUserService.$success()) {
-        this.$toast.show(`Usuario '${this.form.get('name')?.value}' creado con éxito`, 'success');
-        this.$getAllUsersService.retry();
-        this.dialogRef.close();
+        this.afterCreated();
       }
       if (this.$createUserService.$hasError()) {
         this.$toast.show(`Algo salió mal. Por favor, vuelva a intentar.`, 'error');
@@ -91,6 +93,26 @@ export class CreateUserModalComponent implements OnDestroy {
       motherLastName,
       email,
       roleIds: this.selectedRoleIds.length > 0 ? this.selectedRoleIds : undefined,
+    });
+  }
+
+  // La creación no acepta sucursal: se asigna justo después (ver UserBranchService).
+  private afterCreated() {
+    const name = this.form.get('name')?.value;
+    const email = this.form.get('email')?.value ?? '';
+    const branchId = this.form.get('branchId')?.value;
+    const finish = (message: string, tone: 'success' | 'warning') => {
+      this.$toast.show(message, tone);
+      this.$getAllUsersService.retry();
+      this.dialogRef.close();
+    };
+    if (!branchId) {
+      finish(`Usuario '${name}' creado con éxito`, 'success');
+      return;
+    }
+    this.branchService.setBranchIdByEmail(email, branchId).subscribe({
+      next: () => finish(`Usuario '${name}' creado y asignado a su sucursal`, 'success'),
+      error: () => finish(`Usuario '${name}' creado, pero no se pudo asignar la sucursal. Asígnala al editarlo.`, 'warning'),
     });
   }
 

@@ -1,82 +1,114 @@
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+<div class="glass overflow-hidden rounded-[1rem]">
   <div class="overflow-x-auto">
-    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-      <thead class="bg-gray-50 dark:bg-gray-900">
-        <tr>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            ID
-          </th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            Transacción
-          </th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            Monto
-          </th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            Método
-          </th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            Fecha
-          </th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            Nota
-          </th>
-          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            Acciones
-          </th>
+    <table class="min-w-full">
+      <thead>
+        <tr class="text-muted-foreground border-b border-[var(--border)] text-left text-xs font-medium uppercase tracking-wider">
+          <th class="px-4 py-3">Fecha</th>
+          @if (showOrder()) {
+          <th class="px-4 py-3">Pedido</th>
+          }
+          <th class="px-4 py-3">Método</th>
+          <th class="px-4 py-3 text-right">Monto</th>
+          <th class="hidden px-4 py-3 text-right sm:table-cell">Propina</th>
+          <th class="hidden px-4 py-3 text-right md:table-cell">Vuelto</th>
+          <th class="px-4 py-3 text-center">Estado</th>
+          @if (canVoid()) {
+          <th class="px-4 py-3"><span class="sr-only">Acciones</span></th>
+          }
         </tr>
       </thead>
-      <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-        @if (loading) {
-          @for (i of [1,2,3,4,5]; track i) {
-            <tr>
-              <td class="px-6 py-4 whitespace-nowrap"><app-skeleton width="40" height="20" /></td>
-              <td class="px-6 py-4 whitespace-nowrap"><app-skeleton width="60" height="20" /></td>
-              <td class="px-6 py-4 whitespace-nowrap"><app-skeleton width="80" height="20" /></td>
-              <td class="px-6 py-4 whitespace-nowrap"><app-skeleton width="70" height="20" /></td>
-              <td class="px-6 py-4 whitespace-nowrap"><app-skeleton width="120" height="20" /></td>
-              <td class="px-6 py-4 whitespace-nowrap"><app-skeleton width="100" height="20" /></td>
-              <td class="px-6 py-4 whitespace-nowrap text-right"><app-skeleton width="60" height="20" /></td>
-            </tr>
+      <tbody>
+        @if (loading()) { @for (row of skeletonRows; track row) {
+        <tr class="border-b border-[var(--border)] last:border-0">
+          <td class="px-4 py-3"><app-skeleton size="xs" style="width: 110px" /></td>
+          @if (showOrder()) {
+          <td class="px-4 py-3"><app-skeleton size="xs" style="width: 110px" /></td>
           }
-        } @else if (payments.length === 0) {
-          <tr>
-            <td colspan="7" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-              No hay pagos registrados
-            </td>
-          </tr>
-        } @else {
-          @for (payment of payments; track payment.id) {
-            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                {{ payment.id }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                {{ payment.transactionId }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                {{ formatAmount(payment.amount) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                {{ getMethodLabel(payment.method) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                {{ formatDate(payment.createdAt) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                {{ payment.note || '-' }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button
-                  (click)="onCancel(payment)"
-                  class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                  Cancelar
-                </button>
-              </td>
-            </tr>
+          <td class="px-4 py-3"><app-skeleton size="xs" style="width: 90px" /></td>
+          <td class="px-4 py-3"><div class="flex justify-end"><app-skeleton size="xs" style="width: 70px" /></div></td>
+          <td class="hidden px-4 py-3 sm:table-cell"><div class="flex justify-end"><app-skeleton size="xs" style="width: 50px" /></div></td>
+          <td class="hidden px-4 py-3 md:table-cell"><div class="flex justify-end"><app-skeleton size="xs" style="width: 50px" /></div></td>
+          <td class="px-4 py-3"><div class="flex justify-center"><app-skeleton size="xs" style="width: 70px" /></div></td>
+          @if (canVoid()) {
+          <td class="px-4 py-3"><div class="flex justify-end"><app-skeleton size="xs" style="width: 36px" /></div></td>
           }
-        }
+        </tr>
+        } } @else { @for (payment of payments(); track payment.id) {
+        <tr class="glass-row border-b border-[var(--border)] transition-colors last:border-0" [class.opacity-60]="payment.cancelled">
+          <td class="text-foreground whitespace-nowrap px-4 py-3 text-sm">{{ formatDateTime(payment.createdAt) }}</td>
+          @if (showOrder()) {
+          <td class="px-4 py-3">
+            <a [routerLink]="['/orders', payment.transactionId]" class="text-foreground hover:text-primary font-mono text-sm font-semibold">
+              {{ payment.invoiceNo ?? '#' + payment.transactionId }}
+            </a>
+          </td>
+          }
+          <td class="px-4 py-3">
+            <span class="text-foreground inline-flex items-center gap-1.5 text-sm">
+              <app-icon class="text-muted-foreground h-4 w-4">{{ methodIcon(payment.method) }}</app-icon>{{ methodLabel(payment.method) }}
+            </span>
+            @if (payment.note) {
+            <p class="text-muted-foreground max-w-[14rem] truncate text-xs" [title]="payment.note">{{ payment.note }}</p>
+            }
+          </td>
+          <td class="text-foreground whitespace-nowrap px-4 py-3 text-right font-semibold tabular-nums" [class.line-through]="payment.cancelled">
+            {{ formatCurrency(payment.amount) }}
+          </td>
+          <td class="text-muted-foreground hidden whitespace-nowrap px-4 py-3 text-right text-sm tabular-nums sm:table-cell">
+            {{ payment.tipAmount ? formatCurrency(payment.tipAmount) : '—' }}
+          </td>
+          <td class="text-muted-foreground hidden whitespace-nowrap px-4 py-3 text-right text-sm tabular-nums md:table-cell">
+            {{ payment.changeAmount ? formatCurrency(payment.changeAmount) : '—' }}
+          </td>
+          <td class="px-4 py-3 text-center">
+            @if (payment.cancelled) {
+            <span class="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2.5 py-0.5 text-xs font-medium text-red-600" [title]="payment.cancellationReason ?? ''">
+              <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>Anulado
+            </span>
+            @if (payment.cancellationReason) {
+            <p class="text-muted-foreground mt-0.5 max-w-[12rem] truncate text-xs" [title]="payment.cancellationReason">{{ payment.cancellationReason }}</p>
+            }
+            } @else {
+            <span class="inline-flex items-center gap-1 rounded-full bg-green-500/15 px-2.5 py-0.5 text-xs font-medium text-green-600">
+              <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>Vigente
+            </span>
+            }
+          </td>
+          @if (canVoid()) {
+          <td class="px-4 py-3 text-right">
+            @if (!payment.cancelled) {
+            <button
+              type="button"
+              title="Anular pago"
+              [attr.aria-label]="'Anular pago de ' + formatCurrency(payment.amount)"
+              class="text-muted-foreground inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors hover:bg-red-500/10 hover:text-red-600"
+              (click)="voidPayment.emit(payment)">
+              <app-icon class="h-5 w-5">block</app-icon>
+            </button>
+            }
+          </td>
+          }
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="8" class="px-4 py-12 text-center">
+            <p class="text-foreground font-medium">Sin pagos</p>
+            <p class="text-muted-foreground mt-1 text-sm">
+              {{ hasFilters() ? 'No hay pagos que coincidan con los filtros.' : 'Todavía no hay pagos registrados.' }}
+            </p>
+            @if (hasFilters()) {
+            <button type="button" class="text-primary mt-3 text-sm font-medium hover:underline" (click)="clearFilters.emit()">Limpiar filtros</button>
+            }
+          </td>
+        </tr>
+        } }
       </tbody>
     </table>
   </div>
+
+  @if (pagination(); as meta) { @if (meta.totalItems > 0) {
+  <div class="border-t border-[var(--border)] px-4 pb-3">
+    <app-pagination-table [pagination]="meta" (pageChange)="pageChange.emit($event)" />
+  </div>
+  } }
 </div>

@@ -4,7 +4,7 @@
       @for (item of headerData; track $index) {
       <th class="h-8 w-[20%] text-center">{{ item }}</th>
       }
-      <th class="w-[90px]"></th>
+      <th class="w-[130px]"></th>
     </tr>
   </ng-template>
   @if (!isLoading()) { @for (table of $tables(); track table.id) {
@@ -17,8 +17,9 @@
         {{ statusLabel(table.status) }}
       </span>
     </td>
-    <td class="w-[90px] text-center">
+    <td class="w-[130px] text-center">
       <div class="flex items-center justify-center gap-1">
+        <app-button size="small" icon="qr_code_2" [attr.aria-label]="'QR de ' + table.name" (click)="showQr(table)" />
         <app-button size="small" icon="edit_document" (click)="updateTable(table)" />
         <app-button size="small" icon="delete" tone="danger" (click)="deleteTable(table)" />
       </div>

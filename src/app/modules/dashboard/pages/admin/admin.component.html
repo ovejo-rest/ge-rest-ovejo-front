@@ -1,65 +1,65 @@
-@let metrics = $metrics(); @let isLoading = $isLoading(); @let hasError = $hasError();
-
-<div>
-  <app-header-dashboard title="Dashboard" subtitle="Resumen de la operación de hoy">
-    <app-button
-      full
-      impact="light"
-      tone="primary"
-      shape="rounded"
-      size="medium"
-      icon="refresh"
-      (buttonClick)="$metricsService.retry()">
-      Actualizar
-    </app-button>
+<div class="space-y-4">
+  <app-header-dashboard title="Resumen" subtitle="Cómo va tu restaurante">
+    <select aria-label="Sucursal" class="glass-input rounded-md px-3 py-2 text-sm" (change)="handleLocation($event)">
+      <option value="all" [selected]="!$locationId()">Todas las sucursales</option>
+      @for (location of $locations(); track location.id) {
+      <option [value]="location.id" [selected]="$locationId() === location.id">{{ location.name }}</option>
+      }
+    </select>
   </app-header-dashboard>
 
-  @if (hasError) {
+  <app-period-selector
+    [preset]="$query().preset"
+    [from]="$query().from"
+    [to]="$query().to"
+    (presetChange)="handlePreset($event)"
+    (customChange)="handleCustom($event)" />
+
+  @if ($metrics(); as m) {
+  <!-- Indicadores principales -->
+  <div class="grid grid-cols-2 gap-3 lg:grid-cols-4" [class.opacity-60]="$isLoading()">
+    <app-kpi-card label="Ventas" icon="payments" [value]="formatCurrency(m.sales.today)" [current]="m.sales.today" [previous]="m.sales.yesterday" [comparison]="$comparison()" />
+    <app-kpi-card label="Pedidos" icon="receipt_long" [value]="'' + m.orders.today" [current]="m.orders.today" [previous]="m.orders.yesterday" [comparison]="$comparison()" />
+    <app-kpi-card label="Ticket promedio" icon="sell" [value]="formatCurrency(m.avgTicket)" hint="Ventas / pedidos cerrados" />
+    <app-kpi-card label="Cobrado" icon="point_of_sale" [value]="formatCurrency(m.sales.collected)" [hint]="'Propinas: ' + formatCurrency(m.sales.tips)" />
+  </div>
+
+  <!-- Operación en curso -->
+  <div class="grid grid-cols-2 gap-3 lg:grid-cols-4" [class.opacity-60]="$isLoading()">
+    <app-kpi-card label="Cuentas abiertas" icon="room_service" [value]="'' + m.orders.open" hint="Pedidos sin cerrar" link="/orders" linkLabel="Ver pedidos" />
+    @if ($locationId()) {
+    <app-kpi-card label="Mesas ocupadas" icon="table_bar" [value]="$occupiedTables() + ' / ' + $tables().length" hint="En este momento" link="/tables" linkLabel="Ver mesas" />
+    } @else {
+    <app-kpi-card label="Mesas ocupadas" icon="table_bar" value="—" hint="Elige una sucursal para verlas" />
+    }
+    <app-kpi-card label="Ventas netas" icon="account_balance" [value]="formatCurrency(m.sales.netSales)" [hint]="'IVA: ' + formatCurrency(m.sales.taxAmount)" />
+    <app-kpi-card label="Cancelados" icon="block" [value]="'' + m.orders.cancelled" hint="Pedidos cancelados en el período" />
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <app-top-products-card [products]="m.topProducts" />
+    <app-recent-orders-card [orders]="m.recentOrders" />
+  </div>
+
+  <p class="text-muted-foreground text-xs">
+    Ventas = pedidos cerrados del {{ m.period.from }} al {{ m.period.to }} ({{ m.period.timeZone }}), comparadas con {{ m.period.previousFrom }} – {{ m.period.previousTo }}.
+    @if ($includesToday()) { Se actualiza cada minuto. }
+  </p>
+  } @else if ($hasError()) {
   <div class="flex flex-col items-center gap-4 py-16 text-center">
     <app-icon class="text-destructive h-14 w-14">error_outline</app-icon>
-    <div>
-      <h2 class="text-foreground text-lg font-semibold">Error al cargar el dashboard</h2>
-      <p class="text-muted-foreground mt-1 text-sm">No se pudieron obtener las métricas. Intenta nuevamente.</p>
-    </div>
-    <app-button impact="bold" tone="primary" shape="rounded" (buttonClick)="$metricsService.retry()">
-      Reintentar
-    </app-button>
+    <p class="text-foreground font-semibold">No se pudieron cargar los indicadores</p>
+    <app-button impact="bold" tone="primary" shape="rounded" (buttonClick)="handleRetry()">Reintentar</app-button>
   </div>
-  } @else if (isLoading && !metrics) {
-  <app-dashboard-skeleton />
   } @else {
-
-  <div class="text-muted-foreground grid grid-cols-1 content-between gap-4 md:grid-cols-2 xl:grid-cols-4">
-    <app-kpi-card
-      title="Ventas hoy"
-      [value]="metrics?.todaySales ?? 0"
-      icon="payments"
-      format="currency"
-      [loading]="isLoading" />
-    <app-kpi-card title="Pedidos hoy" [value]="metrics?.todayOrders ?? 0" icon="receipt_long" [loading]="isLoading" />
-    <app-kpi-card
-      title="Ticket promedio"
-      [value]="metrics?.averageTicket ?? 0"
-      icon="local_activity"
-      format="currency"
-      [loading]="isLoading" />
-    <app-kpi-card
-      title="Mesas ocupadas"
-      [value]="metrics?.occupiedTables ?? 0"
-      icon="table_bar"
-      [loading]="isLoading" />
+  <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+    <app-skeleton size="xl" />
+    }
   </div>
-
-  <div class="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-4">
-    <div>
-      <app-card>
-        <app-area-chart />
-      </app-card>
-    </div>
-    <div class="lg:col-span-3">
-      <app-recent-orders-table [orders]="[]" [loading]="false" [hasError]="false" />
-    </div>
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <app-skeleton size="3xl" />
+    <app-skeleton size="3xl" />
   </div>
-
   }
 </div>

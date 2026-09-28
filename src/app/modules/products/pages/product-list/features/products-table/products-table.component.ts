@@ -1,0 +1,43 @@
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { PaginationMeta } from 'src/app/core/standarized-response/standardized-pagination/pagination-meta.dto';
+import { IconComponent, PaginationTableComponent, SkeletonComponent } from 'src/ui';
+import { ProductDto } from '../../data-access';
+
+@Component({
+  selector: 'app-products-table',
+  standalone: true,
+  imports: [IconComponent, SkeletonComponent, PaginationTableComponent],
+  templateUrl: './products-table.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class ProductsTableComponent {
+  readonly products = input.required<ProductDto[]>();
+  readonly loading = input(false);
+  readonly pagination = input<PaginationMeta | null>(null);
+  readonly categoryNames = input<Record<number, string>>({});
+  readonly hasFilters = input(false);
+
+  readonly edit = output<ProductDto>();
+  readonly delete = output<ProductDto>();
+  readonly pageChange = output<number>();
+  readonly clearFilters = output<void>();
+
+  readonly skeletonRows = [1, 2, 3, 4, 5];
+  readonly #currency = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 });
+
+  price(product: ProductDto): string {
+    const price = product.variations[0]?.sellPriceIncTax;
+    return price === null || price === undefined ? '—' : this.#currency.format(price);
+  }
+
+  categoryLabel(product: ProductDto): string {
+    const names = this.categoryNames();
+    const category = product.categoryId ? names[product.categoryId] : undefined;
+    const subcategory = product.subCategoryId ? names[product.subCategoryId] : undefined;
+    return [category, subcategory].filter(Boolean).join(' › ') || 'Sin categoría';
+  }
+
+  initial(product: ProductDto): string {
+    return product.name.trim().charAt(0).toUpperCase();
+  }
+}

@@ -1,21 +1,137 @@
-import { Component, inject } from '@angular/core';
-import { HeaderDashboardComponent, CardComponent, AreaChartComponent, ButtonComponent, IconComponent } from 'src/ui';
-import { KpiCardComponent, RecentOrdersTableComponent } from './features';
-import { DashboardSkeletonComponent } from './ui';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, untracked } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { interval, map } from 'rxjs';
+import { ButtonComponent, HeaderDashboardComponent, IconComponent, SkeletonComponent } from 'src/ui';
+import { GetAllBusinessLocationsService } from 'src/app/modules/restaurante/pages/business-location/data-access';
+import { WhoamiService } from 'src/app/core/services/whoami/whoami.service';
+import { GetAllTablesService } from 'src/app/modules/tables/pages/table-list/data-access';
+import { formatCurrency } from 'src/app/modules/orders/pages/order-list/ui';
 import { GetDashboardMetricsService } from './data-access';
+import { KpiCardComponent, RecentOrdersCardComponent, TopProductsCardComponent } from './features';
+import { comparisonLabel, PeriodPreset, periodRange, PeriodSelectorComponent, toDateKey } from './ui';
+
+// Con el día de hoy en el rango, los números se refrescan solos.
+const REFRESH_MS = 60_000;
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const PRESETS: PeriodPreset[] = ['today', 'yesterday', '7d', 'month', 'custom'];
+
+// location: número = sucursal; 'all' = todas (elegido explícitamente); null = sin elegir (usa la del usuario).
+type DashboardQuery = Readonly<{ preset: PeriodPreset; from: string; to: string; location: number | 'all' | null }>;
+
+function toQuery(params: ParamMap): DashboardQuery {
+  const preset = (PRESETS.includes(params.get('range') as PeriodPreset) ? params.get('range') : 'today') as PeriodPreset;
+  const from = params.get('from');
+  const to = params.get('to');
+  const custom = from && to && DATE_PATTERN.test(from) && DATE_PATTERN.test(to) ? { from, to } : undefined;
+  const range = periodRange(preset === 'custom' && !custom ? 'today' : preset, custom);
+  const raw = params.get('location');
+  const location = Number(raw);
+  return {
+    preset,
+    ...range,
+    location: raw === 'all' ? 'all' : Number.isInteger(location) && location > 0 ? location : null,
+  };
+}
+
 @Component({
   selector: 'app-admin',
+  standalone: true,
   imports: [
-    HeaderDashboardComponent, CardComponent, AreaChartComponent,
-    ButtonComponent, IconComponent,
-    KpiCardComponent, RecentOrdersTableComponent, DashboardSkeletonComponent,
+    HeaderDashboardComponent,
+    ButtonComponent,
+    IconComponent,
+    SkeletonComponent,
+    PeriodSelectorComponent,
+    KpiCardComponent,
+    TopProductsCardComponent,
+    RecentOrdersCardComponent,
   ],
   templateUrl: './admin.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdminComponent {
-  protected readonly $metricsService = inject(GetDashboardMetricsService);
+export class AdminComponent implements OnInit {
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly metricsService = inject(GetDashboardMetricsService);
+  private readonly locationsService = inject(GetAllBusinessLocationsService);
+  private readonly tablesService = inject(GetAllTablesService);
+  private readonly $branchId = inject(WhoamiService).$branchId;
 
-  protected readonly $metrics = this.$metricsService.$metrics;
-  protected readonly $isLoading = this.$metricsService.$isLoading;
-  protected readonly $hasError = this.$metricsService.$hasError;
+  readonly formatCurrency = formatCurrency;
+
+  readonly $query = toSignal(this.route.queryParamMap.pipe(map(toQuery)), {
+    initialValue: toQuery(this.route.snapshot.queryParamMap),
+  });
+  readonly $metrics = this.metricsService.$metrics;
+  readonly $isLoading = this.metricsService.$isLoading;
+  readonly $hasError = computed(() => this.metricsService.$error() !== undefined);
+  readonly $locations = computed(() => this.locationsService.$locations() ?? []);
+  // Sucursal efectiva: la de la URL; si no hay, la asignada al usuario (si existe); si no, todas.
+  readonly $locationId = computed<number | null>(() => {
+    const { location } = this.$query();
+    if (location === 'all') return null;
+    if (location !== null) return location;
+    const branchId = this.$branchId();
+    return this.$locations().some((item) => item.id === branchId) ? branchId! : null;
+  });
+  // null mientras no se sabe la sucursal del usuario, para no cargar "todas" y luego saltar a la suya.
+  readonly $filters = computed(() => {
+    const { from, to, location } = this.$query();
+    const resolving =
+      location === null && (this.$branchId() === undefined || this.locationsService.$locations() === undefined);
+    return resolving ? null : { dateFrom: from, dateTo: to, locationId: this.$locationId() ?? undefined };
+  });
+
+  readonly $comparison = computed(() => comparisonLabel(this.$query().preset));
+  readonly $includesToday = computed(() => this.$query().to >= toDateKey(new Date()));
+
+  // Mesas ocupadas: el dashboard no lo entrega; se calcula con las mesas de la sucursal elegida.
+  readonly $tables = computed(() => (this.$locationId() ? this.tablesService.$tables() : []));
+  readonly $occupiedTables = computed(() => this.$tables().filter((table) => table.status === 'occupied').length);
+
+  constructor() {
+    effect(() => {
+      const locationId = this.$locationId();
+      if (locationId) untracked(() => this.tablesService.setParams(locationId));
+    });
+
+    // Se recarga al cambiar el período o la sucursal efectiva (incluida la del usuario al llegar).
+    effect(() => {
+      const filters = this.$filters();
+      if (filters) untracked(() => this.metricsService.load(filters));
+    });
+  }
+
+  ngOnInit(): void {
+    interval(REFRESH_MS)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (!this.$includesToday()) return;
+        this.metricsService.retry();
+        if (this.$locationId()) this.tablesService.retry();
+      });
+  }
+
+  handlePreset(preset: PeriodPreset) {
+    this.navigate({ range: preset === 'today' ? null : preset, from: null, to: null });
+  }
+
+  handleCustom({ from, to }: { from: string; to: string }) {
+    this.navigate({ range: 'custom', from, to });
+  }
+
+  handleLocation(event: Event) {
+    const value = (event.target as HTMLSelectElement).value;
+    this.navigate({ location: value || 'all' });
+  }
+
+  handleRetry() {
+    this.metricsService.retry();
+  }
+
+  private navigate(queryParams: Record<string, string | null>) {
+    this.router.navigate([], { relativeTo: this.route, queryParams, queryParamsHandling: 'merge' });
+  }
 }

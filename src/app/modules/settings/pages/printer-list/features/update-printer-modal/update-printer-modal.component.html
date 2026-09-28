@@ -1,0 +1,14 @@
+<app-modal-card>
+  <ng-template app-slot="header">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Editar impresora</h2>
+  </ng-template>
+
+  <app-printer-form-fields [form]="form" [showStatus]="true" />
+
+  <ng-template app-slot="footer">
+    <div class="flex justify-end gap-3">
+      <app-button type="button" impact="light" [disabled]="!!$isLoading()" (buttonClick)="handleCancel()">Cancelar</app-button>
+      <app-button type="button" impact="bold" [disabled]="!!$isLoading()" [isLoading]="!!$isLoading()" (buttonClick)="handleSubmit()">Guardar cambios</app-button>
+    </div>
+  </ng-template>
+</app-modal-card>

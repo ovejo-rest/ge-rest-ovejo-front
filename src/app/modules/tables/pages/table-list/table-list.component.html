@@ -24,6 +24,10 @@
       {{ viewMode === 'grid' ? 'Lista' : 'Grid' }}
     </app-button>
 
+    <app-button full impact="light" tone="primary" shape="rounded" size="medium" icon="qr_code_2" (buttonClick)="printAllQrs()">
+      Imprimir QR
+    </app-button>
+
     <app-button full impact="light" tone="primary" shape="rounded" size="medium" icon="refresh" (buttonClick)="retry()">
       Actualizar
     </app-button>
@@ -54,7 +58,7 @@
   </div>
   } @else if (viewMode === 'grid') {
   <app-card>
-    <app-tables-grid [tables]="tables" [sectors]="sectors" [isLoading]="isLoading" />
+    <app-tables-grid [tables]="tables" [sectors]="sectors" [isLoading]="isLoading" [openingTableId]="$openingTableId()" (tableSelect)="onTableSelected($event)" />
   </app-card>
   } @else {
   <app-tables-table [tables]="tables" [isLoading]="isLoading" (retryData)="retry()" />

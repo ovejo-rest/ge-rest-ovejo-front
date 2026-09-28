@@ -1,0 +1,62 @@
+<div class="glass overflow-hidden rounded-[1rem]">
+  <div class="overflow-x-auto">
+    <table class="min-w-full">
+      <thead>
+        <tr class="text-muted-foreground border-b border-[var(--border)] text-left text-xs font-medium uppercase tracking-wider">
+          <th class="px-4 py-3">Producto</th>
+          <th class="px-4 py-3 text-center">Cant.</th>
+          <th class="hidden px-4 py-3 text-right sm:table-cell">Precio</th>
+          <th class="px-4 py-3 text-right">Subtotal</th>
+          @if (showKitchenStatus()) {
+          <th class="px-4 py-3 text-center">Cocina</th>
+          }
+          @if (canServe()) {
+          <th class="px-4 py-3"><span class="sr-only">Acciones</span></th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (line of lines(); track line.lineId) {
+        <tr class="border-b border-[var(--border)] last:border-0">
+          <td class="px-4 py-3">
+            <p class="text-foreground font-medium">{{ line.productName }}</p>
+            @if (variationLabel(line); as variation) {
+            <p class="text-muted-foreground text-xs">{{ variation }}</p>
+            }
+            @if (line.sellLineNote) {
+            <p class="mt-0.5 text-xs italic text-amber-600">“{{ line.sellLineNote }}”</p>
+            }
+          </td>
+          <td class="text-foreground px-4 py-3 text-center font-semibold tabular-nums">{{ line.quantity }}</td>
+          <td class="text-muted-foreground hidden px-4 py-3 text-right text-sm tabular-nums sm:table-cell">
+            {{ formatCurrency(line.unitPriceIncTax) }}
+          </td>
+          <td class="text-foreground px-4 py-3 text-right font-medium tabular-nums">
+            {{ formatCurrency(line.unitPriceIncTax * line.quantity) }}
+          </td>
+          @if (showKitchenStatus()) {
+          <td class="px-4 py-3 text-center">
+            <app-status-badge [map]="kitchenStatus" [status]="line.resLineOrderStatus" fallback="—" />
+          </td>
+          }
+          @if (canServe()) {
+          <td class="px-4 py-3 text-right">
+            @if (line.resLineOrderStatus !== 'served') {
+            <button
+              type="button"
+              class="glass-row inline-flex h-9 items-center gap-1 rounded-md px-3 text-sm font-medium disabled:opacity-50"
+              [disabled]="pendingLineId() !== null"
+              [attr.aria-label]="'Marcar ' + line.productName + ' como servido'"
+              (click)="serveLine.emit(line)">
+              <app-icon class="h-4 w-4">{{ pendingLineId() === line.lineId ? 'hourglass_empty' : 'room_service' }}</app-icon>
+              Servir
+            </button>
+            }
+          </td>
+          }
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

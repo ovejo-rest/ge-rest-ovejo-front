@@ -1,1 +1,1 @@
-export * from './dashboard-skeleton';
+export * from './period-selector';

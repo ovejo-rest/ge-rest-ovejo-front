@@ -35,15 +35,18 @@ export class UpdateTableModalComponent implements OnDestroy {
     description: [this.data.description || ''],
     capacity: [this.data.capacity, [Validators.required, Validators.min(1)]],
     sectorId: [this.data.sectorId],
-    status: [this.data.status as TableStatus],
+    status: [{ value: this.data.status as TableStatus, disabled: this.data.status === 'occupied' }],
   });
 
-  readonly statusOptions: { value: TableStatus; label: string }[] = [
-    { value: 'available', label: 'Disponible' },
-    { value: 'occupied', label: 'Ocupada' },
-    { value: 'reserved', label: 'Reservada' },
-    { value: 'blocked', label: 'Bloqueada' },
-  ];
+  // "Ocupada" y "Disponible" cambian solas con los pedidos; a mano solo se reserva o bloquea.
+  readonly isOccupied = this.data.status === 'occupied';
+  readonly statusOptions: { value: TableStatus; label: string }[] = this.isOccupied
+    ? [{ value: 'occupied', label: 'Ocupada (tiene un pedido abierto)' }]
+    : [
+        { value: 'available', label: 'Disponible' },
+        { value: 'reserved', label: 'Reservada' },
+        { value: 'blocked', label: 'Bloqueada' },
+      ];
 
   constructor() {
     effect(() => {
@@ -70,7 +73,7 @@ export class UpdateTableModalComponent implements OnDestroy {
       description: description || undefined,
       capacity: capacity ?? undefined,
       sectorId: sectorId ?? undefined,
-      status: status ?? undefined,
+      status: status && status !== this.data.status ? status : undefined,
     });
   }
 

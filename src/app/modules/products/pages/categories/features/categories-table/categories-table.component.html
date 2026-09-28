@@ -1,0 +1,32 @@
+<app-table>
+  <ng-template app-slot="head">
+    <tr>
+      @for (item of headerData; track $index) {
+      <th class="h-8 text-center">{{ item }}</th>
+      }
+      <th class="w-[90px]"></th>
+    </tr>
+  </ng-template>
+  @if (isLoading()) {
+  <tr>
+    <td colspan="4" class="px-2 py-4"><app-progress-bar /></td>
+  </tr>
+  } @else { @for (row of $rows(); track row.category.id) {
+  <tr class="glass-row h-10">
+    <td class="text-center font-medium">
+      @if (row.level > 0) {
+      <span class="text-muted-foreground" [style.padding-left.px]="(row.level - 1) * 16">└ </span>
+      }
+      {{ row.category.name }}
+    </td>
+    <td class="text-center">{{ row.category.shortCode || '-' }}</td>
+    <td class="text-muted-foreground text-center">{{ row.category.description || '-' }}</td>
+    <td class="w-[90px] text-center">
+      <div class="flex items-center justify-center gap-1">
+        <app-button size="small" icon="edit_document" (buttonClick)="handleUpdate(row.category)" />
+        <app-button size="small" icon="delete" tone="danger" (buttonClick)="handleDelete(row.category)" />
+      </div>
+    </td>
+  </tr>
+  } }
+</app-table>

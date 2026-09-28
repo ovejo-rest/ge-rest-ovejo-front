@@ -1,0 +1,59 @@
+<div class="flex flex-col gap-4">
+  <!-- Barra superior -->
+  <div class="flex flex-wrap items-center gap-3">
+    <h1 class="text-foreground flex items-center gap-2 text-lg font-semibold">
+      <app-icon class="text-primary h-6 w-6">restaurant</app-icon>Cocina
+    </h1>
+    <span class="text-muted-foreground text-sm">
+      {{ $orders().length }} {{ $orders().length === 1 ? 'comanda' : 'comandas' }} · {{ $itemCount() }} ítems
+    </span>
+    <div class="ml-auto flex items-center gap-2">
+      <span class="text-muted-foreground hidden text-xs sm:inline" [class.text-red-600]="$hasError()">
+        {{ $hasError() ? 'Sin conexión · ' : '' }}Actualizado {{ formatTime($updatedAt()) }}
+      </span>
+      <button type="button" class="glass-row flex h-10 w-10 items-center justify-center rounded-md" aria-label="Actualizar" title="Actualizar" (click)="refresh()">
+        <app-icon class="h-5 w-5">refresh</app-icon>
+      </button>
+      <button type="button" class="glass-row flex h-10 w-10 items-center justify-center rounded-md" [attr.aria-label]="$isFullscreen() ? 'Salir de pantalla completa' : 'Pantalla completa'" (click)="toggleFullscreen()">
+        <app-icon class="h-5 w-5">{{ $isFullscreen() ? 'fullscreen_exit' : 'fullscreen' }}</app-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Estaciones -->
+  @if ($stations().length) {
+  <div class="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1" role="tablist" aria-label="Estaciones">
+    <button type="button" role="tab" class="shrink-0 rounded-full px-4 py-2 text-sm font-medium" [class]="$stationId() === null ? 'bg-primary text-white' : 'glass-row text-foreground'" [attr.aria-selected]="$stationId() === null" (click)="selectStation(null)">
+      Todas
+    </button>
+    @for (station of $stations(); track station.id) {
+    <button type="button" role="tab" class="shrink-0 rounded-full px-4 py-2 text-sm font-medium" [class]="$stationId() === station.id ? 'bg-primary text-white' : 'glass-row text-foreground'" [attr.aria-selected]="$stationId() === station.id" (click)="selectStation(station.id)">
+      {{ station.name }}
+    </button>
+    }
+  </div>
+  }
+
+  @if (!$hasLoaded() && !$hasError()) {
+  <p class="text-muted-foreground py-16 text-center text-sm">Cargando comandas…</p>
+  } @else if (!$hasLoaded() && $hasError()) {
+  <div class="flex flex-col items-center gap-3 py-16 text-center">
+    <app-icon class="text-destructive h-14 w-14">wifi_off</app-icon>
+    <p class="text-foreground font-semibold">No se pudieron cargar las comandas</p>
+    <button type="button" class="text-primary text-sm font-medium hover:underline" (click)="refresh()">Reintentar</button>
+  </div>
+  } @else if (!$orders().length) {
+  <app-empty-state icon="done_all" title="Todo al día" [description]="'No hay comandas pendientes en ' + $stationName() + '. Las nuevas aparecerán solas.'" />
+  } @else {
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+    @for (order of $orders(); track order.transactionId) {
+    <app-kitchen-ticket
+      [order]="order"
+      [now]="$now()"
+      [busy]="$busyIds().has(order.transactionId)"
+      [stationSelected]="$stationId() !== null"
+      (markReady)="handleMarkReady($event)" />
+    }
+  </div>
+  }
+</div>
