@@ -1,29 +1,50 @@
-<div class="flex h-screen w-screen">
-  <div class="auth-bg bg-primary hidden flex-1 items-center justify-center bg-cover lg:flex">
-    <div class="max-w-2xl space-y-4 p-8 text-center text-white">
-      <img src="./assets/images/auth-screens.png" alt="dashboard widget" />
-      <h1 class="text-4xl font-bold">"Fast, Efficient and Productive"</h1>
-      <p class="text-xs font-light">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-        magna aliqua. Ut enim ad minim veniam, quis
-        <span class="cursor-pointer font-medium text-yellow-400">nostrud</span> exercitation ullamco laboris nisi ut
-        aliquip ex ea commodo <span class="cursor-pointer font-medium text-yellow-400">consequat.</span> Duis aute irure
-        dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-        cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-      </p>
-    </div>
+<div #screen class="auth-screen min-h-dvh relative overflow-x-hidden">
+  <!-- Fondo fijo a pantalla completa: color primario + líneas (con leve movimiento y parallax) + profundidad -->
+  <div class="bg-primary fixed inset-0" aria-hidden="true"></div>
+  <div class="auth-lines-drift fixed" aria-hidden="true">
+    <div class="auth-bg auth-lines-parallax absolute inset-0 bg-cover"></div>
   </div>
-  <div class="auth-glass-panel glass flex flex-1 items-center justify-center">
-    <div class="max-w-md overflow-y-auto px-4 sm:w-[500px]">
-      <!-- logo -->
-      <div class="flex items-center justify-center gap-3">
-        <a class="bg-primary rounded-sm p-2">
-          <app-icon> how_to_reg </app-icon>
-        </a>
-        <b class="text-md text-foreground font-bold"> Angular Tailwind </b>
+  <div class="auth-shade fixed inset-0" aria-hidden="true"></div>
+  <div class="auth-blobs-parallax fixed inset-0" aria-hidden="true">
+    <span class="auth-blob auth-blob--a"></span>
+    <span class="auth-blob auth-blob--b"></span>
+  </div>
+
+  <div class="auth-safe min-h-dvh relative grid grid-rows-[auto_1fr] lg:grid-cols-2 lg:grid-rows-1">
+    <!-- Marca: centrada sobre la tarjeta en móvil/tablet, a la izquierda en escritorio -->
+    <section
+      class="flex flex-col items-center justify-center px-6 pt-8 text-center text-white sm:pt-12 lg:items-start lg:px-16 lg:pt-0 lg:text-left">
+      <div class="flex items-center gap-3">
+        <span
+          class="bg-white/15 flex h-10 w-10 items-center justify-center rounded-xl backdrop-blur-md sm:h-11 sm:w-11">
+          <app-icon class="h-6 w-6">restaurant</app-icon>
+        </span>
+        <span class="text-lg font-bold tracking-wide sm:text-xl">REDOM | Chile </span>
       </div>
-      <!-- Route -->
-      <router-outlet></router-outlet>
-    </div>
+
+      <h1 class="mt-4 max-w-lg text-2xl font-semibold leading-tight sm:mt-6 sm:text-3xl lg:mt-12 lg:text-5xl">
+        Tu restaurante, en un solo lugar.
+      </h1>
+      <p class="mt-3 hidden max-w-md text-base font-light text-white/80 md:block lg:mt-4 lg:text-lg">
+        Toma pedidos, coordina la cocina y cobra más rápido, desde el salón o donde estés.
+      </p>
+      <ul class="mt-6 hidden max-w-lg flex-wrap justify-center gap-2 sm:flex lg:mt-10 lg:justify-start lg:gap-3">
+        @for (feature of features; track feature.label) {
+        <li
+          class="auth-chip inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium lg:px-4 lg:py-2 lg:text-sm">
+          <app-icon class="h-4 w-4 lg:h-5 lg:w-5">{{ feature.icon }}</app-icon
+          >{{ feature.label }}
+        </li>
+        }
+      </ul>
+    </section>
+
+    <!-- Formulario en vidrio -->
+    <section class="flex items-start justify-center px-4 pb-10 pt-6 sm:items-center sm:px-6 lg:px-12 lg:py-10">
+      <div
+        class="auth-card w-full max-w-md rounded-[1.75rem] px-5 py-1 sm:rounded-[2rem] sm:px-10 sm:py-2 2xl:max-w-lg">
+        <router-outlet></router-outlet>
+      </div>
+    </section>
   </div>
 </div>

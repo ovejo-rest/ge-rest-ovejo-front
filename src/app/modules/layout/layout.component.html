@@ -1,8 +1,11 @@
-<div class="flex h-screen w-full overflow-hidden">
+<div class="app-glass-shell flex h-screen w-full overflow-hidden">
+  <!-- Prueba de glassmorphism: fondo de marca estático (ver styles.css, bloque "PRUEBA: marco") -->
+  <div class="app-shell-backdrop" aria-hidden="true"></div>
+
   <!-- Sidebar -->
   <app-sidebar />
 
-  <div class="glass flex grow flex-col content-start overflow-hidden">
+  <div class="glass app-glass-main flex grow flex-col content-start overflow-hidden">
     <!-- Header -->
     <app-navbar />
     <!-- main content -->

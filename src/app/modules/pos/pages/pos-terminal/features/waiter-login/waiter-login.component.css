@@ -1,52 +1,6 @@
-/* Pantalla de bloqueo de la terminal: fondo con manchas de color del tema y tarjeta de vidrio. */
-.lock-screen {
-  background:
-    radial-gradient(120% 120% at 50% 0%, color-mix(in srgb, var(--primary) 35%, #0b1020) 0%, #070a14 70%);
-  color: #fff;
-}
-
-.lock-blob {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(80px);
-  opacity: 0.55;
-  animation: lock-float 18s ease-in-out infinite alternate;
-  pointer-events: none;
-}
-.lock-blob--a { width: 42vw; height: 42vw; top: -10vw; left: -8vw; background: var(--primary); }
-.lock-blob--b { width: 34vw; height: 34vw; bottom: -12vw; right: -6vw; background: color-mix(in srgb, var(--primary) 40%, #22d3ee); animation-delay: -6s; }
-.lock-blob--c { width: 26vw; height: 26vw; top: 40%; left: 55%; background: color-mix(in srgb, var(--primary) 30%, #a855f7); animation-delay: -12s; }
-
-@keyframes lock-float {
-  0% { transform: translate3d(0, 0, 0) scale(1); }
-  100% { transform: translate3d(4vw, 3vw, 0) scale(1.12); }
-}
-
-.glass-panel {
-  background: rgb(255 255 255 / 0.08);
-  border: 1px solid rgb(255 255 255 / 0.16);
-  backdrop-filter: blur(28px) saturate(140%);
-  -webkit-backdrop-filter: blur(28px) saturate(140%);
-  box-shadow: 0 24px 60px -12px rgb(0 0 0 / 0.45), inset 0 1px 0 rgb(255 255 255 / 0.12);
-}
-
-.glass-chip {
-  background: rgb(255 255 255 / 0.1);
-  border: 1px solid rgb(255 255 255 / 0.14);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
-
-.glass-tile {
-  background: rgb(255 255 255 / 0.06);
-  border: 1px solid rgb(255 255 255 / 0.12);
-  transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease;
-}
-.glass-tile:hover { background: rgb(255 255 255 / 0.12); border-color: rgb(255 255 255 / 0.24); }
-.glass-tile:active { transform: scale(0.96); }
-
+/* La pantalla de bloqueo usa las piezas globales del login (auth-*, en styles.css). Aquí solo lo propio. */
 .avatar {
-  box-shadow: 0 8px 20px -6px rgb(0 0 0 / 0.5), inset 0 1px 0 rgb(255 255 255 / 0.35);
+  box-shadow: 0 8px 20px -6px rgb(0 0 0 / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.35);
 }
 
 .fade-in { animation: fade-in 0.28s ease-out; }
@@ -56,5 +10,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lock-blob, .fade-in { animation: none; }
+  .fade-in { animation: none; }
 }

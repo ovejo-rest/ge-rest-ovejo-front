@@ -5,10 +5,10 @@
       <app-icon class="h-4 w-4">store</app-icon>{{ $config().locationName ?? 'Terminal de salón' }}
     </span>
     <div class="fixed right-3 top-3 z-50 flex items-center gap-1">
-      <button type="button" class="text-muted-foreground flex h-10 w-10 items-center justify-center rounded-full bg-white/10 backdrop-blur" [attr.aria-label]="$isFullscreen() ? 'Salir de pantalla completa' : 'Pantalla completa'" (click)="toggleFullscreen()">
+      <button type="button" class="flex h-10 w-10 items-center justify-center rounded-full bg-black/25 text-white backdrop-blur" [attr.aria-label]="$isFullscreen() ? 'Salir de pantalla completa' : 'Pantalla completa'" (click)="toggleFullscreen()">
         <app-icon class="h-5 w-5">{{ $isFullscreen() ? 'fullscreen_exit' : 'fullscreen' }}</app-icon>
       </button>
-      <button type="button" class="text-muted-foreground flex h-10 w-10 items-center justify-center rounded-full bg-white/10 backdrop-blur" aria-label="Administrar terminal" title="Administrar" (click)="openAdmin()">
+      <button type="button" class="flex h-10 w-10 items-center justify-center rounded-full bg-black/25 text-white backdrop-blur" aria-label="Administrar terminal" title="Administrar" (click)="openAdmin()">
         <app-icon class="h-5 w-5">settings</app-icon>
       </button>
     </div>
