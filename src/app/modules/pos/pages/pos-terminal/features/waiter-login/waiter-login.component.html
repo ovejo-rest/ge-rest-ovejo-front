@@ -1,17 +1,23 @@
 @if (variant() === 'screen') {
-<!-- Terminal de salón: pantalla de bloqueo con vidrio esmerilado -->
-<div class="lock-screen fixed inset-0 z-40 overflow-y-auto">
-  <span class="lock-blob lock-blob--a"></span>
-  <span class="lock-blob lock-blob--b"></span>
-  <span class="lock-blob lock-blob--c"></span>
+<!-- Terminal de salón: misma estética del login (color de marca + líneas en movimiento + tarjeta de vidrio), centrada -->
+<div class="fixed inset-0 z-40 overflow-y-auto">
+  <div class="bg-primary fixed inset-0" aria-hidden="true"></div>
+  <div class="auth-lines-drift fixed" aria-hidden="true">
+    <div class="auth-bg auth-lines-parallax absolute inset-0 bg-cover"></div>
+  </div>
+  <div class="auth-shade fixed inset-0" aria-hidden="true"></div>
+  <div class="auth-blobs-parallax fixed inset-0" aria-hidden="true">
+    <span class="auth-blob auth-blob--a"></span>
+    <span class="auth-blob auth-blob--b"></span>
+  </div>
 
-  <div class="relative flex min-h-full flex-col items-center px-4 py-6 sm:py-10">
+  <div class="auth-safe relative flex min-h-full flex-col items-center px-4 py-6 text-white sm:py-10">
     <div class="flex w-full max-w-5xl items-center justify-between gap-3 pr-24">
-      <span class="glass-chip inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium">
-        <app-icon class="h-4 w-4">point_of_sale</app-icon>REDOM
+      <span class="auth-chip inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold tracking-wide">
+        <app-icon class="h-4 w-4">restaurant</app-icon>REDOM
       </span>
       @if (locationName()) {
-      <span class="glass-chip inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm">
+      <span class="auth-chip inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm">
         <app-icon class="h-4 w-4">store</app-icon>{{ locationName() }}
       </span>
       }
@@ -19,10 +25,10 @@
 
     <div class="mt-6 text-center sm:mt-10">
       <p class="text-6xl font-extralight tabular-nums tracking-tight sm:text-8xl">{{ time($now()) }}</p>
-      <p class="mt-1 text-base font-light text-white/75 sm:text-lg">{{ longDate($now()) }}</p>
+      <p class="mt-1 text-base font-light text-white/80 sm:text-lg">{{ longDate($now()) }}</p>
     </div>
 
-    <div class="glass-panel mt-8 w-full max-w-2xl rounded-[2rem] p-6 sm:p-8">
+    <div class="auth-card mt-8 w-full max-w-2xl rounded-[2rem] p-6 text-left sm:p-8">
       <ng-container *ngTemplateOutlet="content" />
     </div>
   </div>
@@ -37,43 +43,43 @@
   @let screen = variant() === 'screen';
   @if ($selected(); as member) {
   <div class="fade-in flex flex-col items-center">
-    <button type="button" class="mb-4 inline-flex items-center gap-1 self-start text-sm" [class]="screen ? 'text-white/70 hover:text-white' : 'text-muted-foreground hover:text-primary'" (click)="back()">
+    <button type="button" class="text-muted-foreground hover:text-primary mb-4 inline-flex items-center gap-1 self-start text-sm" (click)="back()">
       <app-icon class="h-4 w-4">arrow_back</app-icon>No soy yo
     </button>
     <span class="avatar mb-3 flex h-20 w-20 items-center justify-center rounded-full text-2xl font-semibold text-white" [style.background]="avatarGradient(member)">
       {{ initials(member) }}
     </span>
-    <h2 class="mb-1 text-2xl font-semibold" [class.text-foreground]="!screen">Hola, {{ member.name }}</h2>
-    <p class="mb-6 text-sm" [class]="screen ? 'text-white/70' : 'text-muted-foreground'">Ingresa tu PIN de 4 dígitos</p>
-    <app-pin-pad [appearance]="screen ? 'glass' : 'default'" [disabled]="$isChecking()" (submitPin)="checkPin($event)" />
+    <h2 class="text-foreground mb-1 text-2xl font-semibold">Hola, {{ member.name }} <span class="text-primary">!</span></h2>
+    <p class="text-muted-foreground mb-6 text-sm">Ingresa tu PIN de 4 dígitos</p>
+    <app-pin-pad [disabled]="$isChecking()" (submitPin)="checkPin($event)" />
   </div>
   } @else {
   <div class="fade-in flex flex-col items-center">
-    <h2 class="mb-1 text-2xl font-semibold sm:text-3xl" [class.text-foreground]="!screen">¿Quién atiende?</h2>
-    <p class="mb-6 text-sm" [class]="screen ? 'text-white/70' : 'text-muted-foreground'">Toca tu nombre para comenzar</p>
+    <h2 class="text-foreground mb-1 text-2xl font-semibold sm:text-3xl">¿Quién atiende<span class="text-primary">?</span></h2>
+    <p class="text-muted-foreground mb-6 text-sm">Toca tu nombre para comenzar</p>
 
     <div class="grid w-full grid-cols-2 gap-3 sm:grid-cols-3" [class.md:grid-cols-4]="!screen">
       @for (member of $staff(); track member.code) {
       <button
         type="button"
         class="flex flex-col items-center gap-2 rounded-2xl p-4"
-        [class]="screen ? 'glass-tile' : 'glass-row active:scale-95'"
+        class="glass-row active:scale-95"
         [class.opacity-50]="!member.hasPin"
         [attr.aria-label]="member.name + ' ' + member.fatherLastName + (member.hasPin ? '' : ', sin PIN')"
         (click)="select(member)">
         <span class="avatar flex h-14 w-14 items-center justify-center rounded-full text-lg font-semibold text-white" [style.background]="avatarGradient(member)">
           {{ initials(member) }}
         </span>
-        <span class="text-center text-sm font-medium" [class.text-foreground]="!screen">{{ member.name }} {{ member.fatherLastName }}</span>
+        <span class="text-foreground text-center text-sm font-medium">{{ member.name }} {{ member.fatherLastName }}</span>
         @if (!member.hasPin) {
-        <span class="text-xs" [class]="screen ? 'text-white/60' : 'text-muted-foreground'">Sin PIN</span>
+        <span class="text-muted-foreground text-xs">Sin PIN</span>
         }
       </button>
       } @empty {
       <div class="col-span-full py-6 text-center">
-        <p class="text-sm font-medium" [class.text-foreground]="!screen">{{ $isLoadingStaff() ? 'Cargando meseros…' : 'No hay meseros disponibles' }}</p>
+        <p class="text-foreground text-sm font-medium">{{ $isLoadingStaff() ? 'Cargando meseros…' : 'No hay meseros disponibles' }}</p>
         @if (!$isLoadingStaff()) {
-        <p class="mx-auto mt-1 max-w-md text-xs" [class]="screen ? 'text-white/65' : 'text-muted-foreground'">
+        <p class="text-muted-foreground mx-auto mt-1 max-w-md text-xs">
           Un usuario aparece aquí si tiene el rol <b>Mesero</b> (código WAITER), pertenece a este restaurante y está activo.
           Asígnalo en Roles y permisos → Usuarios y roles.
         </p>
@@ -82,7 +88,7 @@
       }
     </div>
 
-    <button type="button" class="mt-5 inline-flex items-center gap-1 text-sm font-medium" [class]="screen ? 'text-white/75 hover:text-white' : 'text-primary hover:underline'" [disabled]="$isLoadingStaff()" (click)="refreshStaff()">
+    <button type="button" class="text-primary mt-5 inline-flex items-center gap-1 text-sm font-medium hover:underline" [disabled]="$isLoadingStaff()" (click)="refreshStaff()">
       <app-icon class="h-4 w-4">refresh</app-icon>Actualizar lista
     </button>
 

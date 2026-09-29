@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, injec
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { interval, map } from 'rxjs';
-import { ButtonComponent, HeaderDashboardComponent, IconComponent, SkeletonComponent } from 'src/ui';
+import { ButtonComponent, IconComponent, SkeletonComponent } from 'src/ui';
 import { GetAllBusinessLocationsService } from 'src/app/modules/restaurante/pages/business-location/data-access';
 import { WhoamiService } from 'src/app/core/services/whoami/whoami.service';
 import { GetAllTablesService } from 'src/app/modules/tables/pages/table-list/data-access';
@@ -38,7 +38,6 @@ function toQuery(params: ParamMap): DashboardQuery {
   selector: 'app-admin',
   standalone: true,
   imports: [
-    HeaderDashboardComponent,
     ButtonComponent,
     IconComponent,
     SkeletonComponent,
@@ -83,6 +82,22 @@ export class AdminComponent implements OnInit {
       location === null && (this.$branchId() === undefined || this.locationsService.$locations() === undefined);
     return resolving ? null : { dateFrom: from, dateTo: to, locationId: this.$locationId() ?? undefined };
   });
+
+  // Encabezado: saludo según la hora, nombre del usuario y sucursal elegida.
+  private readonly $whoami = inject(WhoamiService).$whoami;
+  readonly $greeting = computed(() => {
+    const hour = new Date().getHours();
+    const salute = hour < 12 ? 'Buenos días' : hour < 20 ? 'Buenas tardes' : 'Buenas noches';
+    const name = this.$whoami()?.user.name?.split(' ')[0];
+    return name ? `${salute}, ${name}` : salute;
+  });
+  readonly $today = computed(() => {
+    const label = new Date().toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+    return label.charAt(0).toUpperCase() + label.slice(1);
+  });
+  readonly $locationName = computed(
+    () => this.$locations().find((location) => location.id === this.$locationId())?.name ?? 'Todas las sucursales',
+  );
 
   readonly $comparison = computed(() => comparisonLabel(this.$query().preset));
   readonly $includesToday = computed(() => this.$query().to >= toDateKey(new Date()));

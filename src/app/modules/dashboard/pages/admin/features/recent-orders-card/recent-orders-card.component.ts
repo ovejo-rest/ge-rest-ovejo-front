@@ -9,7 +9,7 @@ import { DashboardMetricsDto } from '../../data-access';
   imports: [RouterLink, StatusBadgeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="glass h-full overflow-hidden rounded-[1rem]">
+    <section class="glass-tile-soft h-full overflow-hidden rounded-2xl">
       <div class="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
         <h2 class="text-foreground font-semibold">Pedidos recientes</h2>
         <a routerLink="/orders" class="text-primary text-xs font-medium hover:underline">Ver todos</a>
