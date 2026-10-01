@@ -1,16 +1,10 @@
-<form [formGroup]="form" class="my-10 space-y-6">
+<form [formGroup]="form" class="my-10 space-y-6" (ngSubmit)="submitForm()">
   <div class="text-center">
     <h2 class="text-foreground mb-1 text-3xl font-semibold">Crea tu cuenta <span class="text-primary">!</span></h2>
     <p class="text-muted-foreground text-sm">Empieza a administrar tu restaurante.</p>
   </div>
 
-
-  <div routerLink="/dashboard">
-    <app-button full impact="bold" tone="light" shape="rounded" size="medium">
-      <svg-icon src="assets/icons/google-logo.svg" [svgClass]="'h-6 w-6 mr-2'"> </svg-icon>
-      Registrate con Google
-    </app-button>
-  </div>
+  <app-google-button label="Registrarse con Google" [disabled]="$googleLoading()" (credential)="signUpWithGoogle($event)" />
 
   <div
     class="before:border-muted after:border-muted my-4 flex items-center before:mt-0.5 before:flex-1 before:border-t after:mt-0.5 after:flex-1 after:border-t">
@@ -18,77 +12,64 @@
   </div>
 
   <div class="space-y-3 text-left">
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
     <div class="relative">
-      <input 
-      type="text" 
-      id="email" 
-      class="peer block" 
-      placeholder=" "
-      formControlName="email"
-      />
-      <label
-        for="email"
-        class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-[0] -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">
-        Email address
-      </label>
+      <input type="text" id="name" class="peer block" placeholder=" " formControlName="name" autocomplete="given-name"
+        [class.is__invalid-input]="submitted && form.controls.name.invalid" />
+      <label for="name" class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-[0] -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">Nombre *</label>
     </div>
     <div class="relative">
-      <input 
-      [type]="hide ? 'password' : 'text'" 
-      id="password" 
-      class="peer block" 
-      placeholder=" "
-      formControlName="password"
-      (input)="updatePasswordStrength($event)" />
-      <label
-        for="password"
-        class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-[0] -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">
-        Password
-      </label>
-      <span class="text-muted-foreground absolute top-2 cursor-pointer ltr:right-3 rtl:left-3">
-        <app-icon (clicked)="hide = !hide">
-          {{ hide ? 'visibility_off': 'visibility' }}
-        </app-icon>
+      <input type="text" id="father-last-name" class="peer block" placeholder=" " formControlName="fatherLastName" autocomplete="family-name"
+        [class.is__invalid-input]="submitted && form.controls.fatherLastName.invalid" />
+      <label for="father-last-name" class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-[0] -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">Apellido paterno *</label>
+    </div>
+    <div class="relative">
+      <input type="text" id="mother-last-name" class="peer block" placeholder=" " formControlName="motherLastName"
+        [class.is__invalid-input]="submitted && form.controls.motherLastName.invalid" />
+      <label for="mother-last-name" class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-[0] -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">Apellido materno</label>
+    </div>
+    <div class="relative">
+      <input type="text" id="rut" class="peer block" placeholder=" " formControlName="rut"
+        [class.is__invalid-input]="submitted && form.controls.rut.invalid" (blur)="formatRut()" />
+      <label for="rut" class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-[0] -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">RUT (opcional)</label>
+    </div>
+    </div>
+    <div class="relative">
+      <input type="email" id="email" class="peer block" placeholder=" " formControlName="email" autocomplete="email"
+        [class.is__invalid-input]="submitted && form.controls.email.invalid" />
+      <label for="email" class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-[0] -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">Email *</label>
+    </div>
+
+    <div class="relative">
+      <input [type]="hide ? 'password' : 'text'" id="password" class="peer block" placeholder=" " formControlName="password"
+        autocomplete="new-password" maxlength="72" [class.is__invalid-input]="submitted && form.controls.password.invalid"
+        (input)="updatePasswordStrength($event)" />
+      <label for="password" class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-[0] -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">Contraseña *</label>
+      <span class="text-muted-foreground absolute top-1/2 -translate-y-1/2 cursor-pointer ltr:right-3 rtl:left-3">
+        <app-icon (clicked)="hide = !hide">{{ hide ? 'visibility_off' : 'visibility' }}</app-icon>
       </span>
     </div>
-    <!-- Password Meeter -->
-
-   
-
-    <div class="grid grid-cols-4 gap-2">
-      @for (idx of [0,1,2,3] ; track $index) {
-        <div
-        class="h-1 rounded-xs" 
+    <div class="grid grid-cols-4 gap-2" aria-hidden="true">
+      @for (idx of [0, 1, 2, 3]; track $index) {
+      <div
+        class="h-1 rounded-xs"
         [ngClass]="{
           'bg-muted': passwordStrength === 0 || passwordStrength <= idx,
           'bg-red-400': passwordStrength === 1 && idx === 0,
           'bg-orange-400': passwordStrength === 2 && idx <= 1,
           'bg-yellow-500': passwordStrength === 3 && idx <= 2,
           'bg-green-500': passwordStrength === 4
-        }">
-        </div>
+        }"></div>
       }
     </div>
-    <span class="text-muted-foreground text-xs">
-      Al menos 8 digitos, con letras, numeros y símbolos.
-    </span>
+    <span class="text-muted-foreground text-xs">Mínimo 8 caracteres. Mejor si combina letras, números y símbolos.</span>
+
     <div class="relative mt-1">
-      <input 
-      [type]="hideConfirm ? 'password' : 'text'"  
-      id="confirm-password" 
-      class="peer block" 
-      placeholder=" "
-      formControlName="confirmPassword"
-      />
-      <label
-        for="confirm-password"
-        class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-[0] -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">
-        Confirm Password
-      </label>
-      <span class="text-muted-foreground absolute top-2 cursor-pointer ltr:right-3 rtl:left-3">
-        <app-icon (clicked)="hideConfirm = !hideConfirm">
-          {{ hideConfirm ? 'visibility_off': 'visibility' }}
-        </app-icon>
+      <input [type]="hideConfirm ? 'password' : 'text'" id="confirm-password" class="peer block" placeholder=" "
+        formControlName="confirmPassword" autocomplete="new-password" maxlength="72" />
+      <label for="confirm-password" class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-[0] -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">Repite la contraseña *</label>
+      <span class="text-muted-foreground absolute top-1/2 -translate-y-1/2 cursor-pointer ltr:right-3 rtl:left-3">
+        <app-icon (clicked)="hideConfirm = !hideConfirm">{{ hideConfirm ? 'visibility_off' : 'visibility' }}</app-icon>
       </span>
     </div>
   </div>
@@ -101,47 +82,33 @@
     </div>
   </div>
 
-  @if(form.errors){
-    @if (form.errors['controlNotMatch']) {
-      <app-alert type="danger" >
-        <div class="ms-3 text-sm font-medium">
-          Las contraseñas deben ser iguales.
-        </div>
-      </app-alert>
-    } 
-    @if(form.errors['emailNotValid']){
-      <app-alert type="danger">
-        <div class="ms-3 text-sm font-medium">
-          El email debe ser válido.
-        </div>
-      </app-alert>
-    }
-    
+  @if (submitted && $validationMessage(); as message) {
+  <app-alert type="danger"><div class="ms-3 text-sm font-medium">{{ message }}</div></app-alert>
   }
-  <!-- Submit Button -->
-  <div>
-    <app-button full 
-    [impact]="form.valid ? 'bold': 'none'" 
-    [tone]="form.valid ? 'primary': 'light'" 
-    shape="rounded" 
-    size="medium" 
-    (buttonClick)="submitForm()" 
-    [disabled]="form.invalid"
-    >Crear cuenta</app-button>
-  </div>
 
-  <!-- Sign-up -->
-  <div class="text-muted-foreground flex items-center text-sm">
-    Ya tienes una cuenta?
-    <app-button 
-    routerLink="/auth/sign-in" 
-    impact="none" 
-    tone="primary" 
-    shape="rounded" 
-    size="small"
-    >
-      Iniciar sesión
+  @if ($error(); as error) {
+  <app-alert [type]="error.kind === 'email-taken' ? 'warning' : 'danger'">
+    <div class="ms-3 text-sm font-medium">
+      {{ error.message }}
+      @if (error.kind === 'email-taken') {
+      <span class="mt-1 flex flex-wrap gap-x-3">
+        <a routerLink="/auth/sign-in" class="text-primary font-semibold underline">Iniciar sesión</a>
+        <a routerLink="/auth/forgot-password" [queryParams]="{ email: form.controls.email.value }" class="text-primary font-semibold underline">Olvidé mi contraseña</a>
+      </span>
+      }
+    </div>
+  </app-alert>
+  }
+
+  <div>
+    <app-button full [impact]="$isSaving() ? 'none' : 'bold'" tone="primary" shape="rounded" size="medium" type="button"
+      [disabled]="$isSaving()" [isLoading]="$isSaving()" (buttonClick)="submitForm()">
+      Crear cuenta
     </app-button>
   </div>
-  
+
+  <div class="text-muted-foreground flex items-center text-sm">
+    ¿Ya tienes una cuenta?
+    <app-button routerLink="/auth/sign-in" impact="none" tone="primary" shape="rounded" size="small">Iniciar sesión</app-button>
+  </div>
 </form>

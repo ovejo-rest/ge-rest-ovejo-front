@@ -2,6 +2,7 @@ import { DestroyRef, Directive, inject, Input, OnInit, TemplateRef, ViewContaine
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, tap } from 'rxjs';
 import { AuthService } from 'src/app/modules/auth/pages/data-access';
+import { environment } from 'src/environments/environment';
 
 @Directive({
   selector: '[appCheckPermission]',
@@ -15,7 +16,8 @@ export class CheckPermissionDirective implements OnInit {
   @Input({ alias: 'appCheckPermission' }) permission: string | string[] | undefined;
 
   ngOnInit(): void {
-    if (!this.permission || (Array.isArray(this.permission) && this.permission.length === 0)) {
+    // Con los permisos apagados (environment.enforcePermissions) se muestra siempre.
+    if (!environment.enforcePermissions || !this.permission || (Array.isArray(this.permission) && this.permission.length === 0)) {
       this.#viewContainer.createEmbeddedView(this.#templateRef);
       return;
     }

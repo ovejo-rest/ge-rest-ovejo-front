@@ -1,92 +1,78 @@
-import { NgClass } from '@angular/common';
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
-import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AngularSvgIconModule } from 'angular-svg-icon';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { switchMap } from 'rxjs';
 import { AlertComponent, ButtonComponent, IconComponent, ToastService } from 'src/ui';
-import { emailFormatValidator } from '../custom-validators';
-import { catchError, of, tap } from 'rxjs';
-import { TemporaryPasswordService } from '../data-access/temporary-password.service';
-import { PasswordTransferService } from '../data-access/password-transfer.service';
-import { TemporaryPasswordResponseDto } from '../dtos';
+import { emailFormatValidator, passwordMatchValidator } from '../custom-validators';
+import { AuthService, getAuthError, PostLoginService } from '../data-access';
 
+/**
+ * Link de los correos de recuperación e invitación: con el código temporal se crea la contraseña,
+ * la cuenta queda ACTIVA y se entra directo.
+ */
 @Component({
   selector: 'app-temporary-password',
   templateUrl: './temporary-password.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    AngularSvgIconModule,
-    ButtonComponent,
-    NgClass,
-    IconComponent,
-    AlertComponent,
-  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ReactiveFormsModule, RouterLink, AlertComponent, ButtonComponent, IconComponent],
 })
 export class TemporaryPasswordComponent {
-  readonly #httpService = inject(TemporaryPasswordService);
-  readonly #router = inject(Router);
-  readonly #toast = inject(ToastService);
-  readonly #fb = inject(FormBuilder);
-  readonly #passwordTransfer = inject(PasswordTransferService);
+  private readonly authService = inject(AuthService);
+  private readonly postLogin = inject(PostLoginService);
+  private readonly toast = inject(ToastService);
+  private readonly params = inject(ActivatedRoute).snapshot.queryParamMap;
 
   hide = true;
   submitted = false;
-  passwordTextType!: boolean;
-  errorMessage: string = '';
-  readonly $isLoading = this.#httpService.$isLoading;
+  readonly $isSaving = signal(false);
+  readonly $error = signal<string | null>(null);
 
-  form = this.#fb.group(
+  readonly form = inject(FormBuilder).nonNullable.group(
     {
-      email: ['', [Validators.required]],
-      password: ['', [Validators.required]],
+      email: [this.params.get('email') ?? '', [Validators.required]],
+      code: [this.params.get('code') ?? '', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]],
+      confirmPassword: ['', [Validators.required]],
     },
-    {
-      validators: [emailFormatValidator('email')],
-    },
+    { validators: [emailFormatValidator('email'), passwordMatchValidator('password', 'confirmPassword')] },
   );
 
-  get f() {
-    return this.form.controls;
+  $validationMessage() {
+    const controls = this.form.controls;
+    if (controls.email.invalid || this.form.hasError('emailNotValid')) return 'Ingresa un email válido.';
+    if (controls.code.invalid) return 'Ingresa el código temporal que te llegó por correo.';
+    if (controls.password.invalid) return 'La contraseña debe tener entre 8 y 72 caracteres.';
+    if (this.form.hasError('controlNotMatch')) return 'Las contraseñas deben ser iguales.';
+    return null;
   }
 
-  togglePasswordTextType() {
-    this.passwordTextType = !this.passwordTextType;
-  }
-
-  temporaryPassword() {
+  submit() {
     this.submitted = true;
-    const email = this.form.get('email')!.value!;
-    const password = this.form.get('password')!.value!;
-
+    this.$error.set(null);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-
-    this.#httpService
-      .validate({ email, password })
-      .pipe(
-        tap((result: TemporaryPasswordResponseDto) => {
-          if (result.code === 201) {
-            this.#passwordTransfer.setCredentials(email, password);
-            this.#router.navigateByUrl('/auth/new-password');
-            this.#toast.show(`Contraseña temporal validada`, 'success');
-          }
-        }),
-        catchError((error) => {
-          if (error.status === 409) {
-            this.#toast.show(`Algo salió mal, corrobora tus datos y vuelve a intentar.`, 'error');
-          }
-
-          if (error.status === 401) {
-            this.#toast.show(`Contraseña temporal inválida, vuelva a intentar.`, 'error');
-          }
-
-          return of(null);
-        }),
-      )
-      .subscribe();
+    const { email, code, password } = this.form.getRawValue();
+    const normalizedEmail = email.trim().toLowerCase();
+    this.$isSaving.set(true);
+    this.authService
+      .resetPassword(normalizedEmail, code.trim(), password)
+      .pipe(switchMap(() => this.authService.login({ email: normalizedEmail, password })))
+      .subscribe({
+        next: (session) => {
+          this.$isSaving.set(false);
+          this.toast.show('Contraseña creada', 'success');
+          this.postLogin.continue(session.userData.name);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.$isSaving.set(false);
+          const message = String(error.error?.message ?? '').toLowerCase();
+          if (error.status === HttpStatusCode.Unauthorized) this.$error.set('El código temporal es incorrecto.');
+          else if (message.includes('pending password')) this.$error.set('No hay un código vigente para este email.');
+          else this.$error.set(getAuthError(error).message);
+        },
+      });
   }
 }
