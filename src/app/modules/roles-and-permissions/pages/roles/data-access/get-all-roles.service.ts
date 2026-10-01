@@ -19,7 +19,7 @@ export class GetAllRolesService {
 
   readonly #params$ = new BehaviorSubject<{ page: number; perPage: number; searchCode?: string; searchName?: string }>({
     page: 1,
-    perPage: 10,
+    perPage: 50,
   });
 
   setParams(params: Partial<{ page: number; perPage: number; searchCode?: string; searchName?: string }>) {
@@ -52,7 +52,7 @@ export class GetAllRolesService {
               return EMPTY;
             }),
             tap(() => this.#isLoading$.next(false)),
-            map((data) => data),
+            map((response) => ({ ...response, data: sortRoles(response.data) })),
           );
       }),
     ),
@@ -61,4 +61,15 @@ export class GetAllRolesService {
   retry() {
     this.#params$.next({ ...this.#params$.getValue() });
   }
+}
+
+/**
+ * El backend no ordena la lista (BACKEND-REQUESTS #26): primero los roles propios,
+ * del más nuevo al más antiguo, y al final los predeterminados.
+ */
+function sortRoles(roles: GetAllRolesDto[]): GetAllRolesDto[] {
+  return [...roles].sort((a, b) => {
+    if (!!a.isGlobal !== !!b.isGlobal) return a.isGlobal ? 1 : -1;
+    return (b.createdAt ?? '').localeCompare(a.createdAt ?? '') || b.id - a.id;
+  });
 }

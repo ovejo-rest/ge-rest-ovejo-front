@@ -7,7 +7,7 @@ import { DashboardMetricsDto } from '../../data-access';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="glass h-full rounded-[1rem] p-4">
+    <section class="glass-tile-soft h-full rounded-2xl p-4">
       <h2 class="text-foreground mb-3 font-semibold">Productos más vendidos</h2>
       @if (!products().length) {
       <p class="text-muted-foreground py-8 text-center text-sm">Sin ventas en el período.</p>

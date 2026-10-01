@@ -8,7 +8,7 @@ import { IconComponent } from 'src/ui';
   imports: [IconComponent, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="glass flex h-full flex-col gap-2 rounded-xl p-4">
+    <div class="glass-tile-soft flex h-full flex-col gap-2 rounded-2xl p-4">
       <div class="flex items-center justify-between gap-2">
         <p class="text-muted-foreground text-sm">{{ label() }}</p>
         <span class="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-lg">

@@ -18,8 +18,14 @@
   <tr class="glass-row h-10">
     <td class="text-center">{{ item.id }}</td>
     <td>{{ item.code }}</td>
-    <td>{{ item.name }}</td>
+    <td>
+      {{ item.name }}
+      @if (item.isGlobal) {
+      <span class="bg-muted text-muted-foreground ms-2 rounded-full px-2 py-0.5 text-xs">Predeterminado</span>
+      }
+    </td>
     <td class="text-center">
+      @if (!item.isGlobal) {
       <div class="flex items-center justify-end gap-2">
         <app-button
           *appCheckPermission="'roles:update-role'"
@@ -33,6 +39,7 @@
           tone="danger"
           (click)="deleteModule(item)"></app-button>
       </div>
+      }
     </td>
   </tr>
   } @empty {

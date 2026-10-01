@@ -1,12 +1,23 @@
 <div class="space-y-4">
-  <app-header-dashboard title="Resumen" subtitle="Cómo va tu restaurante">
-    <select aria-label="Sucursal" class="glass-input rounded-md px-3 py-2 text-sm" (change)="handleLocation($event)">
-      <option value="all" [selected]="!$locationId()">Todas las sucursales</option>
-      @for (location of $locations(); track location.id) {
-      <option [value]="location.id" [selected]="$locationId() === location.id">{{ location.name }}</option>
-      }
-    </select>
-  </app-header-dashboard>
+  <!-- Encabezado de bienvenida (prueba de glassmorphism) -->
+  <section class="dashboard-hero rounded-3xl px-5 py-6 sm:px-8 sm:py-8">
+    <div class="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p class="text-sm font-medium text-white/75">{{ $today() }}</p>
+        <h1 class="mt-1 text-2xl font-semibold sm:text-3xl">{{ $greeting() }}</h1>
+        <p class="mt-1 text-sm text-white/80">Así va tu restaurante{{ $locationId() ? ' en ' + $locationName() : '' }}.</p>
+      </div>
+      <label class="dashboard-hero-chip inline-flex items-center gap-2 self-start rounded-full py-1.5 pl-3 pr-2 text-sm md:self-auto">
+        <app-icon class="h-4 w-4">store</app-icon>
+        <select aria-label="Sucursal" class="cursor-pointer border-0 bg-transparent py-0 pl-0 pr-6 text-sm font-medium text-white focus:ring-0" (change)="handleLocation($event)">
+          <option value="all" class="text-black" [selected]="!$locationId()">Todas las sucursales</option>
+          @for (location of $locations(); track location.id) {
+          <option [value]="location.id" class="text-black" [selected]="$locationId() === location.id">{{ location.name }}</option>
+          }
+        </select>
+      </label>
+    </div>
+  </section>
 
   <app-period-selector
     [preset]="$query().preset"

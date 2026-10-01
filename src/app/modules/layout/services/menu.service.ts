@@ -3,6 +3,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Menu } from 'src/app/core/constants/menu';
 import { MenuItem, SubMenuItem } from 'src/app/core/models/menu.model';
+import { environment } from 'src/environments/environment';
 import { WhoamiService } from 'src/app/core/services/whoami/whoami.service';
 
 @Injectable({
@@ -19,6 +20,8 @@ export class MenuService implements OnDestroy {
   #filteredPagesMenu: Signal<MenuItem[]> = computed(() => {
     const permissions = this._whoamiService.$permissionsSet();
     const menus = this._pagesMenu();
+    // Con los permisos apagados (environment.enforcePermissions) se muestra el menú completo.
+    if (!environment.enforcePermissions) return menus;
 
     return menus
       .map((group) => ({
