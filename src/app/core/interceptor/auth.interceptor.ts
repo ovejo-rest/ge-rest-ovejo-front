@@ -13,7 +13,6 @@ const PUBLIC_PATHS = [
 ];
 const isPublic = (url: string) => PUBLIC_PATHS.some((path) => url.startsWith(path)) && !url.endsWith('/login/logout');
 
-
 const withToken = (req: HttpRequest<unknown>, token: string) =>
   req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
 
@@ -28,14 +27,13 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       if (error.status !== 401) return throwError(() => error);
       // Refresh con cola: si ya hay uno en curso, se espera ese mismo.
-      // Solo un refresh fallido cierra la sesión; los errores del reintento llegan tal cual al llamador.
       return authService.refreshAccessToken().pipe(
+        switchMap((newToken) => next(withToken(req, newToken))),
         catchError((refreshError) => {
           authService.clearSession();
           router.navigate(['/auth/sign-in']);
           return throwError(() => (refreshError instanceof HttpErrorResponse ? error : refreshError));
         }),
-        switchMap((newToken) => next(withToken(req, newToken))),
       );
     }),
   );

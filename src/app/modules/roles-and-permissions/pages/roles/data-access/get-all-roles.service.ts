@@ -52,6 +52,7 @@ export class GetAllRolesService {
               return EMPTY;
             }),
             tap(() => this.#isLoading$.next(false)),
+            map((response) => ({ ...response, data: sortRoles(response.data) })),
           );
       }),
     ),
@@ -60,4 +61,15 @@ export class GetAllRolesService {
   retry() {
     this.#params$.next({ ...this.#params$.getValue() });
   }
+}
+
+/**
+ * El backend no ordena la lista (BACKEND-REQUESTS #26): primero los roles propios,
+ * del más nuevo al más antiguo, y al final los predeterminados.
+ */
+function sortRoles(roles: GetAllRolesDto[]): GetAllRolesDto[] {
+  return [...roles].sort((a, b) => {
+    if (!!a.isGlobal !== !!b.isGlobal) return a.isGlobal ? 1 : -1;
+    return (b.createdAt ?? '').localeCompare(a.createdAt ?? '') || b.id - a.id;
+  });
 }

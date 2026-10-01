@@ -6,7 +6,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
-import { CreateUserService, GetAllUsersService, getCreateUserErrorMessage } from '../../data-access';
+import { CreateUserService, GetAllUsersService, UserBranchService } from '../../data-access';
 import { rutValidator } from 'src/app/shared/validators';
 import { GetAllBusinessLocationsService } from 'src/app/modules/restaurante/pages/business-location/data-access';
 import { GetAllRolesService } from '../../../roles/data-access';
@@ -66,9 +66,14 @@ export class CreateUserModalComponent implements OnDestroy {
         this.$getAllUsersService.retry();
         this.dialogRef.close();
       }
-      const error = this.$createUserService.$error();
-      if (error) {
-        this.$toast.show(getCreateUserErrorMessage(error), 'error');
+      const status = this.$createUserService.$error();
+      if (status) {
+        const messages: Record<number, string> = {
+          409: 'Ese email o RUT ya está registrado.',
+          403: 'No puedes asignar alguno de esos roles.',
+          404: 'Alguno de los roles ya no existe.',
+        };
+        this.$toast.show(messages[status] ?? 'No se pudo enviar la invitación. Intenta nuevamente.', 'error');
       }
     });
   }

@@ -50,6 +50,7 @@ export class RolesTableComponent {
     alias: 'pagination',
   });
   headerData = ['Id', 'Código', 'Nombre', 'Acción'];
+  readonly perPage = signal(50);
 
   viewDetailRole() {
     this.dialog.open(CreateNewRoleModalComponent, {
