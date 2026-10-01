@@ -1,10 +1,9 @@
-import { Component, Inject, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AlertComponent, ButtonComponent, ToastService } from 'src/ui';
 import { emailFormatValidator } from '../custom-validators';
-import { catchError, of, tap } from 'rxjs';
-import { ForgotPasswordService } from '../data-access';
+import { AuthService, getAuthError } from '../data-access';
 
 @Component({
   selector: 'app-forgot-password',
@@ -14,19 +13,16 @@ import { ForgotPasswordService } from '../data-access';
   imports: [FormsModule, RouterLink, ButtonComponent, ReactiveFormsModule, AlertComponent],
 })
 export class ForgotPasswordComponent {
-  readonly #httpService = inject(ForgotPasswordService);
-  private readonly $toast = inject(ToastService);
+  private readonly authService = inject(AuthService);
+  private readonly toast = inject(ToastService);
+  private readonly router = inject(Router);
 
   submitted = false;
-  constructor(private route: Router) {}
+  readonly $isLoading = signal(false);
 
-  private $fb = inject(FormBuilder);
-
-  readonly $isLoading = this.#httpService.$isLoading;
-
-  form = this.$fb.group(
+  form = inject(FormBuilder).group(
     {
-      email: ['', [Validators.required]],
+      email: [inject(ActivatedRoute).snapshot.queryParamMap.get('email') ?? '', [Validators.required]],
     },
     {
       validators: [emailFormatValidator('email')],
@@ -35,33 +31,23 @@ export class ForgotPasswordComponent {
 
   submitForm() {
     this.submitted = true;
-
-    const email = this.form.get('email')!.value!;
-
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-
-    this.#httpService
-      .deactivate({
-        email: email,
-      })
-      .pipe(
-        tap((result: { code: number; message: string }) => {
-          if (result.code === 200) {
-            this.route.navigateByUrl('/auth/temporary-password');
-            this.$toast.show(`Se ha creado un contraseña temporal`, 'success');
-          }
-        }),
-        catchError((error) => {
-          if (error.status === 409) {
-            this.$toast.show(`Email inválido`, 'error');
-          }
-
-          return of(null);
-        }),
-      )
-      .subscribe();
+    const email = this.form.get('email')!.value!.trim().toLowerCase();
+    this.$isLoading.set(true);
+    // El backend siempre responde 200 (no revela si el email existe).
+    this.authService.forgotPassword(email).subscribe({
+      next: () => {
+        this.$isLoading.set(false);
+        this.toast.show('Si el email está registrado, te enviamos un código temporal', 'success');
+        this.router.navigate(['/auth/temporary-password'], { queryParams: { email } });
+      },
+      error: (error) => {
+        this.$isLoading.set(false);
+        this.toast.show(getAuthError(error).message, 'error');
+      },
+    });
   }
 }

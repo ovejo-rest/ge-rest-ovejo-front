@@ -12,7 +12,7 @@ Estados: 🔴 bloquea una funcionalidad o produce datos erróneos · 🟡 el fro
 | Prioridad | Solicitudes |
 |---|---|
 | 🔴 Bloquean o producen datos erróneos | #1 listado de pedidos · #3 notas por producto · #4 cancelar pedido con pago anulado · #11 "Listo" en cocina marca todas las estaciones |
-| 🟡 Hay workaround en el front | #2, #5–#10, #12–#24 |
+| 🟡 Hay workaround en el front | #2, #5–#10, #12–#24, #26 |
 | ⚪ Por decidir | #25 entrar solo con PIN |
 
 Sugerencia de orden: #4 y #11 (bugs), #3 y #12 (notas en comanda y KDS), #1 y #2 (pedidos y mesas), #15 y #14 (impresión y terminal sin sesión de usuario), #22 (códigos de error).
@@ -279,6 +279,14 @@ Si cambia una coma del mensaje, el front deja de traducirlo.
 **Se pide (si el negocio lo decide):** PIN único por restaurante (409 al asignar uno repetido), `POST /pos/login-by-pin { pin }` que devuelva el mesero, y límite de intentos por equipo/restaurante (no por mesero).
 
 **Front mientras tanto:** selección de mesero + PIN.
+
+### 26. 🟡 `GET /roles-and-permissions/roles` sin orden
+
+**Problema:** la consulta no tiene `ORDER BY` y la paginación se hace en memoria (`PaginationInterceptor`), así que el orden es arbitrario. Un rol recién creado puede caer en cualquier página y parece que "no se creó".
+
+**Se pide:** ordenar en la consulta: roles del restaurante primero (`restaurantId IS NULL` al final) y luego `createdAt DESC`.
+
+**Front mientras tanto:** pide 50 por página y ordena en pantalla (propios más nuevos primero, predeterminados al final). Los roles `isGlobal` se muestran como "Predeterminado", sin editar ni eliminar.
 
 ---
 

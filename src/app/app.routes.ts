@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { terminalModeGuard } from './core';
+import { businessGuard, terminalModeGuard } from './core';
 
 export const routes: Routes = [
   {
@@ -8,8 +8,13 @@ export const routes: Routes = [
     loadChildren: () => import('./modules/terminal/terminal.routes'),
   },
   {
+    // Primer ingreso de un dueño sin negocio: crear el negocio.
+    path: 'onboarding',
+    loadChildren: () => import('./modules/onboarding/onboarding.routes'),
+  },
+  {
     path: '',
-    canActivateChild: [terminalModeGuard],
+    canActivateChild: [terminalModeGuard, businessGuard],
     loadChildren: () => import('./modules/layout/layout.routes'),
   },
   {

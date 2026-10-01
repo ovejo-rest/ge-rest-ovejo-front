@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
 import { CreateUserService, GetAllUsersService, UserBranchService } from '../../data-access';
+import { rutValidator } from 'src/app/shared/validators';
 import { GetAllBusinessLocationsService } from 'src/app/modules/restaurante/pages/business-location/data-access';
 import { GetAllRolesService } from '../../../roles/data-access';
 
@@ -36,6 +37,10 @@ export class CreateUserModalComponent implements OnDestroy {
 
   protected readonly $isLoading = this.$createUserService.$isLoading;
   protected readonly allRoles = this.$allRolesService.$roles;
+  // Solo roles de personal: SUPERADMIN y OWNER no se pueden asignar (el backend los rechaza).
+  protected readonly $staffRoles = computed(() =>
+    (this.allRoles()?.data ?? []).filter((role) => !['SUPERADMIN', 'OWNER'].includes(role.code)),
+  );
   protected readonly $loadingRoles = this.$allRolesService.$isLoading;
   private readonly branchService = inject(UserBranchService);
   protected readonly $locations = inject(GetAllBusinessLocationsService).$locations;
@@ -43,7 +48,7 @@ export class CreateUserModalComponent implements OnDestroy {
   private fb = inject(FormBuilder);
 
   form = this.fb.group({
-    rut: ['', [Validators.required]],
+    rut: ['', [rutValidator]],
     name: ['', [Validators.required]],
     fatherLastName: ['', [Validators.required]],
     motherLastName: [''],
@@ -60,8 +65,14 @@ export class CreateUserModalComponent implements OnDestroy {
       if (this.$createUserService.$success()) {
         this.afterCreated();
       }
-      if (this.$createUserService.$hasError()) {
-        this.$toast.show(`Algo salió mal. Por favor, vuelva a intentar.`, 'error');
+      const status = this.$createUserService.$error();
+      if (status) {
+        const messages: Record<number, string> = {
+          409: 'Ese email o RUT ya está registrado.',
+          403: 'No puedes asignar alguno de esos roles.',
+          404: 'Alguno de los roles ya no existe.',
+        };
+        this.$toast.show(messages[status] ?? 'No se pudo enviar la invitación. Intenta nuevamente.', 'error');
       }
     });
   }

@@ -31,8 +31,14 @@ export class DeleteUserModalComponent {
         this.$getAllUsersService.retry();
         this.dialogRef.close();
       }
-      if (this.$deleteUserService.$hasError()) {
-        this.$toast.show(`Algo salió mal. Por favor, vuelva a intentar.`, 'error');
+      const status = this.$deleteUserService.$error();
+      if (status) {
+        this.$toast.show(
+          status === 403
+            ? 'El dueño del negocio no se puede eliminar.'
+            : 'No se pudo eliminar el usuario. Intenta nuevamente.',
+          'error',
+        );
       }
     });
   }

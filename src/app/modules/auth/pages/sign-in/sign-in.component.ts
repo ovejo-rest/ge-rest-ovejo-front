@@ -1,13 +1,12 @@
 import { NgClass } from '@angular/common';
-import { Component, inject, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
-import { AlertComponent, ButtonComponent, IconComponent, ToastComponent, ToastService } from 'src/ui';
+import { AlertComponent, ButtonComponent, IconComponent, ToastService } from 'src/ui';
 import { emailFormatValidator } from '../custom-validators';
-import { AuthService } from '../data-access';
-import { AccessTokenDto, UserDataDto } from '../dtos';
-import { catchError, of, tap } from 'rxjs';
+import { AuthError, AuthService, getAuthError, PostLoginService } from '../data-access';
+import { GoogleButtonComponent } from '../ui';
 
 @Component({
   selector: 'app-sign-in',
@@ -22,6 +21,7 @@ import { catchError, of, tap } from 'rxjs';
     NgClass,
     IconComponent,
     AlertComponent,
+    GoogleButtonComponent,
   ],
 })
 export class SignInComponent {
@@ -54,36 +54,49 @@ export class SignInComponent {
     this.passwordTextType = !this.passwordTextType;
   }
 
+  readonly #postLogin = inject(PostLoginService);
+  readonly $error = signal<AuthError | null>(null);
+  readonly $googleLoading = signal(false);
+
   loginUser() {
     this.submitted = true;
-    const email = this.loginForm.get('email')!.value!;
-    const password = this.loginForm.get('password')!.value!;
-
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
     }
+    const email = this.loginForm.get('email')!.value!.trim().toLowerCase();
+    const password = this.loginForm.get('password')!.value!;
+    this.$error.set(null);
 
-    this.#httpService
-      .login({ email, password })
-      .pipe(
-        tap((result: { token: AccessTokenDto['token']; refreshToken: string; userData: UserDataDto }) => {
-          if (result.token && result.userData) {
-            localStorage.setItem('token', result.token);
-            localStorage.setItem('refreshToken', result.refreshToken);
-            localStorage.setItem('userData', JSON.stringify(result.userData));
-            localStorage.setItem('lastActivity', String(Date.now()));
-            this._router.navigateByUrl('/dashboard/admin');
-            this.toast.show(`Bienvenido ${result.userData.name}!`, 'success');
-          }
-        }),
-        catchError((error) => {
-          this.errorMessage = `Error al iniciar sesión ${error}`;
-          this.toast.show('Error al iniciar sesión', 'error');
-          return of(null);
-        }),
-      )
-      .subscribe();
+    this.#httpService.login({ email, password }).subscribe({
+      next: (session) => this.#postLogin.continue(session.userData.name),
+      error: (error) => {
+        const authError = getAuthError(error);
+        // Email sin verificar: se reenvía el código y se lleva a "Verifica tu correo".
+        if (authError.kind === 'email-not-verified') {
+          this.#httpService.resendVerificationEmail(email).subscribe({ error: () => undefined });
+          this.toast.show(authError.message, 'warning');
+          this._router.navigate(['/auth/verify-email'], { queryParams: { email } });
+          return;
+        }
+        this.$error.set(authError);
+      },
+    });
+  }
+
+  loginWithGoogle(idToken: string) {
+    this.$error.set(null);
+    this.$googleLoading.set(true);
+    this.#httpService.loginWithGoogle(idToken).subscribe({
+      next: (session) => {
+        this.$googleLoading.set(false);
+        this.#postLogin.continue(session.userData.name, session.isNewUser);
+      },
+      error: (error) => {
+        this.$googleLoading.set(false);
+        this.$error.set(getAuthError(error));
+      },
+    });
   }
 
   // protected readonly $hasError = toSignal(this.#httpService.hasError$);
