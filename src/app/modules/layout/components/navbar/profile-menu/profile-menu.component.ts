@@ -1,21 +1,20 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { NgClass } from '@angular/common';
-import { Component, computed, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
 import { finalize, Observable } from 'rxjs';
 import { ThemeService } from '../../../../../core/services/theme.service';
-import { IconComponent } from 'src/ui';
+import { IconComponent, ImageThumbComponent } from 'src/ui';
 import { AuthService } from 'src/app/modules/auth/pages/data-access';
-import { LoginOutputDto } from 'src/app/modules/auth/pages/dtos';
-import { AvatarService } from 'src/app/core/services/avatar.service';
+import { WhoamiService } from 'src/app/core/services/whoami/whoami.service';
 
 @Component({
   selector: 'app-profile-menu',
   templateUrl: './profile-menu.component.html',
   styleUrls: ['./profile-menu.component.css'],
-  imports: [CdkConnectedOverlay, CdkOverlayOrigin, NgClass, RouterLink, AngularSvgIconModule, IconComponent],
+  imports: [CdkConnectedOverlay, CdkOverlayOrigin, NgClass, RouterLink, AngularSvgIconModule, IconComponent, ImageThumbComponent],
   changeDetection: ChangeDetectionStrategy.Eager,
   animations: [
     trigger('openClose', [
@@ -27,9 +26,16 @@ import { AvatarService } from 'src/app/core/services/avatar.service';
     ]),
   ],
 })
-export class ProfileMenuComponent implements OnInit {
-  userLoginOn: boolean = false;
-  userData: LoginOutputDto['userData'] | null = null;
+export class ProfileMenuComponent {
+  readonly #whoami = inject(WhoamiService);
+
+  // Whoami (o el login) en memoria: refleja al instante cambios de foto y nombre.
+  protected readonly $user = computed(() => {
+    const user = this.#whoami.$currentUser() ?? this.#storedUser();
+    if (!user) return null;
+    const fullName = [user.name, user.fatherLastName, user.motherLastName].filter(Boolean).join(' ');
+    return { ...user, fullName, shortName: [user.name, user.fatherLastName].filter(Boolean).join(' ') };
+  });
   public isOpen = false;
 
   protected positions: ConnectedPosition[] = [
@@ -50,12 +56,12 @@ export class ProfileMenuComponent implements OnInit {
   ];
   public profileMenu = [
     {
-      title: 'Your Profile',
+      title: 'Mi perfil',
       icon: 'account_circle',
       link: '/profile',
     },
     {
-      title: 'Settings',
+      title: 'Configuración',
       icon: 'settings',
       link: '/settings',
     },
@@ -104,7 +110,6 @@ export class ProfileMenuComponent implements OnInit {
     public themeService: ThemeService,
     private $authService: AuthService,
     private readonly _router: Router,
-    protected readonly avatarService: AvatarService,
   ) {}
 
   public toggleMenu(): void {
@@ -136,16 +141,20 @@ export class ProfileMenuComponent implements OnInit {
       .subscribe();
   }
 
-  ngOnInit(): void {
-    const storedUser = localStorage.getItem('userData');
-    if (storedUser) {
-      try {
-        this.userData = JSON.parse(storedUser);
-        this.userLoginOn = true;
-      } catch (error) {
-        console.error('Error al parsear userData desde localStorage:', error);
-        this.userData = null;
-      }
+  // La URL firmada venció (1 hora): se vuelve a pedir whoami.
+  // Máximo una vez por minuto, por si la imagen falla por otro motivo.
+  #lastPhotoRefresh = 0;
+  protected refreshPhoto() {
+    if (Date.now() - this.#lastPhotoRefresh < 60_000) return;
+    this.#lastPhotoRefresh = Date.now();
+    this.#whoami.refetch();
+  }
+
+  #storedUser(): { code: string; name: string; fatherLastName: string; motherLastName: string | null; email: string; profileImageUrl?: string | null } | null {
+    try {
+      return JSON.parse(localStorage.getItem('userData') ?? 'null');
+    } catch {
+      return null;
     }
   }
 }

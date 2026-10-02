@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
+import { throttledRefresh } from 'src/app/core/services/file-upload';
 import { MatDialog } from '@angular/material/dialog';
 import { ButtonComponent, EmptyStateComponent, HeaderDashboardComponent, IconComponent, ToastService } from 'src/ui';
 import {
@@ -25,6 +26,8 @@ export class CategoryListComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly toast = inject(ToastService);
   private readonly getAllService = inject(GetAllCategoriesService);
+  // Las URLs de imagen vencen en 1 hora: se vuelve a pedir el árbol.
+  protected readonly refreshExpiredImages = throttledRefresh(() => this.getAllService.getAll());
 
   readonly $isLoading = this.getAllService.$isLoading;
   readonly $errorMessage = computed(() => {

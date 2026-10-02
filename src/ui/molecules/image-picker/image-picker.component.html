@@ -1,0 +1,78 @@
+<div class="space-y-1.5">
+  <span class="text-foreground block text-sm font-medium">{{ $label() }}</span>
+
+  <div
+    class="glass-input flex items-center gap-4 rounded-xl border border-dashed p-3 transition-colors"
+    [class.border-primary]="$dragOver()"
+    [class.bg-primary/5]="$dragOver()"
+    [class.opacity-60]="$disabled()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="$dragOver.set(false)"
+    (drop)="onDrop($event)">
+    <div class="relative size-20 shrink-0">
+      <app-image-thumb
+        class="border-border size-20 border text-3xl"
+        [src]="$shownUrl()"
+        [round]="$round()"
+        icon="add_photo_alternate"
+        [alt]="$hasImage() ? $label() : 'Sin imagen'" />
+      @if ($uploading()) {
+      <div
+        class="absolute inset-0 flex items-center justify-center bg-black/45 text-xs font-semibold text-white"
+        [class.rounded-full]="$round()"
+        [class.rounded-lg]="!$round()"
+        aria-live="polite">
+        {{ $progress() }}%
+      </div>
+      }
+    </div>
+
+    <div class="min-w-0 flex-1 space-y-2">
+      <div class="flex flex-wrap gap-2">
+        <label
+          [for]="inputId"
+          class="border-border hover:border-primary hover:text-primary focus-within:ring-primary inline-flex cursor-pointer items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors focus-within:ring-2"
+          [class.pointer-events-none]="$disabled() || $uploading()">
+          <app-icon class="text-base">{{ $hasImage() ? 'sync' : 'upload' }}</app-icon>
+          {{ $hasImage() ? 'Cambiar' : 'Elegir imagen' }}
+          <input
+            [id]="inputId"
+            type="file"
+            class="sr-only"
+            [accept]="accept"
+            [disabled]="$disabled() || $uploading()"
+            (change)="onFileInput($event)" />
+        </label>
+
+        @if ($hasImage()) {
+        <button
+          type="button"
+          class="text-muted-foreground hover:text-destructive inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors disabled:opacity-50"
+          [disabled]="$disabled() || $uploading()"
+          (click)="remove()">
+          <app-icon class="text-base">delete</app-icon>
+          Quitar
+        </button>
+        } @if ($isChanged()) {
+        <button
+          type="button"
+          class="text-muted-foreground hover:text-primary inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors disabled:opacity-50"
+          [disabled]="$disabled() || $uploading()"
+          (click)="undo()">
+          <app-icon class="text-base">undo</app-icon>
+          Deshacer
+        </button>
+        }
+      </div>
+
+      <p class="text-muted-foreground truncate text-xs">
+        {{ $fileName() ?? $hint() }}
+      </p>
+      @if ($uploading()) {
+      <div class="bg-muted h-1 w-full overflow-hidden rounded-full" role="progressbar" [attr.aria-valuenow]="$progress()" aria-valuemin="0" aria-valuemax="100">
+        <div class="bg-primary h-full transition-all" [style.width.%]="$progress()"></div>
+      </div>
+      }
+    </div>
+  </div>
+</div>

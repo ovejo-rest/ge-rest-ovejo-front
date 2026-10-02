@@ -3,6 +3,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { map } from 'rxjs';
+import { throttledRefresh } from 'src/app/core/services/file-upload';
 import { ButtonComponent, EmptyStateComponent, HeaderDashboardComponent, IconComponent, ToastService } from 'src/ui';
 import { CategoryDto, GetAllCategoriesService } from '../categories/data-access';
 import { GetAllProductsService, getProductErrorMessage, ProductDto } from './data-access';
@@ -50,6 +51,8 @@ export class ProductListComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly toast = inject(ToastService);
   private readonly getAllService = inject(GetAllProductsService);
+  // Las URLs de imagen vencen en 1 hora: se vuelve a pedir la lista.
+  protected readonly refreshExpiredImages = throttledRefresh(() => this.getAllService.retry());
   private readonly getAllCategoriesService = inject(GetAllCategoriesService);
 
   private readonly filtersComponent = viewChild(FiltersProductTableComponent);

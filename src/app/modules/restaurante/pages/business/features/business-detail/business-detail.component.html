@@ -1,10 +1,39 @@
 <app-card>
   <ng-template app-slot="header">
     <div class="flex items-center justify-between">
-      <h2 class="text-foreground text-xl font-bold">{{ business().name }}</h2>
+      <div class="flex min-w-0 items-center gap-3">
+        <app-image-thumb
+          class="bg-primary/10 text-primary size-11 text-base"
+          [src]="business().logoUrl"
+          [name]="business().name"
+          [alt]="'Logo de ' + business().name"
+          (expired)="refreshExpiredLogo()" />
+        <h2 class="text-foreground truncate text-xl font-bold">{{ business().name }}</h2>
+      </div>
       <app-toggle [checked]="business().isActive" (changed)="onToggleChange($event)" />
     </div>
   </ng-template>
+
+  <div class="border-border border-b border-dashed p-4">
+    @for (key of [$pickerKey()]; track key) {
+    <app-image-picker
+      folder="business_logos"
+      label="Logo del negocio"
+      [currentUrl]="business().logoUrl"
+      [uploading]="$isUploading()"
+      [progress]="$uploadProgress()"
+      [disabled]="$isSavingLogo()"
+      (selectionChange)="$logoSelection.set($event)" />
+    }
+    @if ($logoSelection().kind !== 'keep') {
+    <div class="mt-3 flex justify-end gap-2">
+      <app-button impact="light" type="button" [disabled]="$isSavingLogo()" (buttonClick)="discardLogo()">Descartar</app-button>
+      <app-button impact="bold" tone="primary" type="button" [disabled]="$isSavingLogo()" [isLoading]="$isSavingLogo()" (buttonClick)="saveLogo()">
+        {{ $logoSelection().kind === 'remove' ? 'Quitar logo' : 'Guardar logo' }}
+      </app-button>
+    </div>
+    }
+  </div>
 
   <div class="grid grid-cols-2 gap-4 p-4">
     <div>

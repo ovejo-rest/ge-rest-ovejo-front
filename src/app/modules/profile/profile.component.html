@@ -1,31 +1,29 @@
-<app-header-dashboard title="Perfil de usuario" subtitle="Gestiona tu perfil"></app-header-dashboard>
-<div class="grid gap-4 p-2 md:grid-cols-12">
-  <!-- @let isLoading = $getProfileService.$isLoading();  -->
-  @let profile = $getProfileService.$profile(); @let isLoading = $getProfileService.$isLoading();
-  <div class="col-span-12 md:col-span-4">
-    @if (isLoading) {
-    <app-tarjet-profile-card-skeleton />
-    } @else {
-    <app-tarjet-profile-card
-      [name]="fullName"
-      [email]="profile?.email ?? ''"
-      [profilePhotoPath]="getAvatarUrl()"
-      [typeUserCode]="profile?.typeUserCode ?? ''" />
-    }
-  </div>
-  <div class="col-span-12 md:col-span-8">
-    @if(isLoading){
-    <app-personal-information-profile-card-skeleton />
-    } @else {
-    <app-personal-information-profile-card [profile]="profile!" />
-    }
+<app-header-dashboard title="Mi perfil" subtitle="Tu foto, tus datos y la seguridad de tu cuenta." />
+
+@let profile = $profile();
+@if (profile) {
+<div class="mt-2 grid items-start gap-6 pb-10 lg:grid-cols-12 lg:gap-8">
+  <div class="lg:sticky lg:top-4 lg:col-span-4">
+    <app-profile-hero-card [profile]="profile" [roles]="$roles()" [business]="$business()" />
   </div>
 
-  <div class="col-span-12 col-end-9 md:col-span-8 md:col-end-13">
-    @if (isLoading) {
-    <app-contact-profile-card-skeleton />
-    } @else {
-    <app-contact-profile-card [profile]="profile!" />
-    }
+  <div class="flex min-w-0 flex-col gap-6 lg:col-span-8 lg:gap-8">
+    <app-personal-info-section [profile]="profile" [userCode]="$userCode()!" />
+    <app-contact-section [profile]="profile" (edit)="openContactModal()" />
+    <app-security-section [loggingOut]="$loggingOut()" (changePassword)="openChangePassword()" (logout)="logout()" />
   </div>
 </div>
+} @else if ($hasError()) {
+<div class="glass mx-auto flex max-w-md flex-col items-center gap-3 rounded-2xl px-6 py-10 text-center" role="alert">
+  <span class="flex size-12 items-center justify-center rounded-full bg-red-500/10 text-red-600" aria-hidden="true">
+    <app-icon>cloud_off</app-icon>
+  </span>
+  <p class="text-foreground font-semibold">No pudimos cargar tu perfil</p>
+  <p class="text-muted-foreground text-sm">Revisa tu conexión e inténtalo de nuevo.</p>
+  <app-button impact="bold" tone="primary" type="button" (buttonClick)="retry()">
+    <app-icon class="text-base">refresh</app-icon> Reintentar
+  </app-button>
+</div>
+} @else {
+<app-profile-skeleton />
+}

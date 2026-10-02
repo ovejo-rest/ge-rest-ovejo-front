@@ -1,14 +1,15 @@
-import { Component, computed, DestroyRef, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, OnInit, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgClass } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { IconComponent } from 'src/ui';
+import { ImageSelection } from 'src/app/core/services/file-upload';
+import { IconComponent, ImagePickerComponent } from 'src/ui';
 import { CategoryDto } from '../../../categories/data-access';
 import { ProductForm, suggestSku } from './product-form';
 
 @Component({
   selector: 'app-product-form-fields',
-  imports: [ReactiveFormsModule, NgClass, IconComponent],
+  imports: [ReactiveFormsModule, NgClass, IconComponent, ImagePickerComponent],
   templateUrl: './product-form-fields.component.html',
 })
 export class ProductFormFieldsComponent implements OnInit {
@@ -18,6 +19,10 @@ export class ProductFormFieldsComponent implements OnInit {
   readonly categories = input<CategoryDto[]>([]);
   // Solo al crear: al editar, el SKU existente no debe cambiar al renombrar.
   readonly autoSuggestSku = input(true);
+  readonly currentImageUrl = input<string | null | undefined>(null);
+  readonly uploading = input(false);
+  readonly uploadProgress = input(0);
+  readonly imageChange = output<ImageSelection>();
 
   readonly $selectedCategoryId = signal<number | null>(null);
   readonly $subcategories = computed(() => {

@@ -13,7 +13,6 @@ export function createProductForm(fb: FormBuilder, product?: ProductDto) {
     subCategoryId: [product?.subCategoryId ?? (null as number | null)],
     price: [variation?.sellPriceIncTax ?? (null as number | null), [Validators.required, Validators.min(0)]],
     productDescription: [product?.productDescription ?? ''],
-    image: [product?.image ?? '', [Validators.pattern(/^https?:\/\/.+/i)]],
     preparationTimeInMinutes: [
       product?.preparationTimeInMinutes ?? (null as number | null),
       [Validators.min(0), Validators.max(600)],
@@ -46,7 +45,6 @@ function toBasePayload(form: ProductForm) {
     categoryId: value.categoryId ?? undefined,
     subCategoryId: value.subCategoryId ?? undefined,
     taxType: 'inclusive' as const,
-    image: value.image?.trim() || undefined,
     productDescription: value.productDescription?.trim() || undefined,
     isInactive: !value.available,
     preparationTimeInMinutes: value.preparationTimeInMinutes ?? undefined,
