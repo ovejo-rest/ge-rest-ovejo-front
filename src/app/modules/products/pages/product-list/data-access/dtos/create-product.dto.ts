@@ -10,7 +10,7 @@ export type CreateProductDto = Readonly<{
   categoryId?: number;
   subCategoryId?: number;
   taxType?: 'inclusive' | 'exclusive';
-  image?: string;
+  imageFileId?: string;
   productDescription?: string;
   isInactive?: boolean;
   preparationTimeInMinutes?: number;

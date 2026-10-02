@@ -76,14 +76,14 @@
       [class]="inputClass"></textarea>
   </div>
 
-  <div>
-    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Imagen (URL)</label>
-    <input
-      type="url"
-      formControlName="image"
-      placeholder="https://..."
-      [class]="inputClass"
-      [ngClass]="{ 'border-red-500': isInvalid('image') }" />
+  <div class="sm:col-span-2">
+    <app-image-picker
+      folder="products"
+      label="Imagen del producto"
+      [currentUrl]="currentImageUrl()"
+      [uploading]="uploading()"
+      [progress]="uploadProgress()"
+      (selectionChange)="imageChange.emit($event)" />
   </div>
 
   <div>

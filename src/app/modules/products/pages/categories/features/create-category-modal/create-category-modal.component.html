@@ -41,11 +41,17 @@
       </select>
     </div>
 
+    <app-image-picker
+      folder="categories"
+      label="Imagen"
+      [uploading]="$isUploading()"
+      [progress]="$uploadProgress()"
+      (selectionChange)="onImageChange($event)" />
   </form>
   <ng-template app-slot="footer">
     <div class="flex justify-end gap-3">
-      <app-button type="button" impact="light" [disabled]="!!$isLoading()" (buttonClick)="handleCancel()"> Cancelar </app-button>
-      <app-button type="button" impact="bold" [disabled]="!!$isLoading()" (buttonClick)="handleSubmit()">
+      <app-button type="button" impact="light" [disabled]="$isLoading()" (buttonClick)="handleCancel()"> Cancelar </app-button>
+      <app-button type="button" impact="bold" [disabled]="$isLoading()" (buttonClick)="handleSubmit()">
         @if ($isLoading()) {
         <span class="flex items-center gap-2">
           <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24">

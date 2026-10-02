@@ -6,6 +6,9 @@ export type CategoryDto = Readonly<{
   categoryType: string | null;
   description: string | null;
   slug: string | null;
+  imageFileId?: string | null;
+  // URL firmada (vence en 1 hora).
+  imageUrl?: string | null;
   subcategories?: CategoryDto[];
 }>;
 
@@ -14,6 +17,7 @@ export type CreateCategoryDto = Readonly<{
   shortCode?: string;
   parentId?: number;
   description?: string;
+  imageFileId?: string;
 }>;
 
 export type UpdateCategoryDto = Readonly<{
@@ -21,4 +25,6 @@ export type UpdateCategoryDto = Readonly<{
   name?: string;
   shortCode?: string;
   description?: string;
+  // undefined = no tocar, null = quitar.
+  imageFileId?: string | null;
 }>;

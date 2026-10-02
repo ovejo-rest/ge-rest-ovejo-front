@@ -6,3 +6,4 @@ export * from './activate-business.service';
 export * from './find-all-currencies.service';
 export * from './find-business-setup-steps.service';
 export * from './complete-business-setup-step.service';
+export * from './update-business-logo.service';

@@ -1,0 +1,59 @@
+@let p = profile();
+<section class="glass rounded-2xl p-5 sm:p-6" aria-labelledby="personal-title">
+  <header class="mb-4 flex items-center justify-between gap-3">
+    <div>
+      <h3 id="personal-title" class="text-foreground text-base font-semibold">Información personal</h3>
+      <p class="text-muted-foreground text-xs">Así apareces ante tu equipo.</p>
+    </div>
+    @if (!$editing() && $canEdit()) {
+    <app-button impact="light" tone="primary" size="small" type="button" (buttonClick)="startEdit()">
+      <app-icon class="text-base">edit</app-icon> Editar
+    </app-button>
+    }
+  </header>
+
+  @if ($editing()) {
+  <form [formGroup]="form" class="space-y-4" (ngSubmit)="save()">
+    <div class="grid gap-4 sm:grid-cols-3">
+      <label class="block">
+        <span class="text-muted-foreground mb-1 block text-xs font-medium">Nombre *</span>
+        <input formControlName="name" type="text" autocomplete="given-name" class="glass-input w-full rounded-lg px-3 py-2.5"
+          [class.is__invalid-input]="invalid('name')" [attr.aria-invalid]="invalid('name')" />
+      </label>
+      <label class="block">
+        <span class="text-muted-foreground mb-1 block text-xs font-medium">Apellido paterno *</span>
+        <input formControlName="fatherLastName" type="text" autocomplete="family-name" class="glass-input w-full rounded-lg px-3 py-2.5"
+          [class.is__invalid-input]="invalid('fatherLastName')" [attr.aria-invalid]="invalid('fatherLastName')" />
+      </label>
+      <label class="block">
+        <span class="text-muted-foreground mb-1 block text-xs font-medium">Apellido materno</span>
+        <input formControlName="motherLastName" type="text" class="glass-input w-full rounded-lg px-3 py-2.5"
+          [class.is__invalid-input]="invalid('motherLastName')" />
+      </label>
+    </div>
+    <div class="flex justify-end gap-2">
+      <app-button impact="light" type="button" [disabled]="$saving()" (buttonClick)="cancel()">Cancelar</app-button>
+      <app-button impact="bold" tone="primary" type="button" [disabled]="$saving()" [isLoading]="$saving()" (buttonClick)="save()">Guardar</app-button>
+    </div>
+  </form>
+  } @else {
+  <dl class="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+    <div>
+      <dt class="text-muted-foreground text-xs">Nombre</dt>
+      <dd class="text-foreground text-sm font-medium">{{ p.name }}</dd>
+    </div>
+    <div>
+      <dt class="text-muted-foreground text-xs">Apellidos</dt>
+      <dd class="text-foreground text-sm font-medium">{{ p.fatherLastName }} {{ p.motherLastName ?? '' }}</dd>
+    </div>
+    <div>
+      <dt class="text-muted-foreground text-xs">Email</dt>
+      <dd class="text-foreground break-all text-sm font-medium">{{ p.email }}</dd>
+    </div>
+    <div>
+      <dt class="text-muted-foreground text-xs">RUT</dt>
+      <dd class="text-sm font-medium" [class.text-foreground]="p.rut" [class.text-muted-foreground]="!p.rut">{{ p.rut || 'Sin RUT' }}</dd>
+    </div>
+  </dl>
+  }
+</section>

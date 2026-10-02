@@ -24,8 +24,8 @@
       </p>
       <ol class="mt-6 hidden space-y-3 text-left text-sm sm:block lg:mt-10">
         <li class="flex items-center gap-3">
-          <span class="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold" [class]="$step() === 'done' ? 'bg-white text-primary' : 'auth-chip'">
-            @if ($step() === 'done') { <app-icon class="h-4 w-4">check</app-icon> } @else { 1 }
+          <span class="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold" [class]="$step() !== 'business' ? 'bg-white text-primary' : 'auth-chip'">
+            @if ($step() !== 'business') { <app-icon class="h-4 w-4">check</app-icon> } @else { 1 }
           </span>
           Crea tu negocio
         </li>
@@ -70,11 +70,19 @@
                 }
               </select>
             </label>
+
+            <app-image-picker
+              folder="business_logos"
+              label="Logo (opcional)"
+              [disabled]="$isSaving()"
+              [uploading]="$isUploading()"
+              [progress]="$uploadProgress()"
+              (selectionChange)="onLogoChange($event)" />
           </div>
 
           <app-button full impact="bold" tone="primary" shape="rounded" size="medium" type="button"
             [disabled]="$isSaving()" [isLoading]="$isSaving()" (buttonClick)="submit()">
-            Crear negocio
+            {{ $isUploading() ? 'Subiendo logo…' : 'Crear negocio' }}
           </app-button>
 
           <p class="text-muted-foreground text-center text-sm">
@@ -82,6 +90,32 @@
             <button type="button" class="text-primary font-semibold hover:underline" (click)="logout()">Cerrar sesión</button>
           </p>
         </form>
+        } @else if ($step() === 'photo') {
+        <div class="my-10 space-y-6 text-center">
+          <div>
+            <h2 class="text-foreground mb-1 text-3xl font-semibold">Agrega tu foto <span class="text-primary">!</span></h2>
+            <p class="text-muted-foreground text-sm">Así tu equipo te reconoce. Es opcional, puedes hacerlo después desde Mi perfil.</p>
+          </div>
+          <div class="text-left">
+            <app-image-picker
+              folder="profile_images"
+              label="Foto de perfil"
+              round
+              [disabled]="$isSavingPhoto()"
+              [uploading]="$isUploading()"
+              [progress]="$uploadProgress()"
+              (selectionChange)="onPhotoChange($event)" />
+          </div>
+          <div class="space-y-2">
+            <app-button full impact="bold" tone="primary" shape="rounded" size="medium" type="button"
+              [disabled]="!$photoFile() || $isSavingPhoto()" [isLoading]="$isSavingPhoto()" (buttonClick)="savePhoto()">
+              Guardar foto
+            </app-button>
+            <button type="button" class="text-muted-foreground hover:text-primary w-full py-2 text-sm font-semibold" [disabled]="$isSavingPhoto()" (click)="skipPhoto()">
+              Ahora no
+            </button>
+          </div>
+        </div>
         } @else {
         <div class="my-10 space-y-6 text-center">
           <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500/15 text-green-600">

@@ -12,7 +12,7 @@ Estados: 🔴 bloquea una funcionalidad o produce datos erróneos · 🟡 el fro
 | Prioridad | Solicitudes |
 |---|---|
 | 🔴 Bloquean o producen datos erróneos | #1 listado de pedidos · #3 notas por producto · #4 cancelar pedido con pago anulado · #11 "Listo" en cocina marca todas las estaciones |
-| 🟡 Hay workaround en el front | #2, #5–#10, #12–#24, #26 |
+| 🟡 Hay workaround en el front | #2, #5–#10, #12–#24, #26, #27 |
 | ⚪ Por decidir | #25 entrar solo con PIN |
 
 Sugerencia de orden: #4 y #11 (bugs), #3 y #12 (notas en comanda y KDS), #1 y #2 (pedidos y mesas), #15 y #14 (impresión y terminal sin sesión de usuario), #22 (códigos de error).
@@ -287,6 +287,14 @@ Si cambia una coma del mensaje, el front deja de traducirlo.
 **Se pide:** ordenar en la consulta: roles del restaurante primero (`restaurantId IS NULL` al final) y luego `createdAt DESC`.
 
 **Front mientras tanto:** pide 50 por página y ordena en pantalla (propios más nuevos primero, predeterminados al final). Los roles `isGlobal` se muestran como "Predeterminado", sin editar ni eliminar.
+
+### 27. 🟡 `PATCH /auth/change-password/:code` responde 401 cuando la contraseña actual es incorrecta
+
+**Problema:** 401 es el código de "token vencido". El front, ante un 401, refresca el token y reintenta. En este endpoint no se puede distinguir "contraseña actual incorrecta" de "sesión vencida".
+
+**Se pide:** responder 400 (o 422) con un mensaje claro cuando la contraseña actual no coincide, y dejar el 401 solo para el token.
+
+**Front mientras tanto:** este endpoint no refresca la sesión ante un 401 y muestra "La contraseña actual no es correcta". Si justo el token venció, el usuario ve ese mensaje y al reintentar funciona, porque whoami refresca la sesión cada minuto.
 
 ---
 

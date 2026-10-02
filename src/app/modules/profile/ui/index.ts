@@ -1,1 +1,1 @@
-export * from './skeletons';
+export * from './profile-skeleton';

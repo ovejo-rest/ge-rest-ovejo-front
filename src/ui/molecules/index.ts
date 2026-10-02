@@ -8,3 +8,4 @@ export * from './filters-table';
 export * from './pagination-table';
 export * from './inactive-table-skeleton';
 export * from './empty-state';
+export * from './image-picker';

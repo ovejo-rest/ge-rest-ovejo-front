@@ -25,6 +25,9 @@ export type ProductDto = Readonly<{
   taxType: string;
   sku: string;
   image: string | null;
+  imageFileId?: string | null;
+  // URL firmada (vence en 1 hora).
+  imageUrl?: string | null;
   productDescription: string | null;
   isInactive: boolean;
   notForSelling: boolean;
