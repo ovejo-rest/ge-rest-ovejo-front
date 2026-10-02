@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, effect, inject, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnDestroy, signal } from '@angular/core';
+import { FileUploadService, getUploadErrorMessage, ImageSelection } from 'src/app/core/services/file-upload';
 import { FormBuilder } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ButtonComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
@@ -21,7 +22,13 @@ export class CreateProductModalComponent implements OnDestroy {
 
   readonly $categories = inject(GetAllCategoriesService).$categories;
   readonly form = createProductForm(inject(FormBuilder));
-  readonly $isLoading = this.createService.$isLoading;
+  readonly #upload = inject(FileUploadService);
+  readonly $isUploading = this.#upload.$isUploading;
+  readonly $uploadProgress = this.#upload.$progress;
+  readonly #isSaving = signal(false);
+  // Subiendo la imagen o guardando el producto.
+  readonly $isLoading = computed(() => this.#isSaving() || !!this.createService.$isLoading());
+  #image: ImageSelection = { kind: 'keep' };
 
   constructor() {
     effect(() => {
@@ -44,7 +51,24 @@ export class CreateProductModalComponent implements OnDestroy {
       this.toast.show('Completa los campos obligatorios', 'warning');
       return;
     }
-    this.createService.create(toCreateProductDto(this.form));
+    this.#save();
+  }
+
+  onImageChange(selection: ImageSelection) {
+    this.#image = selection;
+  }
+
+  // La imagen se sube recién al guardar; si falla, el producto no se crea.
+  async #save() {
+    this.#isSaving.set(true);
+    try {
+      const imageFileId = await this.#upload.resolveSelection(this.#image, 'products');
+      this.createService.create({ ...toCreateProductDto(this.form), ...(imageFileId ? { imageFileId } : {}) });
+    } catch (error) {
+      this.toast.show(getUploadErrorMessage(error), 'error');
+    } finally {
+      this.#isSaving.set(false);
+    }
   }
 
   handleCancel() {

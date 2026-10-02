@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, effect, inject, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnDestroy, signal } from '@angular/core';
+import { FileUploadService, getUploadErrorMessage, ImageSelection } from 'src/app/core/services/file-upload';
 import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ButtonComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
@@ -22,7 +23,13 @@ export class UpdateProductModalComponent implements OnDestroy {
   readonly $categories = inject(GetAllCategoriesService).$categories;
   readonly product = inject<ProductDto>(MAT_DIALOG_DATA);
   readonly form = createProductForm(inject(FormBuilder), this.product);
-  readonly $isLoading = this.updateService.$isLoading;
+  readonly #upload = inject(FileUploadService);
+  readonly $isUploading = this.#upload.$isUploading;
+  readonly $uploadProgress = this.#upload.$progress;
+  readonly #isSaving = signal(false);
+  // Subiendo la imagen o guardando el producto.
+  readonly $isLoading = computed(() => this.#isSaving() || !!this.updateService.$isLoading());
+  #image: ImageSelection = { kind: 'keep' };
 
   constructor() {
     effect(() => {
@@ -45,7 +52,27 @@ export class UpdateProductModalComponent implements OnDestroy {
       this.toast.show('Completa los campos obligatorios', 'warning');
       return;
     }
-    this.updateService.update(toUpdateProductDto(this.form, this.product));
+    this.#save();
+  }
+
+  onImageChange(selection: ImageSelection) {
+    this.#image = selection;
+  }
+
+  // Sin tocar la imagen no se envía el campo; quitarla envía null.
+  async #save() {
+    this.#isSaving.set(true);
+    try {
+      const imageFileId = await this.#upload.resolveSelection(this.#image, 'products');
+      this.updateService.update({
+        ...toUpdateProductDto(this.form, this.product),
+        ...(imageFileId !== undefined ? { imageFileId } : {}),
+      });
+    } catch (error) {
+      this.toast.show(getUploadErrorMessage(error), 'error');
+    } finally {
+      this.#isSaving.set(false);
+    }
   }
 
   handleCancel() {

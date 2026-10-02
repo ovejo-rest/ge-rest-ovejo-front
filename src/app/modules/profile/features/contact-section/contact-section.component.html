@@ -1,0 +1,35 @@
+<section class="glass rounded-2xl p-5 sm:p-6" aria-labelledby="contact-title">
+  <header class="mb-4 flex items-center justify-between gap-3">
+    <div>
+      <h3 id="contact-title" class="text-foreground text-base font-semibold">Contacto</h3>
+      <p class="text-muted-foreground text-xs">Dónde ubicarte si hace falta.</p>
+    </div>
+    <app-button impact="light" tone="primary" size="small" type="button" (buttonClick)="edit.emit()">
+      <app-icon class="text-base">{{ $rows().length ? 'edit' : 'add' }}</app-icon> {{ $rows().length ? 'Editar' : 'Agregar' }}
+    </app-button>
+  </header>
+
+  @if ($rows().length) {
+  <dl class="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+    @for (row of $rows(); track row.label) {
+    <div class="flex items-start gap-3">
+      <span class="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg" aria-hidden="true">
+        <app-icon class="text-base">{{ row.icon }}</app-icon>
+      </span>
+      <div class="min-w-0">
+        <dt class="text-muted-foreground text-xs">{{ row.label }}</dt>
+        <dd class="text-foreground break-words text-sm font-medium">{{ row.value }}</dd>
+      </div>
+    </div>
+    }
+  </dl>
+  } @else {
+  <div class="flex flex-col items-center gap-2 py-6 text-center">
+    <span class="bg-muted text-muted-foreground flex size-12 items-center justify-center rounded-full" aria-hidden="true">
+      <app-icon>contact_phone</app-icon>
+    </span>
+    <p class="text-foreground text-sm font-medium">Aún no tienes datos de contacto</p>
+    <p class="text-muted-foreground max-w-xs text-xs">Agrega un teléfono o dirección para que tu equipo pueda ubicarte.</p>
+  </div>
+  }
+</section>

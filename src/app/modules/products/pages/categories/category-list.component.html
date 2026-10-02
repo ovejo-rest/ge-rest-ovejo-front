@@ -42,6 +42,7 @@
     [categories]="categories"
     [isLoading]="isLoading"
     (onUpdate)="handleUpdate($event)"
-    (onDelete)="handleDelete($event)" />
+    (onDelete)="handleDelete($event)"
+    (imageExpired)="refreshExpiredImages()" />
   }
 </div>

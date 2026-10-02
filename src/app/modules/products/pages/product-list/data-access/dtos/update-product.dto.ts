@@ -13,7 +13,8 @@ export type UpdateProductDto = Readonly<{
   categoryId?: number;
   subCategoryId?: number;
   taxType?: 'inclusive' | 'exclusive';
-  image?: string;
+  // undefined = no tocar, null = quitar.
+  imageFileId?: string | null;
   productDescription?: string;
   isInactive?: boolean;
   preparationTimeInMinutes?: number;

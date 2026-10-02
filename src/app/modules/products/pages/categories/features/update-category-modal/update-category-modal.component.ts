@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, effect, inject, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnDestroy, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ButtonComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
+import { FileUploadService, getUploadErrorMessage, ImageSelection } from 'src/app/core/services/file-upload';
+import { ButtonComponent, ImagePickerComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
 import { UpdateCategoryService, CategoryDto, getCategoryErrorMessage } from '../../data-access';
 import { CategoryModalResult } from '../category-modal-result';
 import { NgClass } from '@angular/common';
@@ -9,7 +10,7 @@ import { NgClass } from '@angular/common';
 @Component({
   selector: 'app-update-category-modal',
   standalone: true,
-  imports: [ReactiveFormsModule, ButtonComponent, ModalCardComponent, SlotDirective, NgClass],
+  imports: [ReactiveFormsModule, ButtonComponent, ModalCardComponent, SlotDirective, NgClass, ImagePickerComponent],
   templateUrl: './update-category-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -26,7 +27,12 @@ export class UpdateCategoryModalComponent implements OnDestroy {
     description: [this.category.description || ''],
   });
 
-  readonly $isLoading = this.updateService.$isLoading;
+  readonly #upload = inject(FileUploadService);
+  readonly $isUploading = this.#upload.$isUploading;
+  readonly $uploadProgress = this.#upload.$progress;
+  readonly #isSaving = signal(false);
+  readonly $isLoading = computed(() => this.#isSaving() || !!this.updateService.$isLoading());
+  #image: ImageSelection = { kind: 'keep' };
 
   constructor() {
     effect(() => {
@@ -49,13 +55,31 @@ export class UpdateCategoryModalComponent implements OnDestroy {
       this.toast.show('Completa los campos obligatorios', 'warning');
       return;
     }
-    const value = this.form.getRawValue();
-    this.updateService.update({
-      id: this.category.id,
-      name: value.name || undefined,
-      shortCode: value.shortCode?.trim() || undefined,
-      description: value.description || undefined,
-    });
+    this.#save();
+  }
+
+  onImageChange(selection: ImageSelection) {
+    this.#image = selection;
+  }
+
+  // Sin tocar la imagen no se envía el campo; quitarla envía null.
+  async #save() {
+    this.#isSaving.set(true);
+    try {
+      const imageFileId = await this.#upload.resolveSelection(this.#image, 'categories');
+      const value = this.form.getRawValue();
+      this.updateService.update({
+        id: this.category.id,
+        name: value.name || undefined,
+        shortCode: value.shortCode?.trim() || undefined,
+        description: value.description || undefined,
+        ...(imageFileId !== undefined ? { imageFileId } : {}),
+      });
+    } catch (error) {
+      this.toast.show(getUploadErrorMessage(error), 'error');
+    } finally {
+      this.#isSaving.set(false);
+    }
   }
 
   handleCancel() {

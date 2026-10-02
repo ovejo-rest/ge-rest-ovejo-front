@@ -13,11 +13,19 @@
   </tr>
   } @else { @for (row of $rows(); track row.category.id) {
   <tr class="glass-row h-10">
-    <td class="text-center font-medium">
-      @if (row.level > 0) {
-      <span class="text-muted-foreground" [style.padding-left.px]="(row.level - 1) * 16">└ </span>
-      }
-      {{ row.category.name }}
+    <td class="font-medium">
+      <div class="flex items-center gap-2" [style.padding-left.px]="row.level * 20">
+        @if (row.level > 0) {
+        <span class="text-muted-foreground" aria-hidden="true">└</span>
+        }
+        <app-image-thumb
+          class="bg-primary/10 text-primary size-8 text-xs"
+          [src]="row.category.imageUrl"
+          [name]="row.category.name"
+          [alt]="row.category.name"
+          (expired)="imageExpired.emit()" />
+        <span>{{ row.category.name }}</span>
+      </div>
     </td>
     <td class="text-center">{{ row.category.shortCode || '-' }}</td>
     <td class="text-muted-foreground text-center">{{ row.category.description || '-' }}</td>

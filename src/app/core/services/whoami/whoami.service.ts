@@ -24,6 +24,15 @@ import { WhoamiDto } from './dtos';
 
 const MINUTE = 60_000;
 
+export type SessionUser = Readonly<{
+  code: string;
+  name: string;
+  fatherLastName: string;
+  motherLastName: string | null;
+  email: string;
+  profileImageUrl?: string | null;
+}>;
+
 @Injectable({ providedIn: 'root' })
 export class WhoamiService implements OnDestroy {
   readonly #httpClient = inject(HttpClient);
@@ -87,6 +96,25 @@ export class WhoamiService implements OnDestroy {
 
   forget() {
     this.#latest.set(undefined);
+    this.#sessionUser.set(null);
+  }
+
+  /** Datos del login, solo en memoria, para el header mientras llega whoami. */
+  readonly #sessionUser = signal<SessionUser | null>(null);
+
+  /** Usuario para el header/menú: whoami si ya cargó; si no, lo que trajo el login. */
+  readonly $currentUser = computed<SessionUser | null>(() => this.$whoami()?.user ?? this.#sessionUser());
+
+  seedFromSession(user: SessionUser) {
+    this.#sessionUser.set(user);
+  }
+
+  /** Refleja un cambio propio (foto, nombre) al instante, sin esperar al próximo whoami. */
+  patchUser(changes: Partial<WhoamiDto['user']>) {
+    const current = this.#latest();
+    if (current) this.#latest.set({ ...current, user: { ...current.user, ...changes } });
+    const session = this.#sessionUser();
+    if (session) this.#sessionUser.set({ ...session, ...changes });
   }
 
   ngOnDestroy() {

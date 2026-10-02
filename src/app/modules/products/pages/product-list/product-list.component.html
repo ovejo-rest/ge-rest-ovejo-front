@@ -43,6 +43,7 @@
     (edit)="handleUpdate($event)"
     (delete)="handleDelete($event)"
     (pageChange)="handlePageChange($event)"
-    (clearFilters)="handleClearFilters()" />
+    (clearFilters)="handleClearFilters()"
+    (imageExpired)="refreshExpiredImages()" />
   }
 </div>

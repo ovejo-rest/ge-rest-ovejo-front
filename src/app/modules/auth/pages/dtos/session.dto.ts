@@ -8,6 +8,8 @@ export type SessionUserDataDto = Readonly<{
   email: string;
   status: string;
   restaurantId: number | null;
+  // URL firmada (vence en 1 hora): se usa solo en memoria, no se guarda en localStorage.
+  profileImageUrl?: string | null;
 }>;
 
 export type SessionDto = Readonly<{

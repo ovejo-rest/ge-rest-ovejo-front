@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { ButtonComponent, ProgressBarComponent, SlotDirective, TableComponent } from 'src/ui';
+import { ButtonComponent, ImageThumbComponent, ProgressBarComponent, SlotDirective, TableComponent } from 'src/ui';
 import { CategoryDto } from '../../data-access';
 
 type CategoryRow = { category: CategoryDto; level: number };
@@ -7,7 +7,7 @@ type CategoryRow = { category: CategoryDto; level: number };
 @Component({
   selector: 'app-categories-table',
   standalone: true,
-  imports: [TableComponent, SlotDirective, ButtonComponent, ProgressBarComponent],
+  imports: [TableComponent, SlotDirective, ButtonComponent, ProgressBarComponent, ImageThumbComponent],
   templateUrl: './categories-table.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -16,6 +16,8 @@ export class CategoriesTableComponent {
   readonly isLoading = input(false);
   readonly onUpdate = output<CategoryDto>();
   readonly onDelete = output<CategoryDto>();
+  // Una imagen firmada venció: el contenedor vuelve a pedir la lista.
+  readonly imageExpired = output<void>();
 
   readonly headerData = ['Nombre', 'Código corto', 'Descripción'];
   readonly $rows = computed(() => this.flattenCategories(this.categories()));

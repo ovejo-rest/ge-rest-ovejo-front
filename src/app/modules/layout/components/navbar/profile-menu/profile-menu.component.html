@@ -5,15 +5,14 @@
     (click)="toggleMenu()"
     class="glass-overlay relative flex rounded-full text-sm"
     type="button">
-    <span class="sr-only">Open user menu</span>
-    <img
-      class="size-9 rounded-4xl shrink-0"
-      [src]="
-        avatarService.getAvatarUrl(
-          $safeNavigationMigration(userData?.name) + ' ' + $safeNavigationMigration(userData?.fatherLastName)
-        )
-      "
-      alt="" />
+    <span class="sr-only">Abrir menú de usuario</span>
+    <app-image-thumb
+      class="size-9 text-sm"
+      round
+      [src]="$user()?.profileImageUrl"
+      [name]="$user()?.shortName"
+      [alt]="'Foto de ' + ($user()?.shortName ?? 'perfil')"
+      (expired)="refreshPhoto()" />
   </button>
 
   <ng-template
@@ -26,19 +25,16 @@
       @openClose
       class="glass profile-menu-dropdown w-60 origin-top-right rounded-md border border-dashed py-4 focus:outline-hidden">
       <div class="flext-row flex items-center px-4 pb-4">
-        <div class="w-10 shrink-0">
-          <img
-            class="rounded-4xl"
-            [src]="
-              avatarService.getAvatarUrl(
-                $safeNavigationMigration(userData?.name) + ' ' + $safeNavigationMigration(userData?.fatherLastName)
-              )
-            "
-            alt="" />
-        </div>
+        <app-image-thumb
+          class="size-10 text-sm"
+          round
+          [src]="$user()?.profileImageUrl"
+          [name]="$user()?.shortName"
+          [alt]="'Foto de ' + ($user()?.shortName ?? 'perfil')"
+          (expired)="refreshPhoto()" />
         <div class="text-foreground overflow-hidden px-2 text-sm font-semibold">
-          {{ userData?.name + ' ' + userData?.fatherLastName + ' ' + userData?.motherLastName }}
-          <p class="text-muted-foreground truncate text-ellipsis text-xs font-semibold">{{ userData?.email }}</p>
+          {{ $user()?.fullName }}
+          <p class="text-muted-foreground truncate text-ellipsis text-xs font-semibold">{{ $user()?.email }}</p>
         </div>
       </div>
 

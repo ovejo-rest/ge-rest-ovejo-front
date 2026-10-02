@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { PaginationMeta } from 'src/app/core/standarized-response/standardized-pagination/pagination-meta.dto';
-import { IconComponent, PaginationTableComponent, SkeletonComponent } from 'src/ui';
+import { IconComponent, ImageThumbComponent, PaginationTableComponent, SkeletonComponent } from 'src/ui';
 import { ProductDto } from '../../data-access';
 
 @Component({
   selector: 'app-products-table',
   standalone: true,
-  imports: [IconComponent, SkeletonComponent, PaginationTableComponent],
+  imports: [IconComponent, SkeletonComponent, PaginationTableComponent, ImageThumbComponent],
   templateUrl: './products-table.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -21,6 +21,8 @@ export class ProductsTableComponent {
   readonly delete = output<ProductDto>();
   readonly pageChange = output<number>();
   readonly clearFilters = output<void>();
+  // Una imagen firmada venció: el contenedor vuelve a pedir la lista.
+  readonly imageExpired = output<void>();
 
   readonly skeletonRows = [1, 2, 3, 4, 5];
   readonly #currency = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 });
@@ -35,9 +37,5 @@ export class ProductsTableComponent {
     const category = product.categoryId ? names[product.categoryId] : undefined;
     const subcategory = product.subCategoryId ? names[product.subCategoryId] : undefined;
     return [category, subcategory].filter(Boolean).join(' › ') || 'Sin categoría';
-  }
-
-  initial(product: ProductDto): string {
-    return product.name.trim().charAt(0).toUpperCase();
   }
 }
