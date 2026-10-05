@@ -75,15 +75,16 @@
         (remove)="handleRemove($event)"
         (noteChange)="handleNote($event)" />
 
+      @if (mode === 'create') {
+      <!-- Al agregar productos no hay nota general: cada producto lleva la suya -->
       <form [formGroup]="form" class="space-y-3">
-        <textarea formControlName="kitchenNote" rows="2" placeholder="Nota para cocina (opcional). Se imprime en la comanda." [class]="inputClass"></textarea>
-        @if (mode === 'create') {
+        <textarea formControlName="kitchenNote" rows="2" placeholder="Nota general del pedido (opcional). Se imprime en la comanda." [class]="inputClass"></textarea>
         <label class="flex cursor-pointer items-center justify-between gap-3 text-sm">
           <span class="text-foreground">Enviar a cocina</span>
           <input type="checkbox" formControlName="isKitchenOrder" class="h-5 w-5 accent-[var(--primary)]" />
         </label>
-        }
       </form>
+      }
 
       <div>
         <app-button full impact="bold" tone="primary" shape="rounded" size="large" [disabled]="$isSaving()" [isLoading]="$isSaving()" (buttonClick)="handleSubmit()">

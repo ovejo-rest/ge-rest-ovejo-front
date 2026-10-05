@@ -6,8 +6,8 @@ export type UpdateProductVariationDto = Readonly<{
   isActive?: boolean;
 }>;
 
+// El id va solo en la URL (PUT /products/:id).
 export type UpdateProductDto = Readonly<{
-  id: number;
   name?: string;
   sku?: string;
   categoryId?: number;

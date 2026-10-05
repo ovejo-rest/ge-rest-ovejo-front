@@ -5,14 +5,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmModalComponent, ConfirmModalData, IconComponent, ToastService } from 'src/ui';
 import { BusinessLocationSelector } from 'src/app/modules/sectors/pages/sector-list/ui';
 import { GetAllSectorsService } from 'src/app/modules/sectors/pages/sector-list/data-access';
-import {
-  FindTableOpenOrderService,
-  GetAllTablesService,
-  TableDto,
-} from 'src/app/modules/tables/pages/table-list/data-access';
+import { GetAllTablesService, TableDto } from 'src/app/modules/tables/pages/table-list/data-access';
 import { GetAllCategoriesService } from 'src/app/modules/products/pages/categories/data-access';
 import { ProductDto } from 'src/app/modules/products/pages/product-list/data-access';
-import { getOrderErrorMessage } from 'src/app/modules/orders/pages/order-list/data-access';
 import { GetOrderByIdService, OrderDetailDto } from 'src/app/modules/orders/pages/order-detail/data-access';
 import {
   CollectPaymentModalComponent,
@@ -22,12 +17,12 @@ import {
   AddOrderLinesService,
   CreateOrderService,
   CustomerDto,
+  getOrderSaveErrorMessage,
   GetMenuProductsService,
   OrderProductDto,
 } from 'src/app/modules/orders/pages/order-create/data-access';
 import {
   addToCart,
-  buildKitchenNote,
   CartLine,
   CartNoteChange,
   changeCartQuantity,
@@ -68,7 +63,6 @@ export class PosTerminalComponent implements OnInit, OnDestroy {
   private readonly session = inject(PosSessionService);
   private readonly tablesService = inject(GetAllTablesService);
   private readonly sectorsService = inject(GetAllSectorsService);
-  private readonly findOpenOrderService = inject(FindTableOpenOrderService);
   private readonly categoriesService = inject(GetAllCategoriesService);
   private readonly menuService = inject(GetMenuProductsService);
   private readonly orderService = inject(GetOrderByIdService);
@@ -82,7 +76,6 @@ export class PosTerminalComponent implements OnInit, OnDestroy {
   readonly $locationId = signal<number | null>(null);
   readonly $table = signal<TableDto | null>(null);
   readonly $orderId = signal<number | null>(null);
-  readonly $openingTableId = signal<number | null>(null);
   readonly $tables = this.tablesService.$tables;
   readonly $isLoadingTables = computed(() => this.tablesService.$isLoading() ?? false);
   readonly $sectors = computed(() => this.sectorsService.$sectors() ?? []);
@@ -125,8 +118,13 @@ export class PosTerminalComponent implements OnInit, OnDestroy {
     });
 
     effect(() => {
-      const status = this.createService.$error() ?? this.addLinesService.$error();
-      if (status) this.toast.show(getOrderErrorMessage(status), 'error');
+      const error = this.createService.$error();
+      if (error) this.toast.show(getOrderSaveErrorMessage(error, false), 'error');
+    });
+
+    effect(() => {
+      const error = this.addLinesService.$error();
+      if (error) this.toast.show(getOrderSaveErrorMessage(error, true), 'error');
     });
   }
 
@@ -223,23 +221,17 @@ export class PosTerminalComponent implements OnInit, OnDestroy {
   }
 
   handleSelectTable(table: TableDto) {
-    if (this.$openingTableId() !== null || table.id === this.$table()?.id) return;
+    if (table.id === this.$table()?.id) return;
     this.$table.set(table);
-    this.$orderId.set(null);
     this.$customer.set(null);
-    if (table.status !== 'occupied') return;
-
-    this.$openingTableId.set(table.id);
-    this.findOpenOrderService.find(table).subscribe((orderId) => {
-      this.$openingTableId.set(null);
-      if (this.$table()?.id !== table.id) return;
-      if (!orderId) {
-        this.toast.show(`No se encontró la cuenta abierta de ${table.name}`, 'warning');
-        return;
-      }
-      this.$orderId.set(orderId);
+    // La mesa trae su cuenta abierta más reciente (currentTransactionId): se agregan productos a esa.
+    const orderId = table.currentTransactionId;
+    this.$orderId.set(orderId);
+    if (orderId) {
       this.orderService.load(orderId);
-    });
+      return;
+    }
+    if (table.status === 'occupied') this.toast.show(`No se encontró la cuenta abierta de ${table.name}`, 'warning');
   }
 
   // --- Carta y ticket ---
@@ -277,12 +269,12 @@ export class PosTerminalComponent implements OnInit, OnDestroy {
   handleSubmit() {
     const locationId = this.$locationId();
     if (!this.$cart().length || !locationId) return;
+    // Cada producto lleva su nota; la nota general solo existe al abrir la cuenta.
     const products: OrderProductDto[] = toOrderProducts(this.$cart());
-    const note = buildKitchenNote(this.$cart(), this.$kitchenNote());
 
     const orderId = this.$orderId();
     if (orderId) {
-      this.addLinesService.add({ orderId, products, note, currentNote: this.$order()?.staffNote });
+      this.addLinesService.add({ orderId, products });
       return;
     }
     this.createService.create({
@@ -292,7 +284,7 @@ export class PosTerminalComponent implements OnInit, OnDestroy {
       resWaiterId: this.$waiter()?.code,
       contactId: this.$customer()?.id,
       isKitchenOrder: this.$sendToKitchen(),
-      staffNote: note || undefined,
+      staffNote: this.$kitchenNote().trim() || undefined,
     });
   }
 

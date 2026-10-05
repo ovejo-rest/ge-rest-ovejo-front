@@ -12,13 +12,12 @@ export class CustomerService {
     return this.#httpClient.get<CustomerDetailDto>(`${ApiPathEnum.RESTAURANT}/customers/${id}`);
   }
 
-  // Los datos del cliente se editan como contacto.
-  update(dto: UpdateCustomerDto): Observable<unknown> {
-    return this.#httpClient.put(`${ApiPathEnum.RESTAURANT}/contacts/${dto.id}`, dto);
+  // Los datos del cliente se editan como contacto; el id va solo en la URL.
+  update(id: number, changes: UpdateCustomerDto): Observable<unknown> {
+    return this.#httpClient.put(`${ApiPathEnum.RESTAURANT}/contacts/${id}`, changes);
   }
 
-  // El backend elimina con POST /contacts/:id y el id en el body (ver BACKEND-REQUESTS.md).
   delete(id: number): Observable<unknown> {
-    return this.#httpClient.post(`${ApiPathEnum.RESTAURANT}/contacts/${id}`, { id });
+    return this.#httpClient.delete(`${ApiPathEnum.RESTAURANT}/contacts/${id}`);
   }
 }

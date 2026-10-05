@@ -6,7 +6,6 @@ import { ButtonComponent, ConfirmModalComponent, ConfirmModalData, IconComponent
 import { formatCurrency, formatDateTime, ORDER_STATUS, StatusBadgeComponent } from 'src/app/modules/orders/pages/order-list/ui';
 import { CustomerDetailDto, CustomerService } from './data-access';
 import { UpdateCustomerModalComponent } from './features';
-import { computeCustomerStats } from './ui';
 
 @Component({
   selector: 'app-customer-detail',
@@ -29,7 +28,6 @@ export class CustomerDetailComponent implements OnInit {
   readonly $customer = signal<CustomerDetailDto | null>(null);
   readonly $isLoading = signal(true);
   readonly $error = signal<number | null>(null);
-  readonly $stats = computed(() => computeCustomerStats(this.$customer()?.recentOrders ?? []));
   readonly $orders = computed(() =>
     [...(this.$customer()?.recentOrders ?? [])].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
   );

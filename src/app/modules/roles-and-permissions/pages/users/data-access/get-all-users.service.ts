@@ -76,7 +76,15 @@ export class GetAllUsersService {
               return EMPTY;
             }),
             tap(() => this.#isLoading$.next(false)),
-            map((data) => data),
+            // branch_id puede venir como string desde la consulta cruda: se normaliza a número.
+            map((response) => ({
+              ...response,
+              data: response.data.map((user) => ({
+                ...user,
+                branchId: user.branchId != null ? Number(user.branchId) : null,
+                hasPin: !!user.hasPin,
+              })),
+            })),
           );
       }),
     ),

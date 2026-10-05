@@ -13,9 +13,13 @@ export type BookingDto = Readonly<{
   locationName: string;
   status: BookingStatus;
   partySize: number;
+  contactId: number;
+  // Teléfono del cliente para llamarlo desde la agenda.
+  customerMobile: string | null;
+  tableId: number | null;
 }>;
 
-// Detalle (GET /bookings/:id), necesario para editar.
+// Detalle (GET /bookings/:id), necesario para editar: el listado no trae la nota.
 export type BookingDetailDto = Readonly<{
   id: number;
   locationId: number;
@@ -35,7 +39,12 @@ export type BookingFiltersDto = Readonly<{
   startDate: string;
   endDate: string;
   locationId?: number;
+  // Filtra en el backend por un estado; sin él vienen todas.
+  status?: BookingStatus;
 }>;
+
+// Respuesta de POST /bookings y PUT /bookings/:id.
+export type BookingIdDto = Readonly<{ id: number }>;
 
 export type CreateBookingDto = Readonly<{
   contactId: number;

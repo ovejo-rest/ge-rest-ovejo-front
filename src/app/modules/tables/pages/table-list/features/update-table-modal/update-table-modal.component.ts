@@ -3,7 +3,7 @@ import { Component, effect, inject, OnDestroy } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
-import { TableDto, UpdateTableService, GetAllTablesService, TableStatus } from '../../data-access';
+import { TableDto, UpdateTableService, GetAllTablesService, TableStatus, getTableErrorMessage } from '../../data-access';
 import { GetAllSectorsService } from 'src/app/modules/sectors/pages/sector-list/data-access';
 
 @Component({
@@ -55,8 +55,13 @@ export class UpdateTableModalComponent implements OnDestroy {
         this.$getAll.retry();
         this.dialogRef.close();
       }
-      if (this.$service.$hasError()) {
-        this.$toast.show('Error al actualizar', 'error');
+    });
+
+    // 409 TABLE_HAS_OPEN_ORDER / TABLE_STATUS_AUTOMATIC: el estado lo manejan los pedidos.
+    effect(() => {
+      const error = this.$service.$error();
+      if (error) {
+        this.$toast.show(getTableErrorMessage(error), 'error');
       }
     });
   }

@@ -41,7 +41,7 @@ export class SetServicePinModalComponent implements OnDestroy {
   constructor() {
     effect(() => {
       if (!this.pinService.$success()) return;
-      this.toast.show(`PIN asignado a ${this.user.name}`, 'success');
+      this.toast.show(`PIN ${this.user.hasPin ? 'actualizado' : 'asignado'} para ${this.user.name}`, 'success');
       this.dialogRef.close(true);
     });
     effect(() => {

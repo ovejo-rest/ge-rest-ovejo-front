@@ -20,11 +20,24 @@ export class BookingWeekComponent {
 
   readonly timeOf = timeOf;
 
+  // Las canceladas llegan solo si el filtro de estado las incluye; se muestran tachadas.
+  chipClass(booking: BookingDto): string {
+    switch (booking.status) {
+      case 'completed':
+        return 'bg-green-500/15 text-green-800';
+      case 'waiting':
+        return 'bg-amber-500/15 text-amber-800';
+      case 'cancelled':
+        return 'bg-red-500/10 text-red-700 line-through opacity-70';
+      default:
+        return 'bg-blue-500/15 text-blue-800';
+    }
+  }
+
   readonly $columns = computed<WeekColumn[]>(() => {
     const today = toDateKey(new Date());
     const byDay = new Map<string, BookingDto[]>();
     for (const booking of this.bookings()) {
-      if (booking.status === 'cancelled') continue;
       const key = dateKeyOf(booking.start);
       byDay.set(key, [...(byDay.get(key) ?? []), booking]);
     }

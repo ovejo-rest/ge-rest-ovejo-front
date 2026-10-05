@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, EventEmitter, inject, input, Output, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, EventEmitter, inject, input, Output, ChangeDetectionStrategy } from '@angular/core';
 import {
   ButtonComponent,
   IconComponent,
@@ -38,6 +38,8 @@ export class UsersTableComponent {
   private readonly dialog = inject(MatDialog);
   readonly $users = input.required<UserDto[]>({ alias: 'users' });
   readonly isLoading = input<boolean | undefined>(false, { alias: 'isLoading' });
+  // id de sucursal -> nombre, para mostrar la sucursal de cada usuario.
+  readonly $branchNames = input<Record<number, string>>({}, { alias: 'branchNames' });
 
   @Output() pageChange = new EventEmitter<number>();
   @Output() perPageChange = new EventEmitter<number>();
@@ -45,8 +47,7 @@ export class UsersTableComponent {
   @Output() retryData = new EventEmitter<void>();
 
   readonly $pagination = input.required<PaginationMeta>({ alias: 'pagination' });
-  headerData = ['Nombre', 'Email', 'Estado', 'Acción'];
-  readonly perPage = signal(10);
+  headerData = ['Nombre', 'Email', 'Sucursal', 'PIN POS', 'Estado'];
 
   createUser() {
     this.dialog.open(CreateUserModalComponent, {
@@ -62,12 +63,23 @@ export class UsersTableComponent {
     });
   }
 
+  // Al guardar el PIN se recarga la lista para reflejar hasPin.
   setServicePin(item: UserDto) {
-    this.dialog.open(SetServicePinModalComponent, {
-      width: '440px',
-      maxWidth: '95vw',
-      data: item,
-    });
+    this.dialog
+      .open(SetServicePinModalComponent, {
+        width: '440px',
+        maxWidth: '95vw',
+        data: item,
+      })
+      .afterClosed()
+      .subscribe((saved) => {
+        if (saved) this.retry();
+      });
+  }
+
+  getBranchName(user: UserDto): string | null {
+    if (user.branchId === null) return null;
+    return this.$branchNames()[user.branchId] ?? `Sucursal #${user.branchId}`;
   }
 
   deleteUser(item: UserDto) {
@@ -90,9 +102,7 @@ export class UsersTableComponent {
   }
 
   onPerPageChange(event: Event) {
-    const value = Number((event.target as HTMLSelectElement).value);
-    this.perPage.set(value);
-    this.perPageChange.emit(value);
+    this.perPageChange.emit(Number((event.target as HTMLSelectElement).value));
   }
 
   retry() {

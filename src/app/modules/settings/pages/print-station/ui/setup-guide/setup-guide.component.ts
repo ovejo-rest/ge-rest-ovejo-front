@@ -23,9 +23,9 @@ import { IconComponent } from 'src/ui';
         <li>Elige abajo qué impresora de REDOM atiende este equipo y presiona <b>Iniciar</b>.</li>
         <li>Deja esta pestaña abierta (puede quedar en segundo plano) y el equipo sin suspender.</li>
       </ol>
-      <p class="mt-3 rounded-md bg-amber-500/10 p-2 text-xs text-amber-700">
-        Usa <b>un solo equipo por impresora</b>: si dos equipos atienden la misma impresora, las comandas saldrán
-        duplicadas.
+      <p class="text-muted-foreground mt-3 text-xs">
+        Puedes dejar más de un equipo atendiendo la misma impresora: cada comanda la imprime un solo equipo. Si uno se
+        apaga, sus comandas sin imprimir pasan a otro en unos 2 minutos.
       </p>
     </details>
   `,

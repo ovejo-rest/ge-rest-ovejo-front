@@ -5,11 +5,20 @@ import { interval, map } from 'rxjs';
 import { ButtonComponent, IconComponent, SkeletonComponent } from 'src/ui';
 import { GetAllBusinessLocationsService } from 'src/app/modules/restaurante/pages/business-location/data-access';
 import { WhoamiService } from 'src/app/core/services/whoami/whoami.service';
-import { GetAllTablesService } from 'src/app/modules/tables/pages/table-list/data-access';
 import { formatCurrency } from 'src/app/modules/orders/pages/order-list/ui';
+import { paymentMethodLabel } from 'src/app/modules/payments/pages/payment-list/ui';
 import { GetDashboardMetricsService } from './data-access';
 import { KpiCardComponent, RecentOrdersCardComponent, TopProductsCardComponent } from './features';
-import { comparisonLabel, PeriodPreset, periodRange, PeriodSelectorComponent, toDateKey } from './ui';
+import {
+  BreakdownChartComponent,
+  BreakdownItem,
+  comparisonLabel,
+  PeriodPreset,
+  periodRange,
+  PeriodSelectorComponent,
+  SalesByDayChartComponent,
+  toDateKey,
+} from './ui';
 
 // Con el día de hoy en el rango, los números se refrescan solos.
 const REFRESH_MS = 60_000;
@@ -45,6 +54,8 @@ function toQuery(params: ParamMap): DashboardQuery {
     KpiCardComponent,
     TopProductsCardComponent,
     RecentOrdersCardComponent,
+    SalesByDayChartComponent,
+    BreakdownChartComponent,
   ],
   templateUrl: './admin.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,7 +66,6 @@ export class AdminComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly metricsService = inject(GetDashboardMetricsService);
   private readonly locationsService = inject(GetAllBusinessLocationsService);
-  private readonly tablesService = inject(GetAllTablesService);
   private readonly $branchId = inject(WhoamiService).$branchId;
 
   readonly formatCurrency = formatCurrency;
@@ -102,16 +112,23 @@ export class AdminComponent implements OnInit {
   readonly $comparison = computed(() => comparisonLabel(this.$query().preset));
   readonly $includesToday = computed(() => this.$query().to >= toDateKey(new Date()));
 
-  // Mesas ocupadas: el dashboard no lo entrega; se calcula con las mesas de la sucursal elegida.
-  readonly $tables = computed(() => (this.$locationId() ? this.tablesService.$tables() : []));
-  readonly $occupiedTables = computed(() => this.$tables().filter((table) => table.status === 'occupied').length);
+  // Datos de los gráficos de barras.
+  readonly $categories = computed<BreakdownItem[]>(() =>
+    (this.$metrics()?.salesByCategory ?? []).map((category) => ({
+      label: category.categoryName ?? 'Sin categoría',
+      value: category.revenue,
+      detail: `${category.quantity} u`,
+    })),
+  );
+  readonly $paymentMethods = computed<BreakdownItem[]>(() =>
+    (this.$metrics()?.paymentsByMethod ?? []).map((payment) => ({
+      label: paymentMethodLabel(payment.method),
+      value: payment.amount,
+      detail: `${payment.count} ${payment.count === 1 ? 'pago' : 'pagos'}`,
+    })),
+  );
 
   constructor() {
-    effect(() => {
-      const locationId = this.$locationId();
-      if (locationId) untracked(() => this.tablesService.setParams(locationId));
-    });
-
     // Se recarga al cambiar el período o la sucursal efectiva (incluida la del usuario al llegar).
     effect(() => {
       const filters = this.$filters();
@@ -123,9 +140,7 @@ export class AdminComponent implements OnInit {
     interval(REFRESH_MS)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        if (!this.$includesToday()) return;
-        this.metricsService.retry();
-        if (this.$locationId()) this.tablesService.retry();
+        if (this.$includesToday()) this.metricsService.retry();
       });
   }
 

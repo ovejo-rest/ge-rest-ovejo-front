@@ -1,9 +1,10 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ButtonComponent, HeaderDashboardComponent, IconComponent, CaseTransformDirective } from 'src/ui';
 import { GetAllUsersService } from './data-access';
 import { CreateUserModalComponent, UsersTableComponent } from './features';
 import { MatDialog } from '@angular/material/dialog';
 import { CheckPermissionDirective } from 'src/app/shared/directives';
+import { GetAllBusinessLocationsService } from 'src/app/modules/restaurante/pages/business-location/data-access';
 
 @Component({
   selector: 'app-users',
@@ -14,11 +15,18 @@ import { CheckPermissionDirective } from 'src/app/shared/directives';
 export class UsersComponent {
   private readonly dialog = inject(MatDialog);
   protected readonly $service = inject(GetAllUsersService);
+  private readonly $locationsService = inject(GetAllBusinessLocationsService);
+
+  // Nombre de cada sucursal (la lista de usuarios solo trae branchId).
+  protected readonly $branchNames = computed(() =>
+    Object.fromEntries((this.$locationsService.$locations() ?? []).map((location) => [location.id, location.name])),
+  );
 
   page = 1;
 
   constructor() {
     this.$service.retry();
+    this.$locationsService.retry();
   }
 
   retry() {

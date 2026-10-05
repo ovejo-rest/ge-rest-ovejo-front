@@ -77,10 +77,12 @@
       </button>
       } @empty {
       <div class="col-span-full py-6 text-center">
-        <p class="text-foreground text-sm font-medium">{{ $isLoadingStaff() ? 'Cargando meseros…' : 'No hay meseros disponibles' }}</p>
-        @if (!$isLoadingStaff()) {
+        <p class="text-foreground text-sm font-medium">
+          {{ !locationId() ? 'Selecciona una sucursal' : $isLoadingStaff() ? 'Cargando meseros…' : 'No hay meseros disponibles' }}
+        </p>
+        @if (locationId() && !$isLoadingStaff()) {
         <p class="text-muted-foreground mx-auto mt-1 max-w-md text-xs">
-          Un usuario aparece aquí si tiene el rol <b>Mesero</b> (código WAITER), pertenece a este restaurante y está activo.
+          Un usuario aparece aquí si tiene el rol <b>Mesero</b> (código WAITER), está activo y su sucursal es esta (o no tiene sucursal asignada).
           Asígnalo en Roles y permisos → Usuarios y roles.
         </p>
         }
@@ -88,7 +90,7 @@
       }
     </div>
 
-    <button type="button" class="text-primary mt-5 inline-flex items-center gap-1 text-sm font-medium hover:underline" [disabled]="$isLoadingStaff()" (click)="refreshStaff()">
+    <button type="button" class="text-primary mt-5 inline-flex items-center gap-1 text-sm font-medium hover:underline" [disabled]="$isLoadingStaff() || !locationId()" (click)="refreshStaff()">
       <app-icon class="h-4 w-4">refresh</app-icon>Actualizar lista
     </button>
 

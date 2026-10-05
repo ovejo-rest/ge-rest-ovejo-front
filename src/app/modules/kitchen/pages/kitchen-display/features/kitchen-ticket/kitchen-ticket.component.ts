@@ -18,7 +18,6 @@ export class KitchenTicketComponent {
   // Reloj compartido de la pantalla, para que todas las comandas avancen juntas.
   readonly now = input.required<number>();
   readonly busy = input(false);
-  readonly stationSelected = input(false);
 
   readonly markReady = output<KitchenOrderDto>();
 
@@ -31,6 +30,13 @@ export class KitchenTicketComponent {
   readonly $elapsed = computed(() => {
     const minutes = this.$minutes();
     return minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)} h ${minutes % 60} min`;
+  });
+  // Notas del pedido para toda la comanda (se omiten las vacías y las repetidas).
+  readonly $orderNotes = computed(() => {
+    const notes = [this.order().staffNote, this.order().additionalNotes]
+      .map((note) => note?.trim() ?? '')
+      .filter((note) => note.length > 0);
+    return [...new Set(notes)];
   });
   readonly $itemCount = computed(() => this.order().lineOrders.reduce((sum, line) => sum + line.quantity, 0));
 

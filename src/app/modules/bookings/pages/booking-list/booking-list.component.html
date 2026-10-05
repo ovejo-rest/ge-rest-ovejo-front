@@ -20,6 +20,12 @@
       </button>
       <input type="date" aria-label="Ir a una fecha" class="glass-input h-10 rounded-md px-2 text-sm" [value]="$query().date" (change)="pickDate($event)" />
     </div>
+    <select aria-label="Filtrar por estado" class="glass-input h-10 rounded-md px-2 text-sm" (change)="pickStatus($event)">
+      <option value="" [selected]="!$query().status">Todos los estados</option>
+      @for (option of statusOptions; track option.value) {
+      <option [value]="option.value" [selected]="$query().status === option.value">{{ option.label }}</option>
+      }
+    </select>
     <div class="ml-auto inline-flex rounded-lg p-1" role="tablist" aria-label="Vista">
       <button type="button" role="tab" class="rounded-md px-3 py-1.5 text-sm font-medium" [class]="$query().view === 'day' ? 'bg-primary text-white' : 'glass-row'" [attr.aria-selected]="$query().view === 'day'" (click)="setView('day')">Día</button>
       <button type="button" role="tab" class="ml-1 rounded-md px-3 py-1.5 text-sm font-medium" [class]="$query().view === 'week' ? 'bg-primary text-white' : 'glass-row'" [attr.aria-selected]="$query().view === 'week'" (click)="setView('week')">Semana</button>
@@ -39,7 +45,7 @@
   } @else if ($query().view === 'week') {
   <app-booking-week [weekStart]="$weekStart()" [bookings]="$bookings()" (selectDay)="openDay($event)" (edit)="handleEdit($event)" />
   } @else if (!$bookings().length) {
-  <app-empty-state icon="event_available" title="Sin reservas este día" description="Las reservas que registres aparecerán aquí ordenadas por hora.">
+  <app-empty-state icon="event_available" [title]="$query().status ? 'Sin reservas con ese estado este día' : 'Sin reservas este día'" description="Las reservas que registres aparecerán aquí ordenadas por hora.">
     <app-button impact="bold" tone="primary" shape="rounded" icon="add" [disabled]="!$locationId()" (buttonClick)="handleCreate()">Nueva reserva</app-button>
   </app-empty-state>
   } @else {

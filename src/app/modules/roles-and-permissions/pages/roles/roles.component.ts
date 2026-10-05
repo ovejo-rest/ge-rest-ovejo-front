@@ -24,8 +24,9 @@ export class RolesComponent {
     this.changeData();
   }
 
+  // El servicio es compartido (selectores de rol piden 50): al entrar se vuelve a la vista paginada.
   changeData() {
-    this.$getAllRolesService.retry();
+    this.$getAllRolesService.setParams({ page: 1, perPage: 10, searchCode: '', searchName: '' });
   }
 
   retry() {

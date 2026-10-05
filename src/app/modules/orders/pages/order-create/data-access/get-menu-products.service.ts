@@ -20,22 +20,24 @@ export class GetMenuProductsService {
   readonly $isLoading = toSignal(this.#isLoading$);
   readonly $error = toSignal(this.#error$);
 
-  // Solo productos disponibles y con precio: los demás no se pueden vender.
+  // Solo lo vendible: el backend filtra activos, no marcados "no a la venta" y con precio.
   readonly $products = toSignal(
     this.#filters$.pipe(
       tap(() => this.#isLoading$.next(true)),
       tap(() => this.#error$.next(undefined)),
       switchMap(({ categoryId, name }) => {
-        let params = new HttpParams().set('page', 1).set('perPage', MENU_PAGE_SIZE);
+        let params = new HttpParams()
+          .set('page', 1)
+          .set('perPage', MENU_PAGE_SIZE)
+          .set('isActive', true)
+          .set('sellable', true);
         if (categoryId) params = params.set('categoryId', categoryId);
         if (name.trim()) params = params.set('name', name.trim());
 
         return this.#httpClient
           .get<StandardizedPagination<ProductDto>>(`${ApiPathEnum.RESTAURANT}/products`, { params })
           .pipe(
-            map(({ data }) =>
-              data.filter((product) => !product.isInactive && product.variations[0]?.sellPriceIncTax != null),
-            ),
+            map(({ data }) => data),
             tap(() => this.#isLoading$.next(false)),
             catchError((error: HttpErrorResponse) => {
               this.#error$.next(error.status);
