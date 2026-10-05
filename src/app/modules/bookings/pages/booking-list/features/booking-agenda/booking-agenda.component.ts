@@ -23,7 +23,14 @@ export class BookingAgendaComponent {
   readonly statusMap = BOOKING_STATUS;
   readonly timeOf = timeOf;
 
-  readonly $active = computed(() => this.bookings().filter((booking) => booking.status !== 'cancelled'));
-  readonly $cancelled = computed(() => this.bookings().filter((booking) => booking.status === 'cancelled'));
-  readonly $guests = computed(() => this.$active().reduce((sum, booking) => sum + booking.partySize, 0));
+  // El filtro por estado lo aplica el backend; aquí solo se muestran las que llegan.
+  // El resumen no cuenta las canceladas (no ocupan mesa).
+  readonly $summary = computed(() => {
+    const active = this.bookings().filter((booking) => booking.status !== 'cancelled');
+    return {
+      count: active.length,
+      guests: active.reduce((sum, booking) => sum + booking.partySize, 0),
+      cancelled: this.bookings().length - active.length,
+    };
+  });
 }

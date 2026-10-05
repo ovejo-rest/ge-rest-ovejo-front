@@ -26,6 +26,9 @@
     [printers]="$printers()"
     [loading]="$isLoading() && !$printers().length"
     [locationNames]="$locationNames()"
+    [now]="$now()"
+    [testingIds]="$testingIds()"
+    (test)="handleTest($event)"
     (edit)="handleUpdate($event)"
     (delete)="handleDelete($event)" />
   }

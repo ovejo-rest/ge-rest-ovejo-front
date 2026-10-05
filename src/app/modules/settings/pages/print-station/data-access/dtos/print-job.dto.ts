@@ -1,6 +1,8 @@
-export type PrintJobStatus = 'pending' | 'printed' | 'failed';
+// printing: reservada por un equipo (POST /print-jobs/pending/claim) mientras la imprime.
+export type PrintJobStatus = 'pending' | 'printing' | 'printed' | 'failed';
 
-// Todo lo necesario para imprimir una comanda (GET /print-jobs/pending).
+// Todo lo necesario para imprimir una comanda (POST /print-jobs/pending/claim).
+// Sin transactionId es un ticket de prueba pedido desde Impresoras (POST /print-jobs/test).
 export type PendingPrintJobDto = Readonly<{
   id: number;
   printerId: number;

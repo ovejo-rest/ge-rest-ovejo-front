@@ -4,6 +4,8 @@ export type OrderProductDto = Readonly<{
   productId: number;
   variationId: number;
   quantity: number;
+  // Nota de este producto ("sin palta"): se imprime en la comanda de su estación y se ve en el KDS.
+  note?: string;
 }>;
 
 export type CreateOrderDto = Readonly<{
@@ -16,7 +18,7 @@ export type CreateOrderDto = Readonly<{
   discountType?: DiscountType;
   discountAmount?: number;
   additionalNotes?: string;
-  // Nota que se imprime en la comanda.
+  // Nota general del pedido; las de cada producto van en products[].note.
   staffNote?: string;
 }>;
 
@@ -28,8 +30,6 @@ export type CreateOrderResponseDto = Readonly<{
 
 export type AddOrderLinesDto = Readonly<{
   orderId: number;
+  // Cada producto lleva su propia nota; el endpoint no recibe nota general.
   products: OrderProductDto[];
-  // Notas de lo agregado: se suman a la nota actual del pedido (staffNote).
-  note?: string;
-  currentNote?: string | null;
 }>;

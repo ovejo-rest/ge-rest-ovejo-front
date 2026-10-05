@@ -23,7 +23,6 @@ export class PosTablesPanelComponent {
   readonly loading = input(false);
   // null = mostrador (sin mesa).
   readonly selectedTableId = input<number | null>(null);
-  readonly openingTableId = input<number | null>(null);
 
   readonly selectTable = output<TableDto>();
   readonly selectCounter = output<void>();

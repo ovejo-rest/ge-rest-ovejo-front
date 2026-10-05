@@ -18,12 +18,12 @@ export class UpdateProductService {
   readonly $hasError = toSignal(this.#error$.pipe(map((code) => code !== undefined)));
   readonly $success = toSignal(this.#success$);
 
-  update(dto: UpdateProductDto) {
+  update(id: number, dto: UpdateProductDto) {
     this.#isLoading$.next(true);
     this.#error$.next(undefined);
 
     this.#httpClient
-      .put<{ id: number }>(`${ApiPathEnum.RESTAURANT}/products/${dto.id}`, dto)
+      .put<{ id: number }>(`${ApiPathEnum.RESTAURANT}/products/${id}`, dto)
       .pipe(
         tap(() => this.#isLoading$.next(false)),
         catchError((error: HttpErrorResponse) => {

@@ -22,8 +22,7 @@ export class DeleteProductService {
     this.#error$.next(undefined);
 
     this.#httpClient
-      // El backend lee el id desde el body (además de la URL).
-      .delete(`${ApiPathEnum.RESTAURANT}/products/${id}`, { body: { id } })
+      .delete(`${ApiPathEnum.RESTAURANT}/products/${id}`)
       .pipe(
         tap(() => this.#isLoading$.next(false)),
         catchError((error: HttpErrorResponse) => {

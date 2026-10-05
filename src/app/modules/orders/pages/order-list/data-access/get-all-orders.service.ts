@@ -24,8 +24,11 @@ export class GetAllOrdersService {
       tap(() => this.#isLoading$.next(true)),
       tap(() => this.#error$.next(undefined)),
       switchMap((params) => {
-        let httpParams = new HttpParams().set('page', params.page).set('perPage', params.perPage);
-        if (params.serviceStaff) httpParams = httpParams.set('serviceStaff', params.serviceStaff);
+        // Solo se envían los filtros con valor; el backend ignora los ausentes.
+        let httpParams = new HttpParams();
+        for (const [key, value] of Object.entries(params)) {
+          if (value !== undefined && value !== null && value !== '') httpParams = httpParams.set(key, value);
+        }
 
         return this.#httpClient
           .get<StandardizedPagination<OrderSummaryDto>>(`${ApiPathEnum.RESTAURANT}/orders`, { params: httpParams })

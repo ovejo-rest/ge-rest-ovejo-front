@@ -13,9 +13,6 @@ const PUBLIC_PATHS = [
 ];
 const isPublic = (url: string) => PUBLIC_PATHS.some((path) => url.startsWith(path)) && !url.endsWith('/login/logout');
 
-// Llevan token, pero su 401 es "contraseña actual incorrecta": no se refresca la sesión.
-const CREDENTIAL_CHECK_PATHS = [`${ApiPathEnum.AUTH}/auth/change-password/`];
-const isCredentialCheck = (url: string) => CREDENTIAL_CHECK_PATHS.some((path) => url.startsWith(path));
 
 const withToken = (req: HttpRequest<unknown>, token: string) =>
   req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
@@ -29,7 +26,7 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(withToken(req, token)).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status !== 401 || isCredentialCheck(req.url)) return throwError(() => error);
+      if (error.status !== 401) return throwError(() => error);
       // Refresh con cola: si ya hay uno en curso, se espera ese mismo.
       // Solo un refresh fallido cierra la sesión; los errores del reintento llegan tal cual al llamador.
       return authService.refreshAccessToken().pipe(

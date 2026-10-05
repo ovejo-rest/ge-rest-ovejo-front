@@ -88,7 +88,6 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   readonly $hasPendingLines = computed(() =>
     (this.$order()?.lines ?? []).some((line) => line.resLineOrderStatus !== 'served'),
   );
-  readonly $hasPayments = computed(() => (this.$order()?.totalPaid ?? 0) > 0);
   readonly $payments = computed(() => {
     const result = this.paymentsService.$payments();
     return result && result.transactionId === this.$orderId() ? result.payments : [];

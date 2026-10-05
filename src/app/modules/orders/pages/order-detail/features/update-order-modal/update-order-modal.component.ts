@@ -68,9 +68,9 @@ export class UpdateOrderModalComponent implements OnDestroy {
     });
 
     effect(() => {
-      const status = this.updateService.$error();
-      if (status) {
-        this.toast.show(getOrderErrorMessage(status), 'error');
+      const error = this.updateService.$error();
+      if (error) {
+        this.toast.show(getOrderErrorMessage(error), 'error');
       }
     });
   }

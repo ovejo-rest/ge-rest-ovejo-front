@@ -6,6 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/modules/auth/pages/data-access';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
+import { ApiErrorCode, readApiError } from 'src/app/core/utils';
 import { ProfileActionsService } from '../../data-access';
 
 export type ChangePasswordModalData = Readonly<{ userCode: string; email: string }>;
@@ -98,13 +99,14 @@ export class ChangePasswordModalComponent {
       },
       error: (error: HttpErrorResponse) => {
         this.$saving.set(false);
-        const message = String(error.error?.message ?? '');
+        const { code, message } = readApiError(error);
+        // Cuenta creada con Google: aún no tiene contraseña.
         if (error.status === HttpStatusCode.BadRequest && /no password yet/i.test(message)) {
           this.$googleAccount.set(true);
           return;
         }
         this.#toast.show(
-          error.status === HttpStatusCode.Unauthorized
+          code === ApiErrorCode.CURRENT_PASSWORD_INVALID
             ? 'La contraseña actual no es correcta'
             : error.status === 0
               ? 'Sin conexión con el servidor'

@@ -3,6 +3,7 @@ import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ButtonComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
+import { ApiErrorCode, readApiError } from 'src/app/core/utils';
 import { formatRut, rutValidator } from 'src/app/shared/validators';
 import { CustomerDetailDto, CustomerService, UpdateCustomerDto } from '../../data-access';
 
@@ -43,16 +44,16 @@ export class UpdateCustomerModalComponent {
       return;
     }
     const changes = this.buildChanges();
-    if (Object.keys(changes).length === 1) {
+    if (!Object.keys(changes).length) {
       this.dialogRef.close(false);
       return;
     }
     this.$isSaving.set(true);
-    this.customerService.update(changes).subscribe({
+    this.customerService.update(this.customer.id, changes).subscribe({
       next: () => this.dialogRef.close(true),
       error: (error: HttpErrorResponse) => {
         this.$isSaving.set(false);
-        this.toast.show(error.status === HttpStatusCode.NotFound ? 'El cliente ya no existe' : 'No se pudo guardar el cliente', 'error');
+        this.toast.show(this.errorMessage(error), 'error');
       },
     });
   }
@@ -61,12 +62,21 @@ export class UpdateCustomerModalComponent {
     this.dialogRef.close(false);
   }
 
+  private errorMessage(error: HttpErrorResponse): string {
+    const { code, details } = readApiError(error);
+    // 409 con el cliente que ya tiene ese teléfono en `details` ({ customerId, name }).
+    if (code === ApiErrorCode.CUSTOMER_PHONE_EXISTS) {
+      const name = typeof details['name'] === 'string' && details['name'] ? details['name'] : 'otro cliente';
+      return `El teléfono ya está registrado para ${name}.`;
+    }
+    return error.status === HttpStatusCode.NotFound ? 'El cliente ya no existe' : 'No se pudo guardar el cliente';
+  }
+
   private buildChanges(): UpdateCustomerDto {
     const value = this.form.getRawValue();
     const original = this.customer;
     const changed = (key: keyof typeof value, current: string | null) => value[key].trim() !== (current ?? '');
     return {
-      id: original.id,
       ...(changed('name', original.name) && { name: value.name.trim() }),
       ...(changed('mobile', original.mobile) && { mobile: value.mobile.trim() }),
       ...(changed('email', original.email) && { email: value.email.trim() }),

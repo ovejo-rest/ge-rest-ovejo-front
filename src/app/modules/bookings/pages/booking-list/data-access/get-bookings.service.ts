@@ -33,6 +33,7 @@ export class GetBookingsService {
           .set('startDate', filters.startDate)
           .set('endDate', filters.endDate);
         if (filters.locationId) params = params.set('locationId', filters.locationId);
+        if (filters.status) params = params.set('status', filters.status);
 
         return this.#httpClient
           .get<StandardizedPagination<BookingDto>>(`${ApiPathEnum.RESTAURANT}/bookings`, { params })

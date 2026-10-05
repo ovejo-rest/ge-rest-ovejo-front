@@ -14,7 +14,7 @@ import {
   ToastService,
 } from 'src/ui';
 import { BusinessLocationSelector } from 'src/app/modules/sectors/pages/sector-list/ui';
-import { BookingDto, BookingService, getBookingErrorMessage, GetBookingsService } from './data-access';
+import { BookingDto, BookingService, BookingStatus, getBookingErrorMessage, GetBookingsService } from './data-access';
 import {
   BookingAgendaComponent,
   BookingModalResult,
@@ -25,16 +25,19 @@ import {
   UpdateBookingModalComponent,
   UpdateBookingModalData,
 } from './features';
-import { addDays, BOOKING_STATUS, longDate, startOfWeek, toDateKey, toIsoRange } from './ui';
+import { addDays, BOOKING_STATUS, BOOKING_STATUS_OPTIONS, longDate, startOfWeek, toDateKey, toIsoRange } from './ui';
 
 type BookingView = 'day' | 'week';
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
-function toQuery(params: ParamMap): { date: string; view: BookingView } {
+function toQuery(params: ParamMap): { date: string; view: BookingView; status: BookingStatus | null } {
   const date = params.get('date');
+  const status = params.get('status') as BookingStatus | null;
   return {
     date: date && DATE_PATTERN.test(date) ? date : toDateKey(new Date()),
     view: params.get('view') === 'week' ? 'week' : 'day',
+    // El estado se filtra en el backend (?status=); sin él vienen todas, canceladas incluidas.
+    status: status && status in BOOKING_STATUS ? status : null,
   };
 }
 
@@ -70,6 +73,7 @@ export class BookingListComponent implements OnInit {
   readonly $isLoading = computed(() => this.bookingsService.$isLoading() ?? false);
   readonly $hasError = computed(() => this.bookingsService.$error() !== undefined);
   readonly $busyIds = signal<ReadonlySet<number>>(new Set());
+  readonly statusOptions = BOOKING_STATUS_OPTIONS;
 
   readonly $weekStart = computed(() => startOfWeek(this.$query().date));
   readonly $title = computed(() => {
@@ -107,6 +111,11 @@ export class BookingListComponent implements OnInit {
     if (DATE_PATTERN.test(value)) this.navigate({ date: value });
   }
 
+  pickStatus(event: Event) {
+    const value = (event.target as HTMLSelectElement).value;
+    this.navigate({ status: value || null });
+  }
+
   openDay(date: string) {
     this.navigate({ date, view: null });
   }
@@ -125,6 +134,7 @@ export class BookingListComponent implements OnInit {
       .subscribe((result) => this.handleResult(result));
   }
 
+  // El listado ya trae contactId y tableId, pero no la nota: el detalle sigue siendo necesario para editar.
   handleEdit(booking: BookingDto) {
     this.setBusy(booking.id, true);
     this.bookingService.findById(booking.id).subscribe({
@@ -198,9 +208,9 @@ export class BookingListComponent implements OnInit {
   private load() {
     const locationId = this.$locationId();
     if (!locationId) return;
-    const { date, view } = this.$query();
+    const { date, view, status } = this.$query();
     const range = view === 'week' ? toIsoRange(startOfWeek(date), 7) : toIsoRange(date, 1);
-    this.bookingsService.load({ ...range, locationId });
+    this.bookingsService.load({ ...range, locationId, ...(status && { status }) });
   }
 
   private navigate(queryParams: Record<string, string | null>) {

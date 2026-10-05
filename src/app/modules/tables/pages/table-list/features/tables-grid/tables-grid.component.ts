@@ -18,7 +18,6 @@ export class TablesGridComponent {
   readonly $tables = input.required<TableDto[]>({ alias: 'tables' });
   readonly $sectors = input<SectorDto[]>([], { alias: 'sectors' });
   readonly isLoading = input(false, { alias: 'isLoading' });
-  readonly openingTableId = input<number | null>(null);
   readonly tableSelect = output<TableDto>();
 
   readonly $groups = computed<SectorGroup[]>(() => {

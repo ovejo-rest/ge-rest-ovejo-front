@@ -1,10 +1,11 @@
 <app-modal-card>
   <ng-template app-slot="header">
-    <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">PIN para el POS</h2>
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">{{ user.hasPin ? 'Cambiar PIN del POS' : 'Asignar PIN del POS' }}</h2>
   </ng-template>
 
   <p class="text-muted-foreground mb-4 text-sm">
-    {{ user.name }} {{ user.fatherLastName }} usará este PIN para identificarse en el POS. Si ya tenía uno, se reemplaza.
+    {{ user.name }} {{ user.fatherLastName }} usará este PIN para identificarse en el POS.
+    @if (user.hasPin) { Ya tiene un PIN asignado: el nuevo lo reemplaza. }
   </p>
 
   <form [formGroup]="form" class="space-y-3" (ngSubmit)="handleSubmit()">

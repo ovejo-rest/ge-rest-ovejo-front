@@ -44,11 +44,10 @@
       <app-button impact="light" tone="primary" shape="rounded" icon="receipt" (buttonClick)="handlePrintBill(order)">Precuenta</app-button>
       <app-button impact="light" tone="primary" shape="rounded" icon="add" (buttonClick)="handleAddItems(order)">Agregar productos</app-button>
       <app-button impact="light" tone="primary" shape="rounded" icon="edit" (buttonClick)="handleEdit(order)">Editar</app-button>
-      <span [title]="$hasPayments() ? 'Anula los pagos del pedido antes de cancelarlo' : ''">
-        <app-button impact="light" tone="danger" shape="rounded" icon="block" [disabled]="$hasPayments()" (buttonClick)="handleCancelOrder(order)">
-          Cancelar pedido
-        </app-button>
-      </span>
+      <!-- Si tiene pagos vigentes, el backend responde ORDER_HAS_PAYMENTS y se avisa con un toast -->
+      <app-button impact="light" tone="danger" shape="rounded" icon="block" (buttonClick)="handleCancelOrder(order)">
+        Cancelar pedido
+      </app-button>
     </div>
     }
   </div>

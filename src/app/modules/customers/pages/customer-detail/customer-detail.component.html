@@ -22,8 +22,8 @@
     </div>
   </div>
 
-  <!-- Indicadores (últimos 20 pedidos) -->
-  @let stats = $stats();
+  <!-- Indicadores de todo el historial (los calcula el backend) -->
+  @let stats = customer.summary;
   <div class="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
     <div class="glass rounded-xl p-4">
       <p class="text-muted-foreground text-xs">Visitas</p>
@@ -31,22 +31,22 @@
     </div>
     <div class="glass rounded-xl p-4">
       <p class="text-muted-foreground text-xs">Total gastado</p>
-      <p class="text-foreground text-2xl font-bold tabular-nums">{{ formatCurrency(stats.spent) }}</p>
+      <p class="text-foreground text-2xl font-bold tabular-nums">{{ formatCurrency(stats.totalSpent) }}</p>
     </div>
     <div class="glass rounded-xl p-4">
       <p class="text-muted-foreground text-xs">Ticket promedio</p>
-      <p class="text-foreground text-2xl font-bold tabular-nums">{{ formatCurrency(stats.averageTicket) }}</p>
+      <p class="text-foreground text-2xl font-bold tabular-nums">{{ formatCurrency(stats.avgTicket) }}</p>
     </div>
     <div class="glass rounded-xl p-4">
       <p class="text-muted-foreground text-xs">Última visita</p>
-      <p class="text-foreground text-lg font-semibold">{{ stats.lastVisit ? formatDateTime(stats.lastVisit) : '—' }}</p>
+      <p class="text-foreground text-lg font-semibold">{{ stats.lastVisitAt ? formatDateTime(stats.lastVisitAt) : '—' }}</p>
     </div>
   </div>
 
   <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
     <!-- Historial -->
     <section class="glass overflow-hidden rounded-[1rem] lg:col-span-2">
-      <h2 class="text-foreground border-b border-[var(--border)] px-4 py-3 font-semibold">Historial de pedidos</h2>
+      <h2 class="text-foreground border-b border-[var(--border)] px-4 py-3 font-semibold">Últimos pedidos</h2>
       @if (!$orders().length) {
       <p class="text-muted-foreground px-4 py-10 text-center text-sm">Todavía no tiene pedidos.</p>
       } @else {
@@ -76,7 +76,6 @@
         <div><dt class="text-muted-foreground text-xs">Dirección</dt><dd class="text-foreground">{{ customer.addressLine1 || '—' }}</dd></div>
         <div><dt class="text-muted-foreground text-xs">Comuna / ciudad</dt><dd class="text-foreground">{{ customer.city || '—' }}</dd></div>
       </dl>
-      <p class="text-muted-foreground mt-4 text-xs">Los indicadores consideran los últimos 20 pedidos.</p>
     </section>
   </div>
   } @else if ($isLoading()) {

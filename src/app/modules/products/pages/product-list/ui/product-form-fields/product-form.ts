@@ -61,7 +61,6 @@ export function toUpdateProductDto(form: ProductForm, original: ProductDto): Upd
   const { price, ...product } = toBasePayload(form);
   const variation = original.variations[0];
   return {
-    id: original.id,
     ...product,
     variations: [
       variation

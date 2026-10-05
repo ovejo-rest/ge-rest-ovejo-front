@@ -6,18 +6,18 @@ import { GetAllTablesService } from 'src/app/modules/tables/pages/table-list/dat
 import { BusinessLocationSelector } from 'src/app/modules/sectors/pages/sector-list/ui';
 import { GetAllCategoriesService } from 'src/app/modules/products/pages/categories/data-access';
 import { ProductDto } from 'src/app/modules/products/pages/product-list/data-access';
-import { getOrderErrorMessage, GetServiceStaffService } from '../order-list/data-access';
+import { GetServiceStaffService } from '../order-list/data-access';
 import { GetOrderByIdService } from '../order-detail/data-access';
 import {
   AddOrderLinesService,
   CreateOrderService,
   CustomerDto,
+  getOrderSaveErrorMessage,
   GetMenuProductsService,
   OrderProductDto,
 } from './data-access';
 import {
   addToCart,
-  buildKitchenNote,
   CartLine,
   CartNoteChange,
   changeCartQuantity,
@@ -116,8 +116,13 @@ export class OrderCreateComponent implements OnInit, OnDestroy {
     });
 
     effect(() => {
-      const status = this.createService.$error() ?? this.addLinesService.$error();
-      if (status) this.toast.show(getOrderErrorMessage(status), 'error');
+      const error = this.createService.$error();
+      if (error) this.toast.show(getOrderSaveErrorMessage(error, false), 'error');
+    });
+
+    effect(() => {
+      const error = this.addLinesService.$error();
+      if (error) this.toast.show(getOrderSaveErrorMessage(error, true), 'error');
     });
 
     effect(() => {
@@ -192,15 +197,15 @@ export class OrderCreateComponent implements OnInit, OnDestroy {
       this.toast.show(missing, 'warning');
       return;
     }
+    // Cada producto lleva su nota; la nota general solo existe al crear el pedido.
     const products: OrderProductDto[] = toOrderProducts(this.$cart());
-    const note = buildKitchenNote(this.$cart(), this.form.getRawValue().kitchenNote ?? '');
 
     if (this.mode === 'add') {
-      this.addLinesService.add({ orderId: this.$orderId()!, products, note, currentNote: this.$order()?.staffNote });
+      this.addLinesService.add({ orderId: this.$orderId()!, products });
       return;
     }
 
-    const { resTableId, resWaiterId, isKitchenOrder } = this.form.getRawValue();
+    const { resTableId, resWaiterId, isKitchenOrder, kitchenNote } = this.form.getRawValue();
     this.createService.create({
       locationId: this.$locationId()!,
       contactId: this.$customer()?.id,
@@ -208,7 +213,7 @@ export class OrderCreateComponent implements OnInit, OnDestroy {
       resTableId: resTableId ?? undefined,
       resWaiterId: resWaiterId ?? undefined,
       isKitchenOrder: !!isKitchenOrder,
-      staffNote: note || undefined,
+      staffNote: kitchenNote?.trim() || undefined,
     });
   }
 

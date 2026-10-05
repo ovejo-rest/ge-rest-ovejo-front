@@ -1,12 +1,6 @@
-@if (!$isReady()) {
-<app-waiter-login
-  [allowAnonymous]="!terminalMode()"
-  [variant]="terminalMode() ? 'screen' : 'card'"
-  [locationName]="locationName()"
-  (loggedIn)="handleLogin($event)" (continueWithoutWaiter)="handleAnonymous()" />
-} @else {
 <div class="flex flex-col gap-3">
-  <!-- Barra superior: sucursal y mesero -->
+  <!-- Barra superior: sucursal y mesero. En /pos se ve también en la pantalla de PIN: la sucursal define qué meseros aparecen -->
+  @if ($isReady() || !terminalMode()) {
   <div class="flex flex-wrap items-center gap-3">
     <h1 class="text-foreground flex items-center gap-2 text-lg font-semibold">
       <app-icon class="text-primary h-6 w-6">point_of_sale</app-icon>POS
@@ -16,6 +10,7 @@
       <app-business-location-selector (selectedLocationChange)="handleLocationChange($event)" />
     </div>
     }
+    @if ($isReady()) {
     <div class="ml-auto flex items-center gap-2">
       <span class="glass-row inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm">
         <app-icon class="h-4 w-4">badge</app-icon>{{ $waiter()?.name ?? 'Sin mesero' }}
@@ -28,8 +23,18 @@
       <button type="button" class="text-primary text-sm font-medium hover:underline" (click)="handleChangeWaiter()">Cambiar</button>
       }
     </div>
+    }
   </div>
+  }
 
+  @if (!$isReady()) {
+  <app-waiter-login
+    [allowAnonymous]="!terminalMode()"
+    [variant]="terminalMode() ? 'screen' : 'card'"
+    [locationName]="locationName()"
+    [locationId]="$locationId()"
+    (loggedIn)="handleLogin($event)" (continueWithoutWaiter)="handleAnonymous()" />
+  } @else {
   <div class="grid grid-cols-1 gap-3 lg:grid-cols-12">
     <div class="lg:col-span-3">
       <app-pos-tables-panel
@@ -37,7 +42,6 @@
         [sectors]="$sectors()"
         [loading]="$isLoadingTables()"
         [selectedTableId]="$table()?.id ?? null"
-        [openingTableId]="$openingTableId()"
         (selectTable)="handleSelectTable($event)"
         (selectCounter)="selectCounter()" />
     </div>
@@ -75,5 +79,5 @@
         (collect)="handleCollect()" />
     </div>
   </div>
+  }
 </div>
-}

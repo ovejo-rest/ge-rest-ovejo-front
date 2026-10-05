@@ -3,6 +3,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { interval, map } from 'rxjs';
 import { EmptyStateComponent, IconComponent, ToastService } from 'src/ui';
+import { readApiError } from 'src/app/core/utils';
 import { GetKitchenOrdersService, GetStationsService, KitchenOrderDto, MarkOrderCookedService } from './data-access';
 import { KitchenTicketComponent } from './features';
 
@@ -70,15 +71,17 @@ export class KitchenDisplayComponent implements OnInit {
 
   handleMarkReady(order: KitchenOrderDto) {
     this.setBusy(order.transactionId, true);
-    this.markCookedService.markCooked(order.transactionId).subscribe({
+    // Con una estación elegida solo se marcan sus líneas; el resto del pedido sigue en las otras pantallas.
+    this.markCookedService.markCooked(order.transactionId, this.$stationId()).subscribe({
       next: () => {
         this.setBusy(order.transactionId, false);
         this.toast.show(`${order.tableName ?? order.invoiceNo} listo para servir`, 'success');
         this.refresh();
       },
-      error: () => {
+      error: (error: unknown) => {
         this.setBusy(order.transactionId, false);
-        this.toast.show('No se pudo marcar la comanda como lista', 'error');
+        this.toast.show(this.markCookedErrorMessage(error), 'error');
+        this.refresh();
       },
     });
   }
@@ -95,6 +98,17 @@ export class KitchenDisplayComponent implements OnInit {
 
   formatTime(date: Date | null | undefined): string {
     return date ? date.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '—';
+  }
+
+  private markCookedErrorMessage(error: unknown): string {
+    switch (readApiError(error).status) {
+      case 404:
+        return 'La comanda o la estación ya no existen';
+      case 409:
+        return 'El pedido fue anulado';
+      default:
+        return 'No se pudo marcar la comanda como lista';
+    }
   }
 
   private setBusy(id: number, busy: boolean) {

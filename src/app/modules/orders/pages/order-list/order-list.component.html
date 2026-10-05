@@ -22,7 +22,13 @@
     title="Aún no hay pedidos"
     description="Los pedidos que se tomen en las mesas o en el POS aparecerán aquí." />
   } @else {
-  <app-filters-order-table [staff]="$staff()" [waiter]="$query().waiter" (waiterChange)="handleWaiterChange($event)" />
+  <app-filters-order-table
+    [staff]="$staff()"
+    [locations]="$locations()"
+    [tables]="$tables()"
+    [filters]="$filters()"
+    (filtersChange)="handleFiltersChange($event)"
+    (clearFilters)="handleClearFilters()" />
 
   <app-orders-table
     [orders]="$orders()"
@@ -30,6 +36,6 @@
     [pagination]="$pagination()"
     [hasFilters]="$hasFilters()"
     (pageChange)="handlePageChange($event)"
-    (clearFilters)="handleWaiterChange(null)" />
+    (clearFilters)="handleClearFilters()" />
   }
 </div>

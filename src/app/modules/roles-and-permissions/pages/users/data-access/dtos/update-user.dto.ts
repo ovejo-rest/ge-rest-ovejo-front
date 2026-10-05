@@ -5,5 +5,6 @@ export type UpdateUserDto = Readonly<{
   motherLastName?: string;
   email?: string;
   statusId?: number;
-  branchId?: number;
+  // null = quitar la sucursal.
+  branchId?: number | null;
 }>;

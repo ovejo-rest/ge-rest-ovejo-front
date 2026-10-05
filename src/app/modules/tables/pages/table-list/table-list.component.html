@@ -58,7 +58,7 @@
   </div>
   } @else if (viewMode === 'grid') {
   <app-card>
-    <app-tables-grid [tables]="tables" [sectors]="sectors" [isLoading]="isLoading" [openingTableId]="$openingTableId()" (tableSelect)="onTableSelected($event)" />
+    <app-tables-grid [tables]="tables" [sectors]="sectors" [isLoading]="isLoading" (tableSelect)="onTableSelected($event)" />
   </app-card>
   } @else {
   <app-tables-table [tables]="tables" [isLoading]="isLoading" (retryData)="retry()" />

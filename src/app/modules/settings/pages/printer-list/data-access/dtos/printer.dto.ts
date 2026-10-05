@@ -10,6 +10,8 @@ export type PrinterDto = Readonly<{
   ipAddress: string | null;
   port: number | null;
   status: PrinterStatus;
+  // Última vez que una estación de impresión pidió sus comandas (null: nunca).
+  lastSeenAt: string | null;
 }>;
 
 export type CreatePrinterDto = Readonly<{

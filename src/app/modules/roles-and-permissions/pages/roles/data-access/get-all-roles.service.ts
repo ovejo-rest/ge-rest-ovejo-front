@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpStatusCode, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, catchError, delay, EMPTY, map, Subject, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, EMPTY, map, Subject, switchMap, tap } from 'rxjs';
 import { GetAllRolesDto } from './dtos';
 import { StandardizedPagination } from 'src/app/core/standarized-response';
 import { ApiPathEnum } from 'src/environments';
@@ -52,7 +52,6 @@ export class GetAllRolesService {
               return EMPTY;
             }),
             tap(() => this.#isLoading$.next(false)),
-            map((response) => ({ ...response, data: sortRoles(response.data) })),
           );
       }),
     ),
@@ -61,15 +60,4 @@ export class GetAllRolesService {
   retry() {
     this.#params$.next({ ...this.#params$.getValue() });
   }
-}
-
-/**
- * El backend no ordena la lista (BACKEND-REQUESTS #26): primero los roles propios,
- * del más nuevo al más antiguo, y al final los predeterminados.
- */
-function sortRoles(roles: GetAllRolesDto[]): GetAllRolesDto[] {
-  return [...roles].sort((a, b) => {
-    if (!!a.isGlobal !== !!b.isGlobal) return a.isGlobal ? 1 : -1;
-    return (b.createdAt ?? '').localeCompare(a.createdAt ?? '') || b.id - a.id;
-  });
 }

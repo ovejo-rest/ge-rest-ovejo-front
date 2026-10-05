@@ -5,9 +5,12 @@
         <tr class="text-muted-foreground border-b border-[var(--border)] text-left text-xs font-medium uppercase tracking-wider">
           <th class="px-4 py-3">Pedido</th>
           <th class="px-4 py-3">Mesa</th>
-          <th class="hidden px-4 py-3 md:table-cell">Mesero</th>
+          <th class="hidden px-4 py-3 md:table-cell">Cliente</th>
+          <th class="hidden px-4 py-3 lg:table-cell">Mesero</th>
           <th class="hidden px-4 py-3 sm:table-cell">Fecha</th>
-          <th class="px-4 py-3 text-center">Cocina</th>
+          <th class="px-4 py-3 text-center">Estado</th>
+          <th class="hidden px-4 py-3 text-center xl:table-cell">Cocina</th>
+          <th class="px-4 py-3 text-right">Total</th>
           <th class="px-4 py-3"><span class="sr-only">Ver detalle</span></th>
         </tr>
       </thead>
@@ -17,8 +20,11 @@
           <td class="px-4 py-3"><app-skeleton size="xs" style="width: 110px" /></td>
           <td class="px-4 py-3"><app-skeleton size="xs" style="width: 70px" /></td>
           <td class="hidden px-4 py-3 md:table-cell"><app-skeleton size="xs" style="width: 120px" /></td>
+          <td class="hidden px-4 py-3 lg:table-cell"><app-skeleton size="xs" style="width: 120px" /></td>
           <td class="hidden px-4 py-3 sm:table-cell"><app-skeleton size="xs" style="width: 100px" /></td>
-          <td class="px-4 py-3"><div class="flex justify-center"><app-skeleton size="xs" style="width: 80px" /></div></td>
+          <td class="px-4 py-3"><div class="flex justify-center"><app-skeleton size="xs" style="width: 90px" /></div></td>
+          <td class="hidden px-4 py-3 xl:table-cell"><div class="flex justify-center"><app-skeleton size="xs" style="width: 80px" /></div></td>
+          <td class="px-4 py-3"><div class="flex justify-end"><app-skeleton size="xs" style="width: 70px" /></div></td>
           <td class="px-4 py-3"><div class="flex justify-end"><app-skeleton size="sm" style="width: 36px" /></div></td>
         </tr>
         } } @else { @for (order of orders(); track order.transactionId) {
@@ -30,14 +36,31 @@
             <p class="text-muted-foreground text-xs sm:hidden">{{ formatRelative(order.orderDate) }}</p>
           </td>
           <td class="text-foreground px-4 py-3 text-sm">{{ order.tableName ?? 'Sin mesa' }}</td>
-          <td class="text-muted-foreground hidden px-4 py-3 text-sm md:table-cell">{{ order.waiterName ?? '—' }}</td>
+          <td class="hidden px-4 py-3 text-sm md:table-cell">
+            @if (order.contactId && order.customerName) {
+            <a [routerLink]="['/customers', order.contactId]" class="text-foreground hover:text-primary">{{ order.customerName }}</a>
+            } @else {
+            <span class="text-muted-foreground">{{ order.customerName ?? '—' }}</span>
+            }
+          </td>
+          <td class="text-muted-foreground hidden px-4 py-3 text-sm lg:table-cell">{{ order.waiterName ?? '—' }}</td>
           <td class="hidden px-4 py-3 sm:table-cell">
             <p class="text-foreground text-sm">{{ formatRelative(order.orderDate) }}</p>
             <p class="text-muted-foreground text-xs">{{ formatDateTime(order.orderDate) }}</p>
           </td>
-          <td class="px-4 py-3 text-center">
+          <td class="px-4 py-3">
+            <div class="flex flex-col items-center gap-1">
+              <app-status-badge [map]="orderStatus" [status]="order.status" />
+              <!-- El estado de pago de un pedido cancelado no aporta -->
+              @if (order.status !== 'CANCELLED') {
+              <app-status-badge [map]="paymentStatus" [status]="order.paymentStatus" />
+              }
+            </div>
+          </td>
+          <td class="hidden px-4 py-3 text-center xl:table-cell">
             <app-status-badge [map]="kitchenStatus" [status]="order.resOrderStatus" fallback="Sin cocina" />
           </td>
+          <td class="text-foreground px-4 py-3 text-right text-sm font-medium tabular-nums">{{ formatCurrency(order.finalTotal) }}</td>
           <td class="px-4 py-3 text-right">
             <a
               [routerLink]="['/orders', order.transactionId]"
@@ -50,7 +73,7 @@
         </tr>
         } @empty {
         <tr>
-          <td colspan="6" class="px-4 py-12 text-center">
+          <td colspan="9" class="px-4 py-12 text-center">
             <p class="text-foreground font-medium">Sin resultados</p>
             <p class="text-muted-foreground mt-1 text-sm">No hay pedidos que coincidan con los filtros.</p>
             @if (hasFilters()) {

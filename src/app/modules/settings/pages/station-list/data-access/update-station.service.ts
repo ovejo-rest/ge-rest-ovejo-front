@@ -17,12 +17,13 @@ export class UpdateStationService {
   readonly $error = toSignal(this.#error$);
   readonly $success = toSignal(this.#success$);
 
-  update(dto: UpdateStationDto) {
+  // El id va solo en la URL; el body lleva únicamente los cambios.
+  update({ id, ...changes }: UpdateStationDto) {
     this.#isLoading$.next(true);
     this.#error$.next(undefined);
 
     this.#httpClient
-      .patch(`${ApiPathEnum.RESTAURANT}/stations/${dto.id}`, dto)
+      .patch(`${ApiPathEnum.RESTAURANT}/stations/${id}`, changes)
       .pipe(
         tap(() => this.#isLoading$.next(false)),
         catchError((error: HttpErrorResponse) => {
