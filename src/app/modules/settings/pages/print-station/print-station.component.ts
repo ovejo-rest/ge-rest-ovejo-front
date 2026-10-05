@@ -4,7 +4,7 @@ import { firstValueFrom, interval } from 'rxjs';
 import { ButtonComponent, HeaderDashboardComponent, ToastService } from 'src/ui';
 import { kitchenTicketHtml, PaperWidth, printHtml, testTicketHtml } from 'src/app/shared/utils/printing';
 import { GetAllPrintersService } from '../printer-list/data-access';
-import { PendingPrintJobDto, PrintJobsService, PrintStationConfigService } from './data-access';
+import { getPrintAgentId, PendingPrintJobDto, PrintJobsService, PrintStationConfigService } from './data-access';
 import { PrintLogComponent, PrintLogEntry, PrintSetupGuideComponent } from './ui';
 
 const POLL_MS = 4000;
@@ -38,6 +38,8 @@ export class PrintStationComponent implements OnInit {
   readonly $printedCount = signal(0);
   readonly $failedCount = signal(0);
   readonly paperWidths: PaperWidth[] = [80, 58];
+  // Mismo id en cada recarga: así el backend sabe qué comandas reservó este equipo.
+  readonly agentId = getPrintAgentId();
 
   #wakeLock: WakeLockSentinelLike | null = null;
 
@@ -88,17 +90,22 @@ export class PrintStationComponent implements OnInit {
     }
   }
 
-  // Revisa la cola y procesa las comandas una por una, en orden.
+  // Reserva las comandas de la cola y las procesa una por una, en orden. Al reservarlas, varios
+  // equipos pueden atender la misma impresora sin imprimir dos veces la misma comanda.
   async poll() {
     const printer = this.$printer();
     if (!this.$isRunning() || !printer || this.$isProcessing()) return;
     this.$isProcessing.set(true);
     try {
-      const jobs = await firstValueFrom(this.printJobs.findPending(printer.id));
+      const jobs = await firstValueFrom(this.printJobs.claim(printer.id, this.agentId));
       this.$connectionError.set(false);
       this.$lastCheck.set(new Date());
-      for (const job of jobs) {
-        if (!this.$isRunning()) break;
+      for (const [index, job] of jobs.entries()) {
+        if (!this.$isRunning()) {
+          // Detenida a mitad de camino: se liberan las reservadas para que otro equipo las tome ya.
+          await this.release(jobs.slice(index));
+          break;
+        }
         await this.printJob(job);
       }
     } catch {
@@ -113,18 +120,30 @@ export class PrintStationComponent implements OnInit {
   }
 
   private async printJob(job: PendingPrintJobDto) {
-    const title = `${job.tableName ?? 'Sin mesa'} · ${job.invoiceNo ?? '#' + job.id}`;
-    const detail = `${job.stationName ?? 'Comanda'} · ${job.items.length} ${job.items.length === 1 ? 'producto' : 'productos'}`;
+    // Sin pedido es la prueba enviada desde Impresoras.
+    const isTest = job.transactionId === null;
+    const title = isTest ? 'Prueba de impresión' : `${job.tableName ?? 'Sin mesa'} · ${job.invoiceNo ?? '#' + job.id}`;
+    const detail = isTest
+      ? 'Enviada desde Impresoras'
+      : `${job.stationName ?? 'Comanda'} · ${job.items.length} ${job.items.length === 1 ? 'producto' : 'productos'}`;
     try {
-      await printHtml(kitchenTicketHtml(job), this.$config().paperWidth);
+      const html = isTest ? testTicketHtml(this.$printer()?.name ?? 'Predeterminada del equipo') : kitchenTicketHtml(job);
+      await printHtml(html, this.$config().paperWidth);
       await firstValueFrom(this.printJobs.updateStatus({ id: job.id, status: 'printed' }));
       this.$printedCount.update((count) => count + 1);
-      this.addLog({ title, detail, result: 'printed' });
+      this.addLog({ title, detail, result: isTest ? 'test' : 'printed' });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error al imprimir';
       await firstValueFrom(this.printJobs.updateStatus({ id: job.id, status: 'failed', errorMessage: message })).catch(() => null);
       this.$failedCount.update((count) => count + 1);
       this.addLog({ title, detail: message, result: 'failed' });
+    }
+  }
+
+  private async release(jobs: PendingPrintJobDto[]) {
+    for (const job of jobs) {
+      // Si falla, el backend la libera solo cuando vence la reserva (2 minutos).
+      await firstValueFrom(this.printJobs.updateStatus({ id: job.id, status: 'pending' })).catch(() => null);
     }
   }
 

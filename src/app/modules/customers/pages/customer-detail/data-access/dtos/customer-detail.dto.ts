@@ -7,6 +7,14 @@ export type CustomerRecentOrderDto = Readonly<{
   createdAt: string;
 }>;
 
+// Indicadores de todo el historial (pedidos no cancelados).
+export type CustomerSummaryDto = Readonly<{
+  visits: number;
+  totalSpent: number;
+  avgTicket: number;
+  lastVisitAt: string | null;
+}>;
+
 export type CustomerDetailDto = Readonly<{
   id: number;
   name: string;
@@ -16,12 +24,13 @@ export type CustomerDetailDto = Readonly<{
   addressLine1: string | null;
   city: string | null;
   createdAt: string;
+  summary: CustomerSummaryDto;
   // Últimos 20 pedidos.
   recentOrders: CustomerRecentOrderDto[];
 }>;
 
+// El id va en la URL (PUT /contacts/:id), no en el body.
 export type UpdateCustomerDto = Readonly<{
-  id: number;
   name?: string;
   mobile?: string;
   email?: string;

@@ -55,15 +55,12 @@ export function quantitiesByProduct(cart: CartLine[]): Record<number, number> {
   }, {});
 }
 
+// La nota de cada línea viaja en su propio producto (sellLineNote en el backend).
 export function toOrderProducts(cart: CartLine[]): OrderProductDto[] {
-  return cart.map(({ productId, variationId, quantity }) => ({ productId, variationId, quantity }));
-}
-
-/**
- * El backend aún no acepta notas por producto (BACKEND-REQUESTS.md): se juntan en la nota del pedido
- * (staffNote), que es la que se imprime en la comanda. Ej.: "1x Completo: sin palta".
- */
-export function buildKitchenNote(cart: CartLine[], generalNote: string): string {
-  const lines = cart.filter((line) => line.note).map((line) => `${line.quantity}x ${line.name}: ${line.note}`);
-  return [...lines, generalNote.trim()].filter(Boolean).join('\n');
+  return cart.map(({ productId, variationId, quantity, note }) => ({
+    productId,
+    variationId,
+    quantity,
+    ...(note ? { note } : {}),
+  }));
 }

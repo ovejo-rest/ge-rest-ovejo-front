@@ -1,4 +1,4 @@
-// Ítem común del listado: sale de GET /contacts?type=customer (sin búsqueda) o de GET /customers?q= (con búsqueda).
+// Ítem del listado (GET /customers, con o sin búsqueda).
 export type CustomerListItemDto = Readonly<{
   id: number;
   name: string;

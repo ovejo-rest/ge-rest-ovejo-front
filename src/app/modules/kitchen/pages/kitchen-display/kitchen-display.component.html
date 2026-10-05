@@ -51,7 +51,6 @@
       [order]="order"
       [now]="$now()"
       [busy]="$busyIds().has(order.transactionId)"
-      [stationSelected]="$stationId() !== null"
       (markReady)="handleMarkReady($event)" />
     }
   </div>

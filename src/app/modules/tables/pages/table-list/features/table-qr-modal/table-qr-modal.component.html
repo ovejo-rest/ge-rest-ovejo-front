@@ -29,7 +29,8 @@
     <app-icon class="text-muted-foreground h-12 w-12">qr_code_2</app-icon>
     <p class="text-foreground font-medium">QR no disponible</p>
     <p class="text-muted-foreground max-w-sm text-sm">
-      {{ $qrCode() ? 'El sistema aún no tiene configurada la dirección de la carta digital (QR_BASE_URL).' : 'Esta mesa todavía no tiene un código QR. Genera uno para empezar.' }}
+      <!-- Solo sin qrUrl: o la mesa no tiene código, o el backend no entregó el enlace de la carta -->
+      {{ $qrCode() ? 'El enlace de la carta digital aún no está disponible. Contacta a soporte.' : 'Esta mesa todavía no tiene un código QR. Genera uno para empezar.' }}
     </p>
   </div>
   }

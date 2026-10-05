@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ButtonComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
 import { CreateCustomerService } from 'src/app/modules/orders/pages/order-create/data-access';
+import { ApiErrorCode, readApiError } from 'src/app/core/utils';
 
 // created: id del cliente nuevo · existing: id del cliente que ya tenía ese teléfono.
 export type CreateCustomerModalResult = Readonly<{ kind: 'created' | 'existing'; id: number }>;
@@ -42,9 +43,10 @@ export class CreateCustomerModalComponent {
       next: (customer) => this.dialogRef.close({ kind: 'created', id: customer.id }),
       error: (error: HttpErrorResponse) => {
         this.$isSaving.set(false);
-        const existing = this.createService.getExistingCustomer(error);
-        if (existing) {
-          this.$existing.set(existing);
+        // 409 con el cliente que ya tiene ese teléfono en `details` ({ customerId, name }).
+        const { code, details } = readApiError(error);
+        if (code === ApiErrorCode.CUSTOMER_PHONE_EXISTS && typeof details['customerId'] === 'number') {
+          this.$existing.set({ id: details['customerId'], name: typeof details['name'] === 'string' ? details['name'] : '' });
           return;
         }
         this.toast.show('No se pudo crear el cliente', 'error');

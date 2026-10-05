@@ -31,6 +31,7 @@
   *appCheckPermission="'users:get-all-users'"
   [isLoading]="isLoading"
   [users]="usersResp?.data ?? []"
+  [branchNames]="$branchNames()"
   [pagination]="usersResp?.pagination ?? { page: 1, perPage: 10, totalItems: 0, totalPages: 0 }"
   (pageChange)="onPageChange($event)"
   (perPageChange)="onPerPageChange($event)"

@@ -1,7 +1,6 @@
-import { KitchenStatus } from '../../../order-list/data-access';
+import { KitchenStatus, OrderStatus, PaymentStatus } from '../../../order-list/data-access';
 
-export type OrderStatus = 'ORDERED' | 'FINAL' | 'CANCELLED';
-export type PaymentStatus = 'due' | 'partial' | 'paid';
+export type { OrderStatus, PaymentStatus };
 export type DiscountType = 'fixed' | 'percentage';
 
 export type OrderLineDto = Readonly<{

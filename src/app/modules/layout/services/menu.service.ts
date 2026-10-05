@@ -53,7 +53,9 @@ export class MenuService implements OnDestroy {
         this._pagesMenu().forEach((menu) => {
           let activeGroup = false;
           menu.items.forEach((subMenu) => {
-            const active = this.isActive(subMenu.route);
+            // Activo si coincide su ruta o la de alguno de sus hijos (p. ej. /orders está dentro de POS).
+            const active =
+              this.isActive(subMenu.route) || !!subMenu.children?.some((child) => this.isActive(child.route));
             subMenu.expanded = active;
             subMenu.active = active;
             if (active) activeGroup = true;

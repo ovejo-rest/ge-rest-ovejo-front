@@ -1,11 +1,56 @@
-<div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-  <select aria-label="Filtrar por mesero" class="glass-input rounded-md px-3 py-2 sm:w-64" (change)="onWaiterChange($event)">
-    <option value="" [selected]="!waiter()">Todos los meseros</option>
-    @for (member of staff(); track member.code) {
-    <option [value]="member.code" [selected]="member.code === waiter()">{{ member.name }} {{ member.fatherLastName }}</option>
+@let current = filters();
+<div class="mb-4 flex flex-wrap items-end gap-3">
+  <select aria-label="Filtrar por estado" class="glass-input rounded-md px-3 py-2 text-sm" (change)="onStatusChange($event)">
+    <option value="" [selected]="!current.status">Todos los estados</option>
+    @for (option of statusOptions; track option.value) {
+    <option [value]="option.value" [selected]="option.value === current.status">{{ option.label }}</option>
     }
   </select>
-  @if (waiter()) {
-  <button type="button" class="text-primary text-sm font-medium hover:underline" (click)="waiterChange.emit(null)">Limpiar filtros</button>
+
+  <select aria-label="Filtrar por estado de pago" class="glass-input rounded-md px-3 py-2 text-sm" (change)="onPaymentChange($event)">
+    <option value="" [selected]="!current.payment">Todos los pagos</option>
+    @for (option of paymentOptions; track option.value) {
+    <option [value]="option.value" [selected]="option.value === current.payment">{{ option.label }}</option>
+    }
+  </select>
+
+  <select aria-label="Filtrar por mesero" class="glass-input rounded-md px-3 py-2 text-sm sm:w-56" (change)="onWaiterChange($event)">
+    <option value="" [selected]="!current.waiter">Todos los meseros</option>
+    @for (member of staff(); track member.code) {
+    <option [value]="member.code" [selected]="member.code === current.waiter">{{ member.name }} {{ member.fatherLastName }}</option>
+    }
+  </select>
+
+  <!-- Con una sola sucursal el filtro no aporta -->
+  @if (locations().length > 1) {
+  <select aria-label="Filtrar por sucursal" class="glass-input rounded-md px-3 py-2 text-sm" (change)="onLocationChange($event)">
+    <option value="" [selected]="!current.location">Todas las sucursales</option>
+    @for (location of locations(); track location.id) {
+    <option [value]="location.id" [selected]="location.id === current.location">{{ location.name }}</option>
+    }
+  </select>
+  }
+
+  <!-- Las mesas dependen de la sucursal elegida -->
+  @if (current.location && tables().length) {
+  <select aria-label="Filtrar por mesa" class="glass-input rounded-md px-3 py-2 text-sm" (change)="onTableChange($event)">
+    <option value="" [selected]="!current.table">Todas las mesas</option>
+    @for (table of tables(); track table.id) {
+    <option [value]="table.id" [selected]="table.id === current.table">{{ table.name }}</option>
+    }
+  </select>
+  }
+
+  <label class="text-muted-foreground flex flex-col gap-1 text-xs">
+    Desde
+    <input type="date" class="glass-input rounded-md px-3 py-1.5 text-sm" [value]="current.from ?? ''" [max]="current.to ?? ''" (change)="onFromChange($event)" />
+  </label>
+  <label class="text-muted-foreground flex flex-col gap-1 text-xs">
+    Hasta
+    <input type="date" class="glass-input rounded-md px-3 py-1.5 text-sm" [value]="current.to ?? ''" [min]="current.from ?? ''" (change)="onToChange($event)" />
+  </label>
+
+  @if ($hasFilters()) {
+  <button type="button" class="text-primary py-2 text-sm font-medium hover:underline" (click)="clearFilters.emit()">Limpiar filtros</button>
   }
 </div>

@@ -45,12 +45,13 @@
       (noteChange)="noteChange.emit($event)" />
   </div>
 
-  @if (cart().length) {
+  <!-- Nota general solo al abrir la cuenta: al agregar productos, cada uno lleva su propia nota -->
+  @if (cart().length && !order()) {
   <textarea
     rows="2"
     maxlength="300"
-    placeholder="Nota para cocina (opcional)"
-    aria-label="Nota para cocina"
+    placeholder="Nota general del pedido (opcional)"
+    aria-label="Nota general del pedido"
     class="glass-input w-full rounded-md px-3 py-2 text-sm"
     [value]="kitchenNote()"
     (input)="kitchenNoteChange.emit($any($event.target).value)"></textarea>

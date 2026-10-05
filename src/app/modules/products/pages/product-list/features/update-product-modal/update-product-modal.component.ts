@@ -64,7 +64,7 @@ export class UpdateProductModalComponent implements OnDestroy {
     this.#isSaving.set(true);
     try {
       const imageFileId = await this.#upload.resolveSelection(this.#image, 'products');
-      this.updateService.update({
+      this.updateService.update(this.product.id, {
         ...toUpdateProductDto(this.form, this.product),
         ...(imageFileId !== undefined ? { imageFileId } : {}),
       });

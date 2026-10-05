@@ -8,9 +8,12 @@ export type TableDto = Readonly<{
   capacity: number;
   status: TableStatus;
   qrCode: string | null;
-  // URL que se codifica en el QR (null si el backend no tiene QR_BASE_URL configurado).
+  // URL de la carta digital que se codifica en el QR (ej. https://app.redom.cl/carta/{qrCode}); null si no hay.
   qrUrl: string | null;
   sectorId: number | null;
+  // Pedido abierto más reciente de la mesa (el que se abre al tocarla) y todos los abiertos.
+  currentTransactionId: number | null;
+  openTransactionIds: number[];
 }>;
 
 export type CreateTableDto = Readonly<{

@@ -1,23 +1,31 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { ApiErrorCode, readApiError } from 'src/app/core/utils';
 
-// Traduce las reglas de negocio del backend (vienen en inglés).
+// Traduce las reglas de negocio del backend por su código; capacidad y personas vienen en `details`.
 export function getBookingErrorMessage(error: HttpErrorResponse): string {
-  const raw = error.error?.message;
-  const message = Array.isArray(raw) ? raw.join(' ') : String(raw ?? '');
-  const capacity = /seats (\d+) people and the booking is for (\d+)/.exec(message);
-  if (capacity) return `La mesa es para ${capacity[1]} personas y la reserva es para ${capacity[2]}.`;
-  if (message.includes('outside the opening hours')) return 'La reserva queda fuera del horario de atención.';
-  if (message.includes('table already has an overlapping')) return 'La mesa ya tiene una reserva en ese horario.';
-  if (message.includes('contact already has an overlapping')) return 'El cliente ya tiene otra reserva a esa hora.';
-  if (message.includes('end after it starts')) return 'La reserva debe terminar después de empezar.';
-  if (message.includes('Table not found')) return 'La mesa no pertenece a esa sucursal.';
+  const { code, details } = readApiError(error);
+  switch (code) {
+    case ApiErrorCode.BOOKING_TABLE_CAPACITY:
+      return typeof details['capacity'] === 'number' && typeof details['partySize'] === 'number'
+        ? `La mesa es para ${details['capacity']} personas y la reserva es para ${details['partySize']}.`
+        : 'La mesa no tiene capacidad para esa cantidad de personas.';
+    case ApiErrorCode.BOOKING_OUTSIDE_HOURS:
+      return 'La reserva queda fuera del horario de atención.';
+    case ApiErrorCode.BOOKING_TABLE_TAKEN:
+      return 'La mesa ya tiene una reserva en ese horario.';
+    case ApiErrorCode.BOOKING_CONTACT_OVERLAP:
+      return 'El cliente ya tiene otra reserva a esa hora.';
+    case ApiErrorCode.BOOKING_INVALID_DATES:
+      return 'La reserva debe terminar después de empezar.';
+  }
   switch (error.status) {
     case HttpStatusCode.BadRequest:
       return 'Revisa los datos de la reserva.';
     case HttpStatusCode.Forbidden:
       return 'No tienes permiso para esta acción.';
     case HttpStatusCode.NotFound:
-      return 'La reserva, el cliente o la sucursal no existen.';
+      // Sin código propio: la mesa no es de la sucursal, o no existen la reserva, el cliente o la sucursal.
+      return 'La reserva, el cliente, la mesa o la sucursal no existen.';
     case HttpStatusCode.Conflict:
       return 'No hay disponibilidad para ese horario.';
     default:

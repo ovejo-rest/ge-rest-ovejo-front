@@ -3,7 +3,15 @@ import { RouterLink } from '@angular/router';
 import { PaginationMeta } from 'src/app/core/standarized-response/standardized-pagination/pagination-meta.dto';
 import { IconComponent, PaginationTableComponent, SkeletonComponent } from 'src/ui';
 import { OrderSummaryDto } from '../../data-access';
-import { formatDateTime, formatRelative, KITCHEN_STATUS, StatusBadgeComponent } from '../../ui';
+import {
+  formatCurrency,
+  formatDateTime,
+  formatRelative,
+  KITCHEN_STATUS,
+  ORDER_STATUS,
+  PAYMENT_STATUS,
+  StatusBadgeComponent,
+} from '../../ui';
 
 @Component({
   selector: 'app-orders-table',
@@ -22,6 +30,9 @@ export class OrdersTableComponent {
   readonly clearFilters = output<void>();
 
   readonly kitchenStatus = KITCHEN_STATUS;
+  readonly orderStatus = ORDER_STATUS;
+  readonly paymentStatus = PAYMENT_STATUS;
+  readonly formatCurrency = formatCurrency;
   readonly skeletonRows = [1, 2, 3, 4, 5];
   readonly formatDateTime = formatDateTime;
   readonly formatRelative = formatRelative;

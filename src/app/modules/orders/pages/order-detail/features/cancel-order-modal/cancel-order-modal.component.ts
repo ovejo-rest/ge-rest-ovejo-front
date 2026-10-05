@@ -30,9 +30,9 @@ export class CancelOrderModalComponent implements OnDestroy {
     });
 
     effect(() => {
-      const status = this.cancelService.$error();
-      if (status) {
-        this.toast.show(getOrderErrorMessage(status), 'error');
+      const error = this.cancelService.$error();
+      if (error) {
+        this.toast.show(getOrderErrorMessage(error), 'error');
       }
     });
   }

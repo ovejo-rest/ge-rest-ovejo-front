@@ -36,7 +36,6 @@
       [class]="statusClasses(table.status)"
       [class.ring-2]="selectedTableId() === table.id"
       [class.ring-primary]="selectedTableId() === table.id"
-      [class.animate-pulse]="openingTableId() === table.id"
       [disabled]="table.status === 'blocked'"
       [attr.aria-pressed]="selectedTableId() === table.id"
       (click)="selectTable.emit(table)">

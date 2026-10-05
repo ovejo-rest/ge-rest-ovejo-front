@@ -1,12 +1,10 @@
 import { HttpClient, HttpErrorResponse, HttpParams, HttpStatusCode } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, catchError, EMPTY, map, Subject, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, EMPTY, Subject, switchMap, tap } from 'rxjs';
 import { StandardizedPagination } from 'src/app/core/standarized-response';
 import { ApiPathEnum } from 'src/environments';
 import { CustomerFiltersDto, CustomerListItemDto } from './dtos';
-
-type ContactItem = Readonly<{ id: number; name: string | null; firstName: string | null; lastName: string | null; mobile: string; email: string | null }>;
 
 @Injectable({ providedIn: 'root' })
 export class GetCustomersService {
@@ -25,28 +23,10 @@ export class GetCustomersService {
       tap(() => this.#isLoading$.next(true)),
       tap(() => this.#error$.next(undefined)),
       switchMap((filters) => {
-        const params = new HttpParams().set('page', filters.page).set('perPage', filters.perPage);
-        // GET /customers exige texto de búsqueda; sin búsqueda se listan los contactos tipo cliente.
-        const request = filters.q
-          ? this.#httpClient.get<StandardizedPagination<CustomerListItemDto>>(`${ApiPathEnum.RESTAURANT}/customers`, {
-              params: params.set('q', filters.q),
-            })
-          : this.#httpClient
-              .get<StandardizedPagination<ContactItem>>(`${ApiPathEnum.RESTAURANT}/contacts`, {
-                params: params.set('type', 'customer'),
-              })
-              .pipe(
-                map(({ data, pagination }) => ({
-                  pagination,
-                  data: data.map((contact) => ({
-                    id: contact.id,
-                    name: contact.name ?? ([contact.firstName, contact.lastName].filter(Boolean).join(' ') || '—'),
-                    mobile: contact.mobile,
-                    email: contact.email,
-                  })),
-                })),
-              );
-        return request.pipe(
+        // GET /customers: con `q` busca por nombre o teléfono; sin él lista todos los clientes.
+        let params = new HttpParams().set('page', filters.page).set('perPage', filters.perPage);
+        if (filters.q) params = params.set('q', filters.q);
+        return this.#httpClient.get<StandardizedPagination<CustomerListItemDto>>(`${ApiPathEnum.RESTAURANT}/customers`, { params }).pipe(
           tap(() => this.#isLoading$.next(false)),
           catchError((error: HttpErrorResponse) => {
             this.#error$.next(error.status);
