@@ -1,0 +1,33 @@
+<app-modal-card>
+  <ng-template app-slot="header">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Nuevo cliente</h2>
+  </ng-template>
+
+  <form [formGroup]="form" class="space-y-4" (ngSubmit)="handleSubmit()">
+    <div>
+      <label for="customer-name" class="text-foreground mb-1 block text-sm font-medium">Nombre *</label>
+      <input id="customer-name" formControlName="name" autocomplete="name" [class]="inputClass" [class.border-red-500]="form.controls.name.invalid && form.controls.name.touched" />
+    </div>
+    <div>
+      <label for="customer-mobile" class="text-foreground mb-1 block text-sm font-medium">Teléfono *</label>
+      <input id="customer-mobile" type="tel" inputmode="tel" formControlName="mobile" placeholder="+56 9 1234 5678" [class]="inputClass" [class.border-red-500]="form.controls.mobile.invalid && form.controls.mobile.touched" />
+    </div>
+    <div>
+      <label for="customer-email" class="text-foreground mb-1 block text-sm font-medium">Email</label>
+      <input id="customer-email" type="email" formControlName="email" autocomplete="email" placeholder="Opcional" [class]="inputClass" [class.border-red-500]="form.controls.email.invalid && form.controls.email.touched" />
+    </div>
+
+    @if ($existing(); as existing) {
+    <button type="button" class="w-full rounded-md bg-amber-500/15 px-3 py-2 text-left text-sm text-amber-700" (click)="openExisting(existing.id)">
+      Ya existe <b>{{ existing.name || 'un cliente' }}</b> con ese teléfono. <span class="font-semibold underline">Ver ficha</span>
+    </button>
+    }
+  </form>
+
+  <ng-template app-slot="footer">
+    <div class="flex justify-end gap-3">
+      <app-button type="button" impact="light" [disabled]="$isSaving()" (buttonClick)="handleCancel()">Cancelar</app-button>
+      <app-button type="button" impact="bold" [disabled]="$isSaving()" [isLoading]="$isSaving()" (buttonClick)="handleSubmit()">Crear cliente</app-button>
+    </div>
+  </ng-template>
+</app-modal-card>

@@ -1,0 +1,34 @@
+@let o = order();
+<div class="glass rounded-[1rem] p-4">
+  <h3 class="text-foreground mb-3 font-semibold">Resumen</h3>
+  <dl class="space-y-2 text-sm">
+    <div class="flex justify-between">
+      <dt class="text-muted-foreground">Subtotal</dt>
+      <dd class="text-foreground tabular-nums">{{ formatCurrency(o.totalBeforeTax) }}</dd>
+    </div>
+    @if ($discount() > 0) {
+    <div class="flex justify-between">
+      <dt class="text-muted-foreground">{{ $discountLabel() }}</dt>
+      <dd class="tabular-nums text-green-600">−{{ formatCurrency($discount()) }}</dd>
+    </div>
+    }
+    <div class="flex justify-between border-t border-[var(--border)] pt-2 text-base font-semibold">
+      <dt class="text-foreground">Total</dt>
+      <dd class="text-foreground tabular-nums">{{ formatCurrency(o.finalTotal) }}</dd>
+    </div>
+    <div class="text-muted-foreground flex justify-between text-xs">
+      <dt>Neto · IVA incluido</dt>
+      <dd class="tabular-nums">{{ formatCurrency(o.netTotal) }} · {{ formatCurrency(o.taxAmount) }}</dd>
+    </div>
+    <div class="flex justify-between pt-2">
+      <dt class="text-muted-foreground">Pagado</dt>
+      <dd class="text-foreground tabular-nums">{{ formatCurrency(o.totalPaid) }}</dd>
+    </div>
+    <div
+      class="flex items-center justify-between rounded-md px-3 py-2 font-semibold"
+      [class]="o.remaining > 0 ? 'bg-amber-500/10 text-amber-700' : 'bg-green-500/10 text-green-700'">
+      <dt>{{ o.remaining > 0 ? 'Saldo por pagar' : 'Pagado completo' }}</dt>
+      <dd class="text-lg tabular-nums">{{ formatCurrency(o.remaining) }}</dd>
+    </div>
+  </dl>
+</div>

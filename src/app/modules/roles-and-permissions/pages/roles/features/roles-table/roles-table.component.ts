@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, input, Output, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, EventEmitter, inject, input, Output, ChangeDetectionStrategy } from '@angular/core';
 import {
   ButtonComponent,
   IconComponent,
@@ -50,7 +50,6 @@ export class RolesTableComponent {
     alias: 'pagination',
   });
   headerData = ['Id', 'Código', 'Nombre', 'Acción'];
-  readonly perPage = signal(10);
 
   viewDetailRole() {
     this.dialog.open(CreateNewRoleModalComponent, {
@@ -84,9 +83,7 @@ export class RolesTableComponent {
     this.filtersChanged.emit({ code: this.searchCode(), name: value });
   }
   onPerPageChange(event: Event) {
-    const value = Number((event.target as HTMLSelectElement).value);
-    this.perPage.set(value);
-    this.perPageChange.emit(value);
+    this.perPageChange.emit(Number((event.target as HTMLSelectElement).value));
   }
 
   retry() {

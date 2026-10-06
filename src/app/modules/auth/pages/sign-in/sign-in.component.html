@@ -5,12 +5,8 @@
     <p class="text-muted-foreground text-sm">Ingresa tus datos para iniciar sesión.</p>
   </div>
 
-  <div routerLink="/dashboard">
-    <app-button full impact="bold" tone="light" shape="rounded" size="medium">
-      <svg-icon src="assets/icons/google-logo.svg" [svgClass]="'h-6 w-6 mr-2'"> </svg-icon>
-      Inicia sesión con Google
-    </app-button>
-  </div>
+
+  <app-google-button label="Continuar con Google" [disabled]="$googleLoading()" (credential)="loginWithGoogle($event)" />
 
   <div
     class="before:border-muted after:border-muted my-4 flex items-center before:mt-0.5 before:flex-1 before:border-t after:mt-0.5 after:flex-1 after:border-t"></div>
@@ -74,6 +70,12 @@
     <div class="ms-3 text-sm font-medium">El email debe ser válido.</div>
   </app-alert>
   } }
+
+  @if ($error(); as error) {
+  <app-alert [type]="error.kind === 'google-account' ? 'warning' : 'danger'">
+    <div class="ms-3 text-sm font-medium">{{ error.message }}</div>
+  </app-alert>
+  }
 
   <!-- Submit Button -->
   <div>

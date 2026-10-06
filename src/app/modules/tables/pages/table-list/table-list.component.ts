@@ -1,46 +1,146 @@
-import { Component, effect, inject, OnDestroy, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, signal } from '@angular/core';
+
 import { MatDialog } from '@angular/material/dialog';
-import { HeaderDashboardComponent, ButtonComponent, IconComponent, CardComponent } from 'src/ui';
-import { TablesTableComponent, TablesGridComponent, CreateTableModalComponent } from './features';
-import { GetAllTablesService, CreateTableService, UpdateTableService, DeleteTableService } from './data-access';
+import { Router } from '@angular/router';
+
+import { HeaderDashboardComponent, ButtonComponent, IconComponent, CardComponent, ToastService } from 'src/ui';
+
+import { TablesTableComponent, TablesGridComponent, CreateTableModalComponent, SectorTabsComponent } from './features';
+
+import {
+  GetAllTablesService,
+  CreateTableService,
+  UpdateTableService,
+  DeleteTableService,
+  TableDto,
+} from './data-access';
+import { printTableQrs } from './ui';
+
+import { BusinessLocationSelector } from 'src/app/modules/sectors/pages/sector-list/ui';
+import { GetAllSectorsService } from 'src/app/modules/sectors/pages/sector-list/data-access';
 
 @Component({
   selector: 'app-table-list',
+
   imports: [
-    HeaderDashboardComponent, ButtonComponent, IconComponent, CardComponent,
-    TablesTableComponent, TablesGridComponent,
+    HeaderDashboardComponent,
+    ButtonComponent,
+    IconComponent,
+    CardComponent,
+    TablesTableComponent,
+    TablesGridComponent,
+    BusinessLocationSelector,
+    SectorTabsComponent,
   ],
+
   templateUrl: './table-list.component.html',
 })
 export class TableListComponent implements OnDestroy {
   private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
+
   protected readonly $getAll = inject(GetAllTablesService);
+  protected readonly $sectorsService = inject(GetAllSectorsService);
+
   protected readonly $createService = inject(CreateTableService);
   protected readonly $updateService = inject(UpdateTableService);
   protected readonly $deleteService = inject(DeleteTableService);
 
   protected readonly $tables = this.$getAll.$tables;
+  protected readonly $sectors = this.$sectorsService.$sectors;
+
   protected readonly $isLoading = this.$getAll.$isLoading;
   protected readonly $hasError = this.$getAll.$hasError;
+
   protected readonly $viewMode = signal<'table' | 'grid'>('grid');
+  protected readonly $selectedSectorId = signal<number | null>(null);
+
+  protected readonly $filteredTables = computed(() => {
+    const tables = this.$tables();
+    const sectorId = this.$selectedSectorId();
+    if (sectorId === null) return tables;
+    return tables.filter((t) => t.sectorId === sectorId);
+  });
 
   constructor() {
     effect(() => {
-      if (this.$createService.$success()) this.$getAll.retry();
-      if (this.$updateService.$success()) this.$getAll.retry();
-      if (this.$deleteService.$success()) this.$getAll.retry();
+      if (this.$createService.$success()) {
+        this.$getAll.retry();
+      }
+
+      if (this.$updateService.$success()) {
+        this.$getAll.retry();
+      }
+
+      if (this.$deleteService.$success()) {
+        this.$getAll.retry();
+      }
     });
   }
 
-  createTable() { this.dialog.open(CreateTableModalComponent, { width: '90%' }); }
+  createTable() {
+    this.dialog.open(CreateTableModalComponent, {
+      width: '90%',
+    });
+  }
 
-  toggleView() { this.$viewMode.update((v) => (v === 'grid' ? 'table' : 'grid')); }
+  toggleView() {
+    this.$viewMode.update((v) => (v === 'grid' ? 'table' : 'grid'));
+  }
 
-  onPageChange(page: number) { this.$getAll.setParams({ page }); }
-  onPerPageChange(perPage: number) { this.$getAll.setParams({ perPage, page: 1 }); }
-  onSearchNameChange(name: string) { this.$getAll.setParams({ name, page: 1 }); }
-  onStatusFilterChange(status: string) { this.$getAll.setParams({ status: status || undefined, page: 1 }); }
-  retry() { this.$getAll.retry(); }
+  onLocationSelected(locationId: number) {
+    this.$getAll.setParams(locationId);
+    this.$sectorsService.setParams({ locationId });
+    this.$selectedSectorId.set(null);
+  }
+
+  onTableSelected(table: TableDto) {
+    const locationId = this.$getAll.getCurrentLocationId();
+    // Con un pedido abierto, la mesa lleva directo a ese pedido (el más reciente si la comparten).
+    if (table.currentTransactionId) {
+      this.router.navigate(['/orders', table.currentTransactionId]);
+      return;
+    }
+    if (table.status === 'blocked') {
+      this.toast.show(`${table.name} está bloqueada`, 'warning');
+      return;
+    }
+    // Ocupada sin pedido abierto informado (datos desfasados): se muestran sus pedidos abiertos.
+    if (table.status === 'occupied') {
+      this.toast.show(`No se encontró el pedido abierto de ${table.name}`, 'warning');
+      this.router.navigate(['/orders'], { queryParams: { location: locationId, table: table.id, status: 'ORDERED' } });
+      return;
+    }
+    this.router.navigate(['/orders/new'], {
+      queryParams: { location: locationId, table: table.id },
+    });
+  }
+
+  onSectorSelected(sectorId: number | null) {
+    this.$selectedSectorId.set(sectorId);
+  }
+
+  retry() {
+    this.$getAll.retry();
+  }
+
+  async printAllQrs() {
+    const sectorNames = new Map(this.$sectors().map((sector) => [sector.id, sector.name]));
+    const printable = this.$filteredTables()
+      .filter((table) => table.qrUrl)
+      .map((table) => ({
+        name: table.name,
+        detail: [table.sectorId ? sectorNames.get(table.sectorId) : null, `${table.capacity} personas`].filter(Boolean).join(' · '),
+        url: table.qrUrl!,
+      }));
+    if (!printable.length) {
+      this.toast.show('No hay mesas con QR disponible para imprimir', 'warning');
+      return;
+    }
+    const opened = await printTableQrs(printable);
+    if (!opened) this.toast.show('Permite las ventanas emergentes para imprimir', 'warning');
+  }
 
   ngOnDestroy(): void {
     this.$createService.reset();

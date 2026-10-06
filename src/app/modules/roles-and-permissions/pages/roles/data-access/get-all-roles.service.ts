@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpStatusCode, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, catchError, delay, EMPTY, map, Subject, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, EMPTY, map, Subject, switchMap, tap } from 'rxjs';
 import { GetAllRolesDto } from './dtos';
 import { StandardizedPagination } from 'src/app/core/standarized-response';
 import { ApiPathEnum } from 'src/environments';
@@ -19,7 +19,7 @@ export class GetAllRolesService {
 
   readonly #params$ = new BehaviorSubject<{ page: number; perPage: number; searchCode?: string; searchName?: string }>({
     page: 1,
-    perPage: 10,
+    perPage: 50,
   });
 
   setParams(params: Partial<{ page: number; perPage: number; searchCode?: string; searchName?: string }>) {
@@ -52,7 +52,6 @@ export class GetAllRolesService {
               return EMPTY;
             }),
             tap(() => this.#isLoading$.next(false)),
-            map((data) => data),
           );
       }),
     ),

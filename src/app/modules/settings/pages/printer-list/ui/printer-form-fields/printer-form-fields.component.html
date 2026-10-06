@@ -1,0 +1,51 @@
+@let f = form();
+<div [formGroup]="f" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+  <div class="sm:col-span-2">
+    <label class="text-foreground mb-1 block text-sm font-medium">Nombre *</label>
+    <input formControlName="name" placeholder="Ej: Térmica cocina" [class]="inputClass" [ngClass]="{ 'border-red-500': isInvalid('name') }" />
+  </div>
+
+  <div class="sm:col-span-2">
+    <span class="text-foreground mb-1 block text-sm font-medium">Conexión</span>
+    <div class="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Tipo de conexión">
+      @for (option of [{ value: 'network', label: 'Red (IP)', icon: 'lan' }, { value: 'usb', label: 'USB', icon: 'usb' }]; track option.value) {
+      <label class="flex cursor-pointer items-center gap-2 rounded-lg border-2 px-3 py-2 text-sm" [class]="f.controls.type.value === option.value ? 'border-primary bg-primary/10 text-primary' : 'glass-row border-transparent'">
+        <input type="radio" class="sr-only" formControlName="type" [value]="option.value" />
+        <app-icon class="h-5 w-5">{{ option.icon }}</app-icon>{{ option.label }}
+      </label>
+      }
+    </div>
+  </div>
+
+  @if (f.controls.type.value === 'network') {
+  <div>
+    <label class="text-foreground mb-1 block text-sm font-medium">IP *</label>
+    <input formControlName="ipAddress" inputmode="decimal" placeholder="192.168.1.50" [class]="inputClass + ' font-mono'" [ngClass]="{ 'border-red-500': isInvalid('ipAddress') }" />
+  </div>
+  <div>
+    <label class="text-foreground mb-1 block text-sm font-medium">Puerto</label>
+    <input type="number" formControlName="port" min="1" max="65535" inputmode="numeric" [class]="inputClass + ' font-mono'" [ngClass]="{ 'border-red-500': isInvalid('port') }" />
+    <p class="text-muted-foreground mt-1 text-xs">Normalmente 9100.</p>
+  </div>
+  }
+
+  <div class="sm:col-span-2">
+    <label class="text-foreground mb-1 block text-sm font-medium">Sucursal</label>
+    <select formControlName="locationId" [class]="inputClass">
+      <option [ngValue]="null">Todas / sin asignar</option>
+      @for (location of $locations() ?? []; track location.id) {
+      <option [ngValue]="location.id">{{ location.name }}</option>
+      }
+    </select>
+  </div>
+
+  @if (showStatus()) {
+  <label class="flex cursor-pointer items-center justify-between gap-4 rounded-md border border-[var(--border)] px-3 py-3 sm:col-span-2">
+    <span>
+      <span class="text-foreground block text-sm font-medium">Activa</span>
+      <span class="text-muted-foreground block text-xs">Si la desactivas, no recibirá comandas.</span>
+    </span>
+    <input type="checkbox" formControlName="active" class="h-5 w-5 accent-[var(--primary)]" />
+  </label>
+  }
+</div>

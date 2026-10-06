@@ -1,0 +1,72 @@
+<div class="space-y-4">
+  <app-header-dashboard title="Estación de impresión" subtitle="Imprime automáticamente las comandas desde este equipo" />
+
+  <app-print-setup-guide />
+
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <!-- Configuración y estado -->
+    <div class="glass space-y-4 rounded-[1rem] p-4 lg:col-span-1">
+      <div class="flex items-center gap-3 rounded-xl p-3" [class]="$isRunning() ? ($connectionError() ? 'bg-amber-500/10' : 'bg-green-500/10') : 'bg-gray-500/10'">
+        <span class="relative flex h-3 w-3">
+          @if ($isRunning() && !$connectionError()) {
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+          }
+          <span class="relative inline-flex h-3 w-3 rounded-full" [class]="$isRunning() ? ($connectionError() ? 'bg-amber-500' : 'bg-green-500') : 'bg-gray-400'"></span>
+        </span>
+        <div>
+          <p class="text-foreground font-semibold">
+            {{ $isRunning() ? ($connectionError() ? 'Sin conexión, reintentando…' : 'Imprimiendo comandas') : 'Detenida' }}
+          </p>
+          <p class="text-muted-foreground text-xs">Última revisión: {{ formatTime($lastCheck()) }}</p>
+        </div>
+      </div>
+
+      <div>
+        <label for="station-printer" class="text-foreground mb-1 block text-sm font-medium">Impresora que atiende este equipo</label>
+        <select id="station-printer" class="glass-input w-full rounded-md px-3 py-2" [disabled]="$isRunning()" (change)="selectPrinter($event)">
+          <option value="" [selected]="!$config().printerId">Elegir impresora…</option>
+          @for (printer of $printers(); track printer.id) {
+          <option [value]="printer.id" [selected]="printer.id === $config().printerId">
+            {{ printer.name }} ({{ printer.type === 'usb' ? 'USB' : printer.ipAddress }}){{ printer.status !== 'ACTIVE' ? ' · inactiva' : '' }}
+          </option>
+          }
+        </select>
+      </div>
+
+      <div>
+        <span class="text-foreground mb-1 block text-sm font-medium">Ancho del papel</span>
+        <div class="grid grid-cols-2 gap-2">
+          @for (width of paperWidths; track width) {
+          <button type="button" class="rounded-lg border-2 px-3 py-2 text-sm font-medium" [class]="$config().paperWidth === width ? 'border-primary bg-primary/10 text-primary' : 'glass-row border-transparent'" (click)="selectPaper(width)">
+            {{ width }} mm
+          </button>
+          }
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        @if ($isRunning()) {
+        <app-button full impact="light" tone="danger" shape="rounded" icon="stop" (buttonClick)="stop()">Detener</app-button>
+        } @else {
+        <app-button full impact="bold" tone="primary" shape="rounded" icon="play_arrow" (buttonClick)="start()">Iniciar</app-button>
+        }
+        <app-button full impact="light" tone="primary" shape="rounded" icon="print" (buttonClick)="printTest()">Prueba</app-button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 text-center">
+        <div class="glass-row rounded-lg p-2">
+          <p class="text-2xl font-bold tabular-nums text-green-600">{{ $printedCount() }}</p>
+          <p class="text-muted-foreground text-xs">Impresas</p>
+        </div>
+        <div class="glass-row rounded-lg p-2">
+          <p class="text-2xl font-bold tabular-nums" [class]="$failedCount() ? 'text-red-600' : 'text-foreground'">{{ $failedCount() }}</p>
+          <p class="text-muted-foreground text-xs">Con error</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-2">
+      <app-print-log [entries]="$log()" />
+    </div>
+  </div>
+</div>

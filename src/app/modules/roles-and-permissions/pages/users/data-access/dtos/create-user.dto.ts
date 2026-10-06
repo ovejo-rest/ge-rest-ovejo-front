@@ -5,4 +5,6 @@ export type CreateUserDto = Readonly<{
   motherLastName: string;
   email: string;
   roleIds?: number[];
+  // Sucursal del restaurante; el backend responde 404 si no le pertenece.
+  branchId?: number;
 }>;

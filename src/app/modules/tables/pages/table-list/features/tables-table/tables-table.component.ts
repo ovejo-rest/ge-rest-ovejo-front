@@ -1,48 +1,79 @@
-import { Component, EventEmitter, input, Output, signal, inject } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
+
 import { MatDialog } from '@angular/material/dialog';
+
 import { NgClass } from '@angular/common';
-import {
-  ButtonComponent, IconComponent, PaginationTableComponent,
-  ProgressBarComponent, SlotDirective, TableComponent,
-} from 'src/ui';
-import { FiltersTableComponent } from '../../ui';
+
+import { ButtonComponent, ProgressBarComponent, SlotDirective, TableComponent } from 'src/ui';
+
 import { TableDto, TableStatus } from '../../data-access';
-import { PaginationMeta } from 'src/app/core/standarized-response/standardized-pagination/pagination-meta.dto';
+
 import { CreateTableModalComponent } from '../create-table-modal';
+
 import { UpdateTableModalComponent } from '../update-table-modal';
+
 import { DeleteTableModalComponent } from '../delete-table-modal';
+
+import { TableQrModalComponent, TableQrModalResult } from '../table-qr-modal';
 
 @Component({
   selector: 'app-tables-table',
-  imports: [
-    NgClass, TableComponent, SlotDirective, ButtonComponent,
-    PaginationTableComponent, ProgressBarComponent, FiltersTableComponent,
-  ],
+
+  imports: [NgClass, TableComponent, SlotDirective, ButtonComponent, ProgressBarComponent],
+
   templateUrl: './tables-table.component.html',
 })
 export class TablesTableComponent {
   private readonly dialog = inject(MatDialog);
-  readonly $tables = input.required<TableDto[]>({ alias: 'tables' });
-  readonly isLoading = input(false, { alias: 'isLoading' });
-  readonly $pagination = input.required<PaginationMeta>({ alias: 'pagination' });
 
-  @Output() pageChange = new EventEmitter<number>();
-  @Output() perPageChange = new EventEmitter<number>();
-  @Output() searchNameChange = new EventEmitter<string>();
-  @Output() statusFilterChange = new EventEmitter<string>();
-  @Output() retryData = new EventEmitter<void>();
+  readonly $tables = input.required<TableDto[]>({
+    alias: 'tables',
+  });
 
-  readonly headerData = ['Nombre', 'Capacidad', 'Sector', 'Estado', 'Acción'];
-  readonly perPage = signal(10);
+  readonly isLoading = input(false, {
+    alias: 'isLoading',
+  });
 
-  createTable() { this.dialog.open(CreateTableModalComponent, { width: '90%' }); }
-  updateTable(item: TableDto) { this.dialog.open(UpdateTableModalComponent, { width: '90%', data: item }); }
-  deleteTable(item: TableDto) { this.dialog.open(DeleteTableModalComponent, { width: '90%', data: item }); }
-  onChangePage(page: number) { this.pageChange.emit(page); }
-  onSearchNameChange(value: string) { this.searchNameChange.emit(value); }
-  onStatusFilterChange(value: string) { this.statusFilterChange.emit(value); }
-  onPerPageChange(event: Event) { const v = Number((event.target as HTMLSelectElement).value); this.perPage.set(v); this.perPageChange.emit(v); }
-  retry() { this.retryData.emit(); }
+  readonly retryData = output<void>();
+
+  readonly headerData = ['Nombre', 'Capacidad', 'Ubicación', 'Estado', 'Acción'];
+
+  createTable() {
+    this.dialog.open(CreateTableModalComponent, {
+      width: '90%',
+    });
+  }
+
+  updateTable(item: TableDto) {
+    this.dialog.open(UpdateTableModalComponent, {
+      width: '90%',
+      data: item,
+    });
+  }
+
+  showQr(item: TableDto) {
+    this.dialog
+      .open<TableQrModalComponent, TableDto, TableQrModalResult>(TableQrModalComponent, {
+        width: '560px',
+        maxWidth: '95vw',
+        data: item,
+      })
+      .afterClosed()
+      .subscribe((result) => {
+        if (result === 'regenerated') this.retryData.emit();
+      });
+  }
+
+  deleteTable(item: TableDto) {
+    this.dialog.open(DeleteTableModalComponent, {
+      width: '90%',
+      data: item,
+    });
+  }
+
+  retry() {
+    this.retryData.emit();
+  }
 
   statusClasses(status: TableStatus): string {
     const map: Record<TableStatus, string> = {
@@ -51,6 +82,7 @@ export class TablesTableComponent {
       reserved: 'bg-blue-500/20 text-blue-600',
       blocked: 'bg-muted text-muted-foreground',
     };
+
     return map[status];
   }
 
@@ -61,6 +93,7 @@ export class TablesTableComponent {
       reserved: 'Reservada',
       blocked: 'Bloqueada',
     };
+
     return map[status];
   }
 }

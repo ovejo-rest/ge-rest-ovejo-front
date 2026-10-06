@@ -21,7 +21,7 @@
     size="medium"
     (buttonClick)="createUser()">
     <app-icon class="h-6 w-7"> add </app-icon>
-    Crear usuario
+    Invitar al equipo
   </app-button>
 </app-header-dashboard>
 
@@ -31,6 +31,7 @@
   *appCheckPermission="'users:get-all-users'"
   [isLoading]="isLoading"
   [users]="usersResp?.data ?? []"
+  [branchNames]="$branchNames()"
   [pagination]="usersResp?.pagination ?? { page: 1, perPage: 10, totalItems: 0, totalPages: 0 }"
   (pageChange)="onPageChange($event)"
   (perPageChange)="onPerPageChange($event)"

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, OnDestroy } from '@angular/core';
+import { Component, effect, inject, OnDestroy, input } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
@@ -8,7 +8,15 @@ import { GetAllSectorsService } from 'src/app/modules/sectors/pages/sector-list/
 
 @Component({
   selector: 'app-create-table-modal',
-  imports: [FormsModule, IconComponent, ReactiveFormsModule, CommonModule, ButtonComponent, SlotDirective, ModalCardComponent],
+  imports: [
+    FormsModule,
+    IconComponent,
+    ReactiveFormsModule,
+    CommonModule,
+    ButtonComponent,
+    SlotDirective,
+    ModalCardComponent,
+  ],
   templateUrl: './create-table-modal.component.html',
 })
 export class CreateTableModalComponent implements OnDestroy {
@@ -23,23 +31,42 @@ export class CreateTableModalComponent implements OnDestroy {
   private fb = inject(FormBuilder);
   form = this.fb.group({
     name: ['', Validators.required],
+    description: [''],
     capacity: [4, [Validators.required, Validators.min(1)]],
-    sectorId: [null as number | null, Validators.required],
+    sectorId: [null as number | null],
   });
 
   constructor() {
-    this.$sectorsService.setParams({ perPage: 100 });
     effect(() => {
-      if (this.$service.$success()) { this.$toast.show('Mesa creada', 'success'); this.$getAll.retry(); this.dialogRef.close(); }
-      if (this.$service.$hasError()) { this.$toast.show('Error al crear la mesa', 'error'); }
+      if (this.$service.$success()) {
+        this.$toast.show('Mesa creada', 'success');
+        this.$getAll.retry();
+        this.dialogRef.close();
+      }
+      if (this.$service.$hasError()) {
+        this.$toast.show('Error al crear la mesa', 'error');
+      }
     });
   }
 
   submitForm() {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-    const { name, capacity, sectorId } = this.form.getRawValue();
-    this.$service.create({ name: name ?? '', capacity: capacity ?? 1, sectorId: sectorId ?? 0 });
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    const { name, description, capacity, sectorId } = this.form.getRawValue();
+    const locationId = this.$getAll.getCurrentLocationId();
+    if (!locationId) return;
+    this.$service.create({
+      name: name ?? '',
+      description: description || undefined,
+      locationId,
+      capacity: capacity ?? undefined,
+      sectorId: sectorId ?? undefined,
+    });
   }
 
-  ngOnDestroy(): void { this.$service.reset(); }
+  ngOnDestroy(): void {
+    this.$service.reset();
+  }
 }

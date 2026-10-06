@@ -43,7 +43,7 @@ export class AssignRoleModalComponent {
 
   constructor() {
     this.assignService.reset();
-    this.$allRolesService.setParams({ perPage: 50 });
+    this.$allRolesService.setParams({ page: 1, perPage: 50, searchCode: '', searchName: '' });
 
     effect(() => {
       if (this.assignService.$success()) {

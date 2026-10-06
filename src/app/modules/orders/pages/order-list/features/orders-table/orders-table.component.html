@@ -1,34 +1,96 @@
-<app-table>
-  <ng-template app-slot="filters">
-    <app-filters-order-table (searchTableChange)="onSearchTable($event)" (statusChange)="onStatusFilter($event)" />
-  </ng-template>
-  <ng-template app-slot="head">
-    <tr>@for (h of headerData; track $index) { <th class="h-8 text-center" [class.w-32]="$index===0" [class.w-24]="$index!==0">{{ h }}</th> }<th class="w-[90px]"></th></tr>
-  </ng-template>
-  @if (!isLoading()) {
-  @for (o of $orders(); track o.id) {
-  <tr class="glass-row h-10 cursor-pointer" (click)="viewDetail(o)">
-    <td class="text-center font-medium">#{{ o.id }}</td>
-    <td class="text-muted-foreground text-center">{{ o.tableName }}</td>
-    <td class="text-center">{{ o.itemCount }}</td>
-    <td class="text-center font-semibold">{{ o.total | currency:'CLP':'symbol-narrow':'1.0-0':'es-CL' }}</td>
-    <td class="text-center"><span class="inline-block rounded-full px-2 py-0.5 text-xs font-medium" [ngClass]="statusClasses(o.status)">{{ statusLabel(o.status) }}</span></td>
-    <td class="text-muted-foreground text-center text-xs">{{ o.createdAt | date:'shortTime' }}</td>
-    <td class="w-[90px] text-center">
-      <div class="flex items-center justify-center gap-1" (click)="$event.stopPropagation()">
-        <app-button size="small" icon="swap_horiz" tone="info" (click)="changeStatus(o)" />
-      </div>
-    </td>
-  </tr>
-  } @empty {
-  <tr><td class="py-4 text-center text-sm" colspan="8">No hay pedidos</td></tr>
-  } } @if (isLoading()) {
-  <tr><td colspan="8" class="px-2 py-4"><app-progress-bar /></td></tr>
-  }
-  <ng-template app-slot="footer">
-    <div class="glass-footer -mx-5 -mb-3 flex flex-wrap items-center justify-between gap-2 px-5 py-3">
-      <div class="flex items-center gap-2">Mostrar<select class="glass-input w-16 rounded-md p-2" [value]="perPage()" (change)="onPerPageChange($event)"><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="50">50</option></select>por página</div>
-      <app-pagination-table [pagination]="$pagination()" (pageChange)="onChangePage($event)" />
-    </div>
-  </ng-template>
-</app-table>
+<div class="glass overflow-hidden rounded-[1rem]">
+  <div class="overflow-x-auto">
+    <table class="min-w-full">
+      <thead>
+        <tr class="text-muted-foreground border-b border-[var(--border)] text-left text-xs font-medium uppercase tracking-wider">
+          <th class="px-4 py-3">Pedido</th>
+          <th class="px-4 py-3">Mesa</th>
+          <th class="hidden px-4 py-3 md:table-cell">Cliente</th>
+          <th class="hidden px-4 py-3 lg:table-cell">Mesero</th>
+          <th class="hidden px-4 py-3 sm:table-cell">Fecha</th>
+          <th class="px-4 py-3 text-center">Estado</th>
+          <th class="hidden px-4 py-3 text-center xl:table-cell">Cocina</th>
+          <th class="px-4 py-3 text-right">Total</th>
+          <th class="px-4 py-3"><span class="sr-only">Ver detalle</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading()) { @for (row of skeletonRows; track row) {
+        <tr class="border-b border-[var(--border)] last:border-0">
+          <td class="px-4 py-3"><app-skeleton size="xs" style="width: 110px" /></td>
+          <td class="px-4 py-3"><app-skeleton size="xs" style="width: 70px" /></td>
+          <td class="hidden px-4 py-3 md:table-cell"><app-skeleton size="xs" style="width: 120px" /></td>
+          <td class="hidden px-4 py-3 lg:table-cell"><app-skeleton size="xs" style="width: 120px" /></td>
+          <td class="hidden px-4 py-3 sm:table-cell"><app-skeleton size="xs" style="width: 100px" /></td>
+          <td class="px-4 py-3"><div class="flex justify-center"><app-skeleton size="xs" style="width: 90px" /></div></td>
+          <td class="hidden px-4 py-3 xl:table-cell"><div class="flex justify-center"><app-skeleton size="xs" style="width: 80px" /></div></td>
+          <td class="px-4 py-3"><div class="flex justify-end"><app-skeleton size="xs" style="width: 70px" /></div></td>
+          <td class="px-4 py-3"><div class="flex justify-end"><app-skeleton size="sm" style="width: 36px" /></div></td>
+        </tr>
+        } } @else { @for (order of orders(); track order.transactionId) {
+        <tr class="glass-row border-b border-[var(--border)] transition-colors last:border-0">
+          <td class="px-4 py-3">
+            <a [routerLink]="['/orders', order.transactionId]" class="text-foreground hover:text-primary font-mono text-sm font-semibold">
+              {{ order.invoiceNo }}
+            </a>
+            <p class="text-muted-foreground text-xs sm:hidden">{{ formatRelative(order.orderDate) }}</p>
+          </td>
+          <td class="text-foreground px-4 py-3 text-sm">{{ order.tableName ?? 'Sin mesa' }}</td>
+          <td class="hidden px-4 py-3 text-sm md:table-cell">
+            @if (order.contactId && order.customerName) {
+            <a [routerLink]="['/customers', order.contactId]" class="text-foreground hover:text-primary">{{ order.customerName }}</a>
+            } @else {
+            <span class="text-muted-foreground">{{ order.customerName ?? '—' }}</span>
+            }
+          </td>
+          <td class="text-muted-foreground hidden px-4 py-3 text-sm lg:table-cell">{{ order.waiterName ?? '—' }}</td>
+          <td class="hidden px-4 py-3 sm:table-cell">
+            <p class="text-foreground text-sm">{{ formatRelative(order.orderDate) }}</p>
+            <p class="text-muted-foreground text-xs">{{ formatDateTime(order.orderDate) }}</p>
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex flex-col items-center gap-1">
+              <app-status-badge [map]="orderStatus" [status]="order.status" />
+              <!-- El estado de pago de un pedido cancelado no aporta -->
+              @if (order.status !== 'CANCELLED') {
+              <app-status-badge [map]="paymentStatus" [status]="order.paymentStatus" />
+              }
+            </div>
+          </td>
+          <td class="hidden px-4 py-3 text-center xl:table-cell">
+            <app-status-badge [map]="kitchenStatus" [status]="order.resOrderStatus" fallback="Sin cocina" />
+          </td>
+          <td class="text-foreground px-4 py-3 text-right text-sm font-medium tabular-nums">{{ formatCurrency(order.finalTotal) }}</td>
+          <td class="px-4 py-3 text-right">
+            <a
+              [routerLink]="['/orders', order.transactionId]"
+              title="Ver detalle"
+              [attr.aria-label]="'Ver detalle del pedido ' + order.invoiceNo"
+              class="text-muted-foreground hover:text-primary inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors">
+              <app-icon class="h-5 w-5">chevron_right</app-icon>
+            </a>
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="9" class="px-4 py-12 text-center">
+            <p class="text-foreground font-medium">Sin resultados</p>
+            <p class="text-muted-foreground mt-1 text-sm">No hay pedidos que coincidan con los filtros.</p>
+            @if (hasFilters()) {
+            <button type="button" class="text-primary mt-3 text-sm font-medium hover:underline" (click)="clearFilters.emit()">
+              Limpiar filtros
+            </button>
+            }
+          </td>
+        </tr>
+        } }
+      </tbody>
+    </table>
+  </div>
+
+  @if (pagination(); as meta) { @if (meta.totalItems > 0) {
+  <div class="border-t border-[var(--border)] px-4 pb-3">
+    <app-pagination-table [pagination]="meta" (pageChange)="pageChange.emit($event)" />
+  </div>
+  } }
+</div>

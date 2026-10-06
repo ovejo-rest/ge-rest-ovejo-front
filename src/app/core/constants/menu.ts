@@ -3,14 +3,67 @@ import { MenuItem } from '../models/menu.model';
 export class Menu {
   public static pages: MenuItem[] = [
     {
-      group: 'Base',
+      group: 'Operación',
       separator: false,
       items: [
         {
           icon: 'dashboard',
-          label: 'Dashboard',
-          route: '/dashboard',
-          children: [{ label: 'Admin', route: '/dashboard/admin' }],
+          label: 'Resumen',
+          route: '/dashboard/admin',
+        },
+        {
+          icon: 'point_of_sale',
+          label: 'POS',
+          route: '/pos',
+          children: [
+            { label: 'Tomar pedido', route: '/pos' },
+            { label: 'Pedidos', route: '/orders' },
+            { label: 'Pagos', route: '/payments' },
+          ],
+        },
+        {
+          icon: 'table_bar',
+          label: 'Mesas',
+          route: '/tables',
+          children: [
+            { label: 'Mesas', route: '/tables' },
+            { label: 'Sectores', route: '/sectors' },
+            { label: 'Reservas', route: '/bookings' },
+          ],
+        },
+        {
+          icon: 'restaurant',
+          label: 'Cocina',
+          route: '/kitchen',
+        },
+        {
+          icon: 'groups',
+          label: 'Clientes',
+          route: '/customers',
+        },
+      ],
+    },
+    {
+      group: 'Administración',
+      separator: true,
+      items: [
+        {
+          icon: 'inventory_2',
+          label: 'Carta',
+          route: '/products',
+          children: [
+            { label: 'Productos', route: '/products' },
+            { label: 'Categorías', route: '/products/categories' },
+          ],
+        },
+        {
+          icon: 'factory',
+          label: 'Negocio',
+          route: '/business',
+          children: [
+            { label: 'Restaurante', route: '/business' },
+            { label: 'Sucursales', route: '/business/location' },
+          ],
         },
         {
           icon: 'admin_panel_settings',
@@ -82,8 +135,15 @@ export class Menu {
       items: [
         {
           icon: 'settings',
-          label: 'Settings',
+          label: 'Configuración',
           route: '/settings',
+          children: [
+            { label: 'Horarios', route: '/settings/schedules' },
+            { label: 'Estaciones', route: '/settings/stations' },
+            { label: 'Impresoras', route: '/settings/printers' },
+            { label: 'Estación de impresión', route: '/settings/print-station' },
+            { label: 'Terminal de salón', route: '/settings/terminal' },
+          ],
         },
         {
           icon: 'notifications',

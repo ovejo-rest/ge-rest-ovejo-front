@@ -1,0 +1,27 @@
+@let f = filters();
+<div class="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+  <select aria-label="Filtrar por método" class="glass-input rounded-md px-3 py-2 sm:w-48" (change)="onMethod($event)">
+    <option value="" [selected]="!f.method">Todos los métodos</option>
+    @for (method of methods; track method.value) {
+    <option [value]="method.value" [selected]="f.method === method.value">{{ method.label }}</option>
+    }
+  </select>
+
+  <label class="flex items-center gap-2 text-sm">
+    <span class="text-muted-foreground">Desde</span>
+    <input type="date" aria-label="Desde" class="glass-input rounded-md px-3 py-2" [value]="f.from ?? ''" [max]="f.to ?? ''" (change)="onDate('from', $event)" />
+  </label>
+  <label class="flex items-center gap-2 text-sm">
+    <span class="text-muted-foreground">Hasta</span>
+    <input type="date" aria-label="Hasta" class="glass-input rounded-md px-3 py-2" [value]="f.to ?? ''" [min]="f.from ?? ''" (change)="onDate('to', $event)" />
+  </label>
+
+  <label class="text-foreground flex cursor-pointer items-center gap-2 text-sm">
+    <input type="checkbox" class="h-4 w-4 accent-[var(--primary)]" [checked]="f.includeCancelled" (change)="onIncludeCancelled($event)" />
+    Incluir anulados
+  </label>
+
+  @if (hasFilters()) {
+  <button type="button" class="text-primary text-sm font-medium hover:underline" (click)="clear.emit()">Limpiar filtros</button>
+  }
+</div>

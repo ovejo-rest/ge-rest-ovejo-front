@@ -1,0 +1,47 @@
+<div class="my-10 space-y-6">
+  <div class="text-center">
+    <h2 class="text-foreground mb-1 text-3xl font-semibold">Verifica tu correo <span class="text-primary">!</span></h2>
+    <p class="text-muted-foreground text-sm">Ingresa el código de 6 dígitos que enviamos a</p>
+    <p class="text-foreground mt-1 break-all text-sm font-semibold">{{ email }}</p>
+  </div>
+
+  <div class="flex justify-center gap-2 sm:gap-3" (paste)="onPaste($event)" role="group" aria-label="Código de verificación">
+    @for (slot of slots; track slot) {
+    <input
+      #digit
+      type="text"
+      inputmode="numeric"
+      autocomplete="one-time-code"
+      maxlength="6"
+      class="text-foreground h-12 w-10 text-center text-xl font-semibold tabular-nums sm:h-14 sm:w-12"
+      [attr.aria-label]="'Dígito ' + (slot + 1)"
+      [value]="$digits()[slot]"
+      [disabled]="$isVerifying()"
+      (input)="onInput(slot, $event)"
+      (keydown)="onKeydown(slot, $event)" />
+    }
+  </div>
+
+  @if ($error(); as error) {
+  <app-alert type="danger"><div class="ms-3 text-sm font-medium">{{ error.message }}</div></app-alert>
+  }
+
+  <app-button full impact="bold" tone="primary" shape="rounded" size="medium" type="button"
+    [disabled]="$code().length !== 6 || $isVerifying()" [isLoading]="$isVerifying()" (buttonClick)="verify()">
+    Verificar
+  </app-button>
+
+  <div class="text-muted-foreground text-center text-sm">
+    ¿No te llegó?
+    @if ($resendIn() > 0) {
+    <span class="tabular-nums">Puedes reenviarlo en {{ $resendIn() }} s</span>
+    } @else {
+    <button type="button" class="text-primary font-semibold hover:underline" (click)="resend()">Reenviar código</button>
+    }
+    <p class="mt-2 text-xs">Revisa también la carpeta de spam.</p>
+  </div>
+
+  <div class="text-center text-sm">
+    <a routerLink="/auth/sign-in" class="text-primary font-medium hover:underline">Volver a iniciar sesión</a>
+  </div>
+</div>

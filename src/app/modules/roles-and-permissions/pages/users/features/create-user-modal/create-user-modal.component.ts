@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
@@ -6,7 +6,9 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
-import { CreateUserService, GetAllUsersService } from '../../data-access';
+import { CreateUserService, GetAllUsersService, getCreateUserErrorMessage } from '../../data-access';
+import { rutValidator } from 'src/app/shared/validators';
+import { GetAllBusinessLocationsService } from 'src/app/modules/restaurante/pages/business-location/data-access';
 import { GetAllRolesService } from '../../../roles/data-access';
 
 @Component({
@@ -35,22 +37,28 @@ export class CreateUserModalComponent implements OnDestroy {
 
   protected readonly $isLoading = this.$createUserService.$isLoading;
   protected readonly allRoles = this.$allRolesService.$roles;
+  // Solo roles de personal: SUPERADMIN y OWNER no se pueden asignar (el backend los rechaza).
+  protected readonly $staffRoles = computed(() =>
+    (this.allRoles()?.data ?? []).filter((role) => !['SUPERADMIN', 'OWNER'].includes(role.code)),
+  );
   protected readonly $loadingRoles = this.$allRolesService.$isLoading;
+  protected readonly $locations = inject(GetAllBusinessLocationsService).$locations;
 
   private fb = inject(FormBuilder);
 
   form = this.fb.group({
-    rut: ['', [Validators.required]],
+    rut: ['', [rutValidator]],
     name: ['', [Validators.required]],
     fatherLastName: ['', [Validators.required]],
     motherLastName: [''],
     email: ['', [Validators.required, Validators.email]],
     roleIds: [[] as number[]],
+    branchId: [null as number | null],
   });
 
   constructor() {
     this.$createUserService.reset();
-    this.$allRolesService.setParams({ perPage: 50 });
+    this.$allRolesService.setParams({ page: 1, perPage: 50, searchCode: '', searchName: '' });
 
     effect(() => {
       if (this.$createUserService.$success()) {
@@ -58,8 +66,9 @@ export class CreateUserModalComponent implements OnDestroy {
         this.$getAllUsersService.retry();
         this.dialogRef.close();
       }
-      if (this.$createUserService.$hasError()) {
-        this.$toast.show(`Algo salió mal. Por favor, vuelva a intentar.`, 'error');
+      const error = this.$createUserService.$error();
+      if (error) {
+        this.$toast.show(getCreateUserErrorMessage(error), 'error');
       }
     });
   }
@@ -83,6 +92,7 @@ export class CreateUserModalComponent implements OnDestroy {
     const fatherLastName = this.form.get('fatherLastName')!.value ?? '';
     const motherLastName = this.form.get('motherLastName')!.value ?? '';
     const email = this.form.get('email')!.value ?? '';
+    const branchId = this.form.get('branchId')!.value;
 
     this.$createUserService.create({
       rut,
@@ -91,6 +101,7 @@ export class CreateUserModalComponent implements OnDestroy {
       motherLastName,
       email,
       roleIds: this.selectedRoleIds.length > 0 ? this.selectedRoleIds : undefined,
+      branchId: branchId ?? undefined,
     });
   }
 

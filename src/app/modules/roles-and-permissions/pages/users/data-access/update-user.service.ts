@@ -1,16 +1,17 @@
-import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, catchError, EMPTY, map, Subject, switchMap, tap } from 'rxjs';
 import { UpdateUserDto } from './dtos';
 import { ApiPathEnum } from 'src/environments';
+import { ApiError, readApiError } from 'src/app/core/utils';
 
 @Injectable({ providedIn: 'root' })
 export class UpdateUserService {
   readonly #httpClient = inject(HttpClient);
 
   readonly #isLoading$ = new BehaviorSubject(false);
-  readonly #error$ = new Subject<HttpStatusCode | undefined>();
+  readonly #error$ = new Subject<ApiError | undefined>();
   readonly #submit$ = new Subject<UpdateUserDto>();
   readonly #success$ = new Subject<boolean>();
 
@@ -31,14 +32,15 @@ export class UpdateUserService {
           if (input.motherLastName !== undefined) body['motherLastName'] = input.motherLastName;
           if (input.email !== undefined) body['email'] = input.email;
           if (input.statusId !== undefined) body['statusId'] = input.statusId;
+          if (input.branchId !== undefined) body['branchId'] = input.branchId;
 
           return this.#httpClient.patch<{ message: string }>(`${ApiPathEnum.AUTH}/users/${input.userId}`, body).pipe(
             tap(() => {
               this.#success$.next(true);
               this.#isLoading$.next(false);
             }),
-            catchError((error: HttpErrorResponse) => {
-              this.#error$.next(error.status);
+            catchError((error: unknown) => {
+              this.#error$.next(readApiError(error));
               this.#success$.next(false);
               this.#isLoading$.next(false);
               return EMPTY;

@@ -1,0 +1,62 @@
+<app-modal-card>
+  <ng-template app-slot="header">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">QR de {{ table.name }}</h2>
+  </ng-template>
+
+  @if ($qrUrl(); as url) {
+  <div class="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
+    <div class="w-48 shrink-0">
+      <app-table-qr-code [value]="url" [alt]="'QR de ' + table.name" />
+    </div>
+    <div class="min-w-0 flex-1 space-y-3">
+      <p class="text-muted-foreground text-sm">
+        Al escanearlo, el cliente abre la carta de esta mesa. Imprímelo y déjalo visible en la mesa.
+      </p>
+      <div class="glass-row flex items-center gap-2 rounded-md px-3 py-2">
+        <span class="text-foreground min-w-0 flex-1 truncate font-mono text-xs" [title]="url">{{ url }}</span>
+        <button type="button" title="Copiar enlace" aria-label="Copiar enlace" class="text-muted-foreground hover:text-primary" (click)="copyLink(url)">
+          <app-icon class="h-4 w-4">content_copy</app-icon>
+        </button>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <app-button impact="bold" tone="primary" shape="rounded" size="small" icon="print" (buttonClick)="print(url)">Imprimir</app-button>
+        <app-button impact="light" tone="primary" shape="rounded" size="small" icon="download" (buttonClick)="download(url)">Descargar PNG</app-button>
+      </div>
+    </div>
+  </div>
+  } @else {
+  <div class="flex flex-col items-center gap-3 py-6 text-center">
+    <app-icon class="text-muted-foreground h-12 w-12">qr_code_2</app-icon>
+    <p class="text-foreground font-medium">QR no disponible</p>
+    <p class="text-muted-foreground max-w-sm text-sm">
+      <!-- Solo sin qrUrl: o la mesa no tiene código, o el backend no entregó el enlace de la carta -->
+      {{ $qrCode() ? 'El enlace de la carta digital aún no está disponible. Contacta a soporte.' : 'Esta mesa todavía no tiene un código QR. Genera uno para empezar.' }}
+    </p>
+  </div>
+  }
+
+  <!-- Regenerar: invalida el QR impreso anterior, por eso pide confirmación -->
+  <div class="mt-5 border-t border-[var(--border)] pt-4">
+    @if ($confirmRegenerate()) {
+    <div class="rounded-lg bg-amber-500/10 p-3">
+      <p class="text-sm text-amber-700">El QR actual dejará de funcionar y tendrás que imprimir el nuevo. ¿Continuar?</p>
+      <div class="mt-2 flex justify-end gap-2">
+        <app-button impact="light" size="small" [disabled]="!!$isRegenerating()" (buttonClick)="$confirmRegenerate.set(false)">No</app-button>
+        <app-button impact="bold" tone="danger" size="small" [disabled]="!!$isRegenerating()" [isLoading]="!!$isRegenerating()" (buttonClick)="regenerate()">
+          Sí, regenerar
+        </app-button>
+      </div>
+    </div>
+    } @else {
+    <button type="button" class="text-muted-foreground hover:text-primary inline-flex items-center gap-1 text-sm" (click)="$qrCode() ? $confirmRegenerate.set(true) : regenerate()">
+      <app-icon class="h-4 w-4">autorenew</app-icon>{{ $qrCode() ? 'Regenerar QR' : 'Generar QR' }}
+    </button>
+    }
+  </div>
+
+  <ng-template app-slot="footer">
+    <div class="flex justify-end">
+      <app-button type="button" impact="light" (buttonClick)="close()">Cerrar</app-button>
+    </div>
+  </ng-template>
+</app-modal-card>

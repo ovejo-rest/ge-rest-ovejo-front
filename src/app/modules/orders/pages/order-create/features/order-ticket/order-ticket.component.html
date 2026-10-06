@@ -1,0 +1,87 @@
+<div>
+  <div class="mb-2 flex items-center justify-between">
+    <h3 class="text-foreground font-semibold">Productos</h3>
+    <span class="text-muted-foreground text-xs">{{ $itemCount() }} {{ $itemCount() === 1 ? 'ítem' : 'ítems' }}</span>
+  </div>
+
+  @if (lines().length === 0) {
+  <div class="text-muted-foreground rounded-lg border border-dashed border-[var(--border)] px-4 py-8 text-center text-sm">
+    Toca un producto para agregarlo.
+  </div>
+  } @else {
+  <ul class="divide-y divide-[var(--border)]">
+    @for (line of lines(); track line.key) {
+    <li class="py-2">
+      <div class="flex items-center gap-2">
+        <div class="min-w-0 flex-1">
+          <p class="text-foreground truncate text-sm font-medium">{{ line.name }}</p>
+          @if (line.note) {
+          <p class="truncate text-xs italic text-amber-600">“{{ line.note }}”</p>
+          } @else {
+          <p class="text-muted-foreground text-xs tabular-nums">{{ formatCurrency(line.unitPrice) }} c/u</p>
+          }
+        </div>
+        <div class="flex items-center gap-1">
+          <button
+            type="button"
+            class="flex h-9 w-9 items-center justify-center rounded-md"
+            [class]="line.note ? 'bg-amber-500/15 text-amber-700' : 'glass-row'"
+            [attr.aria-label]="(line.note ? 'Editar nota de ' : 'Agregar nota a ') + line.name"
+            [title]="line.note ? 'Editar nota' : 'Agregar nota'"
+            (click)="editNote(line)">
+            <app-icon class="h-4 w-4">edit_note</app-icon>
+          </button>
+          <button
+            type="button"
+            class="glass-row flex h-9 w-9 items-center justify-center rounded-md"
+            [attr.aria-label]="line.quantity === 1 ? 'Quitar ' + line.name : 'Restar uno de ' + line.name"
+            (click)="line.quantity === 1 ? remove.emit(line.key) : decrement.emit(line.key)">
+            <app-icon class="h-4 w-4">{{ line.quantity === 1 ? 'delete' : 'remove' }}</app-icon>
+          </button>
+          <span class="text-foreground w-7 text-center font-semibold tabular-nums">{{ line.quantity }}</span>
+          <button type="button" class="glass-row flex h-9 w-9 items-center justify-center rounded-md" [attr.aria-label]="'Sumar uno de ' + line.name" (click)="increment.emit(line.key)">
+            <app-icon class="h-4 w-4">add</app-icon>
+          </button>
+        </div>
+        <span class="text-foreground w-20 text-right text-sm font-semibold tabular-nums">{{ formatCurrency(line.unitPrice * line.quantity) }}</span>
+      </div>
+
+      @if ($editingKey() === line.key) {
+      <div class="border-primary mt-2 space-y-2 rounded-lg border-2 p-2">
+        <div class="flex flex-wrap gap-1.5">
+          @for (quick of quickNotes; track quick) {
+          <button type="button" class="glass-row rounded-full px-3 py-1.5 text-xs font-medium" (click)="addQuickNote(quick)">{{ quick }}</button>
+          }
+        </div>
+        <div class="flex gap-2">
+          <input
+            type="text"
+            maxlength="120"
+            placeholder="Ej: sin palta"
+            [attr.aria-label]="'Nota para ' + line.name"
+            class="glass-input min-w-0 flex-1 rounded-md px-3 py-2 text-sm"
+            [value]="$draft()"
+            (input)="onDraft($event)"
+            (keydown.enter)="saveNote(line.key)" />
+          <button type="button" class="bg-primary flex h-10 w-10 items-center justify-center rounded-md text-white" aria-label="Guardar nota" (click)="saveNote(line.key)">
+            <app-icon class="h-5 w-5">check</app-icon>
+          </button>
+          <button type="button" class="text-muted-foreground flex h-10 w-10 items-center justify-center rounded-md" aria-label="Cancelar" (click)="cancelNote()">
+            <app-icon class="h-5 w-5">close</app-icon>
+          </button>
+        </div>
+        @if (line.quantity > 1) {
+        <p class="text-muted-foreground text-xs">La nota aplica a las {{ line.quantity }} unidades. Para que solo una lleve la nota, deja esta línea en 1 y vuelve a tocar el producto.</p>
+        }
+      </div>
+      }
+    </li>
+    }
+  </ul>
+  <div class="mt-2 flex items-center justify-between border-t border-[var(--border)] pt-3">
+    <span class="text-foreground font-semibold">Total estimado</span>
+    <span class="text-foreground text-lg font-bold tabular-nums">{{ formatCurrency($total()) }}</span>
+  </div>
+  <p class="text-muted-foreground mt-1 text-xs">IVA incluido. El total final lo confirma el sistema al guardar.</p>
+  }
+</div>

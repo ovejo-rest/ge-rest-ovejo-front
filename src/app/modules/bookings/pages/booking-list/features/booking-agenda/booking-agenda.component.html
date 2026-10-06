@@ -1,0 +1,61 @@
+<div class="space-y-3">
+  @let summary = $summary();
+  <p class="text-muted-foreground text-sm">
+    {{ summary.count }} {{ summary.count === 1 ? 'reserva' : 'reservas' }} · {{ summary.guests }} personas
+    @if (summary.cancelled) { · {{ summary.cancelled }} {{ summary.cancelled === 1 ? 'cancelada' : 'canceladas' }} }
+  </p>
+
+  @for (booking of bookings(); track booking.id) {
+  @let cancelled = booking.status === 'cancelled';
+  <article class="glass flex flex-col gap-3 rounded-xl p-4 sm:flex-row sm:items-center" [class.opacity-60]="cancelled || busyIds().has(booking.id)">
+    <div class="flex items-center gap-4 sm:w-40 sm:shrink-0">
+      <div class="text-center">
+        <p class="text-foreground text-2xl font-bold tabular-nums" [class.line-through]="cancelled">{{ timeOf(booking.start) }}</p>
+        <p class="text-muted-foreground text-xs tabular-nums">hasta {{ timeOf(booking.end) }}</p>
+      </div>
+    </div>
+
+    <div class="min-w-0 flex-1">
+      <div class="flex flex-wrap items-center gap-2">
+        <h3 class="text-foreground truncate font-semibold" [class.line-through]="cancelled">{{ booking.customerName }}</h3>
+        <app-status-badge [map]="statusMap" [status]="booking.status" />
+      </div>
+      <p class="text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+        <span class="inline-flex items-center gap-1"><app-icon class="h-4 w-4">group</app-icon>{{ booking.partySize }} pers.</span>
+        <span class="inline-flex items-center gap-1"><app-icon class="h-4 w-4">table_bar</app-icon>{{ booking.tableName ?? 'Sin mesa' }}</span>
+        @if (booking.customerMobile) {
+        <a [href]="'tel:' + booking.customerMobile" class="hover:text-primary inline-flex items-center gap-1 tabular-nums" [attr.aria-label]="'Llamar a ' + booking.customerName">
+          <app-icon class="h-4 w-4">call</app-icon>{{ booking.customerMobile }}
+        </a>
+        }
+        @if (booking.waiterName) {
+        <span class="inline-flex items-center gap-1"><app-icon class="h-4 w-4">badge</app-icon>{{ booking.waiterName }}</span>
+        }
+      </p>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      @if (cancelled) {
+      <button type="button" class="glass-row h-10 rounded-md px-3 text-sm font-medium" [disabled]="busyIds().has(booking.id)" (click)="changeStatus.emit({ booking, status: 'booked' })">Reactivar</button>
+      } @else {
+      @if (booking.status === 'waiting') {
+      <button type="button" class="glass-row h-10 rounded-md px-3 text-sm font-medium" [disabled]="busyIds().has(booking.id)" (click)="changeStatus.emit({ booking, status: 'booked' })">Confirmar</button>
+      }
+      @if (booking.status === 'booked' || booking.status === 'waiting') {
+      <button type="button" class="inline-flex h-10 items-center gap-1 rounded-md bg-green-600 px-3 text-sm font-medium text-white" [disabled]="busyIds().has(booking.id)" (click)="changeStatus.emit({ booking, status: 'completed' })">
+        <app-icon class="h-4 w-4">how_to_reg</app-icon>Llegó
+      </button>
+      }
+      <button type="button" title="Editar" [attr.aria-label]="'Editar reserva de ' + booking.customerName" class="text-muted-foreground hover:text-primary inline-flex h-10 w-10 items-center justify-center rounded-md" [disabled]="busyIds().has(booking.id)" (click)="edit.emit(booking)">
+        <app-icon class="h-5 w-5">edit</app-icon>
+      </button>
+      @if (booking.status !== 'completed') {
+      <button type="button" title="Cancelar reserva" [attr.aria-label]="'Cancelar reserva de ' + booking.customerName" class="text-muted-foreground inline-flex h-10 w-10 items-center justify-center rounded-md hover:bg-red-500/10 hover:text-red-600" [disabled]="busyIds().has(booking.id)" (click)="changeStatus.emit({ booking, status: 'cancelled' })">
+        <app-icon class="h-5 w-5">event_busy</app-icon>
+      </button>
+      }
+      }
+    </div>
+  </article>
+  }
+</div>

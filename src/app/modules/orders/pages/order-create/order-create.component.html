@@ -1,0 +1,99 @@
+<div>
+  <a
+    [routerLink]="mode === 'add' ? ['/orders', $orderId()] : ['/tables']"
+    class="text-muted-foreground hover:text-primary mb-3 inline-flex items-center gap-1 text-sm">
+    <app-icon class="h-4 w-4">arrow_back</app-icon>{{ mode === 'add' ? 'Volver al pedido' : 'Mesas' }}
+  </a>
+
+  <div class="mb-4">
+    @if (mode === 'add') {
+    <h1 class="text-foreground text-xl font-semibold">
+      Agregar productos
+      @if ($order(); as order) {
+      <span class="text-muted-foreground font-mono text-base">· {{ order.invoiceNo }} · {{ order.tableName ?? 'Sin mesa' }}</span>
+      }
+    </h1>
+    <p class="text-muted-foreground text-sm">Si es un pedido de cocina, se enviará una comanda solo con lo nuevo.</p>
+    } @else {
+    <h1 class="text-foreground text-xl font-semibold">Nuevo pedido</h1>
+    <p class="text-muted-foreground text-sm">Elige los productos y confirma para abrir la cuenta.</p>
+    }
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <div class="lg:col-span-2">
+      <app-product-picker
+        [products]="$products()"
+        [categories]="$categories()"
+        [loading]="$isLoadingProducts()"
+        [selectedCategoryId]="$selectedCategoryId()"
+        [quantities]="$quantities()"
+        (categoryChange)="handleCategoryChange($event)"
+        (searchChange)="handleSearchChange($event)"
+        (add)="handleAdd($event)" />
+    </div>
+
+    <aside class="glass flex flex-col gap-4 rounded-[1rem] p-4 lg:sticky lg:top-4 lg:self-start">
+      @if (mode === 'create') {
+      <form [formGroup]="form" class="grid grid-cols-2 gap-3">
+        @if (!$locationId()) {
+        <div class="col-span-2">
+          <label class="text-foreground mb-1 block text-sm font-medium">Sucursal *</label>
+          <app-business-location-selector (selectedLocationChange)="handleLocationChange($event)" />
+        </div>
+        }
+        <div>
+          <label class="text-foreground mb-1 block text-sm font-medium">Mesa</label>
+          <select formControlName="resTableId" [class]="inputClass">
+            <option [ngValue]="null">Sin mesa</option>
+            @for (table of $tables(); track table.id) {
+            <option [ngValue]="table.id" [disabled]="table.status === 'blocked'">
+              {{ table.name }}{{ table.status === 'blocked' ? ' (bloqueada)' : table.status === 'occupied' ? ' (ocupada)' : '' }}
+            </option>
+            }
+          </select>
+        </div>
+        <div>
+          <label class="text-foreground mb-1 block text-sm font-medium">Mesero</label>
+          <select formControlName="resWaiterId" [class]="inputClass">
+            <option [ngValue]="null">Sin mesero</option>
+            @for (member of $staff(); track member.code) {
+            <option [ngValue]="member.code">{{ member.name }} {{ member.fatherLastName }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-span-2">
+          <app-customer-selector [selected]="$customer()" (selectedChange)="$customer.set($event)" />
+        </div>
+      </form>
+      }
+
+      <app-order-ticket
+        [lines]="$cart()"
+        (increment)="handleIncrement($event)"
+        (decrement)="handleDecrement($event)"
+        (remove)="handleRemove($event)"
+        (noteChange)="handleNote($event)" />
+
+      @if (mode === 'create') {
+      <!-- Al agregar productos no hay nota general: cada producto lleva la suya -->
+      <form [formGroup]="form" class="space-y-3">
+        <textarea formControlName="kitchenNote" rows="2" placeholder="Nota general del pedido (opcional). Se imprime en la comanda." [class]="inputClass"></textarea>
+        <label class="flex cursor-pointer items-center justify-between gap-3 text-sm">
+          <span class="text-foreground">Enviar a cocina</span>
+          <input type="checkbox" formControlName="isKitchenOrder" class="h-5 w-5 accent-[var(--primary)]" />
+        </label>
+      </form>
+      }
+
+      <div>
+        <app-button full impact="bold" tone="primary" shape="rounded" size="large" [disabled]="$isSaving()" [isLoading]="$isSaving()" (buttonClick)="handleSubmit()">
+          {{ mode === 'add' ? 'Agregar al pedido' : 'Confirmar pedido' }}
+        </app-button>
+        @if ($missing(); as missing) {
+        <p class="text-muted-foreground mt-2 text-center text-xs">{{ missing }}</p>
+        }
+      </div>
+    </aside>
+  </div>
+</div>

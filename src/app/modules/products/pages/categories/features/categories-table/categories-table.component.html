@@ -1,0 +1,40 @@
+<app-table>
+  <ng-template app-slot="head">
+    <tr>
+      @for (item of headerData; track $index) {
+      <th class="h-8 text-center">{{ item }}</th>
+      }
+      <th class="w-[90px]"></th>
+    </tr>
+  </ng-template>
+  @if (isLoading()) {
+  <tr>
+    <td colspan="4" class="px-2 py-4"><app-progress-bar /></td>
+  </tr>
+  } @else { @for (row of $rows(); track row.category.id) {
+  <tr class="glass-row h-10">
+    <td class="font-medium">
+      <div class="flex items-center gap-2" [style.padding-left.px]="row.level * 20">
+        @if (row.level > 0) {
+        <span class="text-muted-foreground" aria-hidden="true">└</span>
+        }
+        <app-image-thumb
+          class="bg-primary/10 text-primary size-8 text-xs"
+          [src]="row.category.imageUrl"
+          [name]="row.category.name"
+          [alt]="row.category.name"
+          (expired)="imageExpired.emit()" />
+        <span>{{ row.category.name }}</span>
+      </div>
+    </td>
+    <td class="text-center">{{ row.category.shortCode || '-' }}</td>
+    <td class="text-muted-foreground text-center">{{ row.category.description || '-' }}</td>
+    <td class="w-[90px] text-center">
+      <div class="flex items-center justify-center gap-1">
+        <app-button size="small" icon="edit_document" (buttonClick)="handleUpdate(row.category)" />
+        <app-button size="small" icon="delete" tone="danger" (buttonClick)="handleDelete(row.category)" />
+      </div>
+    </td>
+  </tr>
+  } }
+</app-table>

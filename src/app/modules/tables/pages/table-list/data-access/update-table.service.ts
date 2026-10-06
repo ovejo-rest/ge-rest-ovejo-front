@@ -1,7 +1,8 @@
-import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, catchError, EMPTY, map, Subject, switchMap, tap } from 'rxjs';
+import { ApiError, readApiError } from 'src/app/core/utils';
 import { UpdateTableDto } from './dtos';
 import { ApiPathEnum } from 'src/environments';
 
@@ -9,26 +10,27 @@ import { ApiPathEnum } from 'src/environments';
 export class UpdateTableService {
   readonly #httpClient = inject(HttpClient);
   readonly #isLoading$ = new BehaviorSubject(false);
-  readonly #error$ = new Subject<HttpStatusCode | undefined>();
-  readonly #submit$ = new Subject<{ id: number; data: UpdateTableDto }>();
+  readonly #error$ = new Subject<ApiError | undefined>();
+  readonly #submit$ = new Subject<UpdateTableDto>();
   readonly #success$ = new Subject<boolean>();
 
   readonly $isLoading = toSignal(this.#isLoading$);
   readonly $error = toSignal(this.#error$);
-  readonly $hasError = toSignal(this.#error$.pipe(map((c) => c !== undefined)));
+  readonly $hasError = toSignal(this.#error$.pipe(map((e) => e !== undefined)));
   readonly $success = toSignal(this.#success$);
 
   constructor() {
     this.#submit$.pipe(
       tap(() => this.#isLoading$.next(true)),
       tap(() => this.#error$.next(undefined)),
-      switchMap(({ id, data }) => this.#httpClient.patch(`${ApiPathEnum.RESTAURANT}/tables/${id}`, data).pipe(
+      // El id va solo en la URL; el backend no lo acepta en el body.
+      switchMap(({ id, ...changes }) => this.#httpClient.put(`${ApiPathEnum.RESTAURANT}/tables/${id}`, changes).pipe(
         tap(() => { this.#success$.next(true); this.#isLoading$.next(false); }),
-        catchError((e: HttpErrorResponse) => { this.#error$.next(e.status); this.#success$.next(false); this.#isLoading$.next(false); return EMPTY; }),
+        catchError((e: unknown) => { this.#error$.next(readApiError(e)); this.#success$.next(false); this.#isLoading$.next(false); return EMPTY; }),
       )),
     ).subscribe();
   }
 
-  update(id: number, data: UpdateTableDto) { this.#submit$.next({ id, data }); }
+  update(data: UpdateTableDto) { this.#submit$.next(data); }
   reset() { this.#error$.next(undefined); this.#success$.next(false); this.#isLoading$.next(false); }
 }

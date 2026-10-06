@@ -1,0 +1,47 @@
+<div class="glass flex h-full flex-col rounded-[1rem] p-3">
+  <div class="mb-2 flex items-center justify-between">
+    <h2 class="text-foreground font-semibold">Mesas</h2>
+    <span class="text-muted-foreground text-xs">{{ $occupiedCount() }}/{{ tables().length }} ocupadas</span>
+  </div>
+
+  @if (sectors().length > 1) {
+  <div class="-mx-1 mb-2 flex gap-1 overflow-x-auto px-1 pb-1">
+    <button type="button" class="shrink-0 rounded-full px-3 py-1 text-xs font-medium" [class]="$sectorId() === null ? 'bg-primary text-white' : 'glass-row'" (click)="$sectorId.set(null)">
+      Todos
+    </button>
+    @for (sector of sectors(); track sector.id) {
+    <button type="button" class="shrink-0 rounded-full px-3 py-1 text-xs font-medium" [class]="$sectorId() === sector.id ? 'bg-primary text-white' : 'glass-row'" (click)="$sectorId.set(sector.id)">
+      {{ sector.name }}
+    </button>
+    }
+  </div>
+  }
+
+  @if (loading()) {
+  <app-progress-bar />
+  }
+
+  <div class="grid grid-cols-3 gap-2 overflow-y-auto sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-3">
+    <button
+      type="button"
+      class="flex min-h-[64px] flex-col items-center justify-center rounded-lg border-2 p-2 text-xs font-medium active:scale-95"
+      [class]="selectedTableId() === null ? 'border-primary bg-primary/10 text-primary' : 'glass-row text-foreground border-transparent'"
+      (click)="selectCounter.emit()">
+      <app-icon class="h-5 w-5">storefront</app-icon>Sin mesa
+    </button>
+    @for (table of $visibleTables(); track table.id) {
+    <button
+      type="button"
+      class="flex min-h-[64px] flex-col items-center justify-center rounded-lg border-2 p-2 active:scale-95"
+      [class]="statusClasses(table.status)"
+      [class.ring-2]="selectedTableId() === table.id"
+      [class.ring-primary]="selectedTableId() === table.id"
+      [disabled]="table.status === 'blocked'"
+      [attr.aria-pressed]="selectedTableId() === table.id"
+      (click)="selectTable.emit(table)">
+      <span class="text-sm font-semibold">{{ table.name }}</span>
+      <span class="text-[11px]">{{ table.capacity }} pers.</span>
+    </button>
+    }
+  </div>
+</div>

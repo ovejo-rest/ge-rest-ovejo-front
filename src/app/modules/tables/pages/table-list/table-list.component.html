@@ -1,4 +1,4 @@
-@let tables = $tables(); @let isLoading = $isLoading(); @let hasError = $hasError(); @let viewMode = $viewMode();
+@let tables = $filteredTables(); @let sectors = $sectors(); @let isLoading = $isLoading(); @let hasError = $hasError(); @let viewMode = $viewMode();
 
 <div>
   <app-header-dashboard title="Mesas" subtitle="Gestiona las mesas de tu restaurante">
@@ -12,6 +12,7 @@
       (buttonClick)="createTable()">
       Crear mesa
     </app-button>
+
     <app-button
       full
       impact="light"
@@ -22,35 +23,44 @@
       (buttonClick)="toggleView()">
       {{ viewMode === 'grid' ? 'Lista' : 'Grid' }}
     </app-button>
+
+    <app-button full impact="light" tone="primary" shape="rounded" size="medium" icon="qr_code_2" (buttonClick)="printAllQrs()">
+      Imprimir QR
+    </app-button>
+
     <app-button full impact="light" tone="primary" shape="rounded" size="medium" icon="refresh" (buttonClick)="retry()">
       Actualizar
     </app-button>
   </app-header-dashboard>
 
+  <!-- Selectores -->
+  <div class="mb-4 flex flex-wrap items-center gap-2">
+    <div class="w-56">
+      <app-business-location-selector (selectedLocationChange)="onLocationSelected($event)" />
+    </div>
+  </div>
+
+  <!-- Tabs de sectores -->
+  @if (sectors.length > 0) {
+  <div class="mb-4">
+    <app-sector-tabs [sectors]="sectors" (selectedSectorId)="onSectorSelected($event)" />
+  </div>
+  }
+
   @if (hasError) {
   <div class="flex flex-col items-center gap-4 py-16 text-center">
-    <app-icon class="text-destructive h-14 w-14">error_outline</app-icon>
+    <app-icon class="text-destructive h-14 w-14"> error_outline </app-icon>
     <div>
       <h2 class="text-foreground text-lg font-semibold">Error al cargar las mesas</h2>
       <p class="text-muted-foreground mt-1 text-sm">No se pudieron obtener los datos. Intenta nuevamente.</p>
     </div>
-    <app-button impact="bold" tone="primary" shape="rounded" (buttonClick)="retry()">Reintentar</app-button>
+    <app-button impact="bold" tone="primary" shape="rounded" (buttonClick)="retry()"> Reintentar </app-button>
   </div>
   } @else if (viewMode === 'grid') {
   <app-card>
-    <app-tables-grid
-      [tables]="tables?.data ?? []"
-      [isLoading]="isLoading ?? false" />
+    <app-tables-grid [tables]="tables" [sectors]="sectors" [isLoading]="isLoading" (tableSelect)="onTableSelected($event)" />
   </app-card>
   } @else {
-  <app-tables-table
-    [tables]="tables?.data ?? []"
-    [pagination]="tables?.pagination ?? { page: 1, perPage: 10, totalItems: 0, totalPages: 0 }"
-    [isLoading]="isLoading ?? false"
-    (pageChange)="onPageChange($event)"
-    (perPageChange)="onPerPageChange($event)"
-    (searchNameChange)="onSearchNameChange($event)"
-    (statusFilterChange)="onStatusFilterChange($event)"
-    (retryData)="retry()" />
+  <app-tables-table [tables]="tables" [isLoading]="isLoading" (retryData)="retry()" />
   }
 </div>

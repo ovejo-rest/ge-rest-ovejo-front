@@ -1,0 +1,102 @@
+<div>
+  <a routerLink="/customers" class="text-muted-foreground hover:text-primary mb-3 inline-flex items-center gap-1 text-sm">
+    <app-icon class="h-4 w-4">arrow_back</app-icon>Clientes
+  </a>
+
+  @if ($customer(); as customer) {
+  <!-- Encabezado -->
+  <div class="mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <h1 class="text-foreground text-2xl font-semibold">{{ customer.name }}</h1>
+      <div class="text-muted-foreground mt-1 flex flex-wrap gap-x-5 gap-y-1 text-sm">
+        <a [href]="'tel:' + customer.mobile" class="hover:text-primary inline-flex items-center gap-1"><app-icon class="h-4 w-4">call</app-icon>{{ customer.mobile }}</a>
+        @if (customer.email) {
+        <a [href]="'mailto:' + customer.email" class="hover:text-primary inline-flex items-center gap-1"><app-icon class="h-4 w-4">mail</app-icon>{{ customer.email }}</a>
+        }
+        <span class="inline-flex items-center gap-1"><app-icon class="h-4 w-4">event</app-icon>Cliente desde {{ sinceLabel(customer.createdAt) }}</span>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <app-button impact="light" tone="primary" shape="rounded" icon="edit" (buttonClick)="handleEdit(customer)">Editar</app-button>
+      <app-button impact="light" tone="danger" shape="rounded" icon="delete" (buttonClick)="handleDelete(customer)">Eliminar</app-button>
+    </div>
+  </div>
+
+  <!-- Indicadores de todo el historial (los calcula el backend) -->
+  @let stats = customer.summary;
+  <div class="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div class="glass rounded-xl p-4">
+      <p class="text-muted-foreground text-xs">Visitas</p>
+      <p class="text-foreground text-2xl font-bold tabular-nums">{{ stats.visits }}</p>
+    </div>
+    <div class="glass rounded-xl p-4">
+      <p class="text-muted-foreground text-xs">Total gastado</p>
+      <p class="text-foreground text-2xl font-bold tabular-nums">{{ formatCurrency(stats.totalSpent) }}</p>
+    </div>
+    <div class="glass rounded-xl p-4">
+      <p class="text-muted-foreground text-xs">Ticket promedio</p>
+      <p class="text-foreground text-2xl font-bold tabular-nums">{{ formatCurrency(stats.avgTicket) }}</p>
+    </div>
+    <div class="glass rounded-xl p-4">
+      <p class="text-muted-foreground text-xs">Última visita</p>
+      <p class="text-foreground text-lg font-semibold">{{ stats.lastVisitAt ? formatDateTime(stats.lastVisitAt) : '—' }}</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <!-- Historial -->
+    <section class="glass overflow-hidden rounded-[1rem] lg:col-span-2">
+      <h2 class="text-foreground border-b border-[var(--border)] px-4 py-3 font-semibold">Últimos pedidos</h2>
+      @if (!$orders().length) {
+      <p class="text-muted-foreground px-4 py-10 text-center text-sm">Todavía no tiene pedidos.</p>
+      } @else {
+      <ul class="divide-y divide-[var(--border)]">
+        @for (order of $orders(); track order.transactionId) {
+        <li>
+          <a [routerLink]="['/orders', order.transactionId]" class="glass-row flex items-center gap-3 px-4 py-3">
+            <div class="min-w-0 flex-1">
+              <p class="text-foreground font-mono text-sm font-semibold">{{ order.invoiceNo }}</p>
+              <p class="text-muted-foreground text-xs">{{ formatDateTime(order.createdAt) }}</p>
+            </div>
+            <app-status-badge [map]="orderStatus" [status]="order.status" />
+            <span class="text-foreground w-24 text-right font-semibold tabular-nums">{{ formatCurrency(order.total) }}</span>
+            <app-icon class="text-muted-foreground h-5 w-5">chevron_right</app-icon>
+          </a>
+        </li>
+        }
+      </ul>
+      }
+    </section>
+
+    <!-- Datos -->
+    <section class="glass rounded-[1rem] p-4">
+      <h2 class="text-foreground mb-3 font-semibold">Datos</h2>
+      <dl class="space-y-3 text-sm">
+        <div><dt class="text-muted-foreground text-xs">RUT</dt><dd class="text-foreground">{{ customer.taxNumber || '—' }}</dd></div>
+        <div><dt class="text-muted-foreground text-xs">Dirección</dt><dd class="text-foreground">{{ customer.addressLine1 || '—' }}</dd></div>
+        <div><dt class="text-muted-foreground text-xs">Comuna / ciudad</dt><dd class="text-foreground">{{ customer.city || '—' }}</dd></div>
+      </dl>
+    </section>
+  </div>
+  } @else if ($isLoading()) {
+  <div class="space-y-4">
+    <app-skeleton size="sm" style="width: 260px" />
+    <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      @for (i of [1, 2, 3, 4]; track i) {
+      <app-skeleton size="lg" />
+      }
+    </div>
+    <app-skeleton size="2xl" />
+  </div>
+  } @else {
+  <div class="flex flex-col items-center gap-4 py-16 text-center">
+    <app-icon class="text-muted-foreground h-14 w-14">{{ $error() === 404 ? 'person_off' : 'error_outline' }}</app-icon>
+    <p class="text-foreground font-semibold">{{ $error() === 404 ? 'Cliente no encontrado' : 'No se pudo cargar el cliente' }}</p>
+    @if ($error() !== 404) {
+    <app-button impact="bold" tone="primary" shape="rounded" (buttonClick)="load()">Reintentar</app-button>
+    } @else {
+    <a routerLink="/customers" class="text-primary text-sm font-medium hover:underline">Volver a clientes</a>
+    }
+  </div>
+  }
+</div>

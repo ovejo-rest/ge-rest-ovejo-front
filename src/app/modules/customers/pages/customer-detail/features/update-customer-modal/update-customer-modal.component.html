@@ -1,0 +1,40 @@
+<app-modal-card>
+  <ng-template app-slot="header">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Editar cliente</h2>
+  </ng-template>
+
+  <form [formGroup]="form" class="grid grid-cols-1 gap-4 sm:grid-cols-2" (ngSubmit)="handleSubmit()">
+    <div class="sm:col-span-2">
+      <label for="edit-name" class="text-foreground mb-1 block text-sm font-medium">Nombre *</label>
+      <input id="edit-name" formControlName="name" [class]="inputClass" [class.border-red-500]="form.controls.name.invalid && form.controls.name.touched" />
+    </div>
+    <div>
+      <label for="edit-mobile" class="text-foreground mb-1 block text-sm font-medium">Teléfono *</label>
+      <input id="edit-mobile" type="tel" inputmode="tel" formControlName="mobile" [class]="inputClass" [class.border-red-500]="form.controls.mobile.invalid && form.controls.mobile.touched" />
+    </div>
+    <div>
+      <label for="edit-email" class="text-foreground mb-1 block text-sm font-medium">Email</label>
+      <input id="edit-email" type="email" formControlName="email" [class]="inputClass" [class.border-red-500]="form.controls.email.invalid && form.controls.email.touched" />
+    </div>
+    <div>
+      <label for="edit-rut" class="text-foreground mb-1 block text-sm font-medium">RUT</label>
+      <input id="edit-rut" formControlName="taxNumber" placeholder="12.345.678-9" [class]="inputClass" [class.border-red-500]="form.controls.taxNumber.invalid && form.controls.taxNumber.touched" (blur)="formatTaxNumber()" />
+      <p class="text-muted-foreground mt-1 text-xs">Para emitir factura.</p>
+    </div>
+    <div>
+      <label for="edit-city" class="text-foreground mb-1 block text-sm font-medium">Comuna / ciudad</label>
+      <input id="edit-city" formControlName="city" [class]="inputClass" />
+    </div>
+    <div class="sm:col-span-2">
+      <label for="edit-address" class="text-foreground mb-1 block text-sm font-medium">Dirección</label>
+      <input id="edit-address" formControlName="addressLine1" placeholder="Para delivery" [class]="inputClass" />
+    </div>
+  </form>
+
+  <ng-template app-slot="footer">
+    <div class="flex justify-end gap-3">
+      <app-button type="button" impact="light" [disabled]="$isSaving()" (buttonClick)="handleCancel()">Cancelar</app-button>
+      <app-button type="button" impact="bold" [disabled]="$isSaving()" [isLoading]="$isSaving()" (buttonClick)="handleSubmit()">Guardar cambios</app-button>
+    </div>
+  </ng-template>
+</app-modal-card>

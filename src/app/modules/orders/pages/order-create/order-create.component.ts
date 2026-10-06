@@ -1,0 +1,223 @@
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ButtonComponent, IconComponent, ToastService } from 'src/ui';
+import { GetAllTablesService } from 'src/app/modules/tables/pages/table-list/data-access';
+import { BusinessLocationSelector } from 'src/app/modules/sectors/pages/sector-list/ui';
+import { GetAllCategoriesService } from 'src/app/modules/products/pages/categories/data-access';
+import { ProductDto } from 'src/app/modules/products/pages/product-list/data-access';
+import { GetServiceStaffService } from '../order-list/data-access';
+import { GetOrderByIdService } from '../order-detail/data-access';
+import {
+  AddOrderLinesService,
+  CreateOrderService,
+  CustomerDto,
+  getOrderSaveErrorMessage,
+  GetMenuProductsService,
+  OrderProductDto,
+} from './data-access';
+import {
+  addToCart,
+  CartLine,
+  CartNoteChange,
+  changeCartQuantity,
+  CustomerSelectorComponent,
+  OrderTicketComponent,
+  ProductPickerComponent,
+  quantitiesByProduct,
+  removeFromCart,
+  setCartNote,
+  toOrderProducts,
+} from './features';
+
+type OrderCreateMode = 'create' | 'add';
+
+@Component({
+  selector: 'app-order-create',
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    ButtonComponent,
+    IconComponent,
+    BusinessLocationSelector,
+    ProductPickerComponent,
+    OrderTicketComponent,
+    CustomerSelectorComponent,
+  ],
+  templateUrl: './order-create.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class OrderCreateComponent implements OnInit, OnDestroy {
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
+  private readonly createService = inject(CreateOrderService);
+  private readonly addLinesService = inject(AddOrderLinesService);
+  private readonly menuService = inject(GetMenuProductsService);
+  private readonly tablesService = inject(GetAllTablesService);
+  private readonly categoriesService = inject(GetAllCategoriesService);
+  private readonly staffService = inject(GetServiceStaffService);
+  private readonly orderService = inject(GetOrderByIdService);
+
+  readonly mode: OrderCreateMode = this.route.snapshot.data['mode'] === 'add' ? 'add' : 'create';
+  readonly $orderId = signal<number | null>(null);
+  readonly $locationId = signal<number | null>(null);
+
+  readonly $products = this.menuService.$products;
+  readonly $isLoadingProducts = computed(() => this.menuService.$isLoading() ?? false);
+  readonly $categories = computed(() => this.categoriesService.$categories() ?? []);
+  readonly $tables = this.tablesService.$tables;
+  readonly $staff = this.staffService.$staff;
+  readonly $order = computed(() => {
+    const order = this.orderService.$order();
+    return order && order.transactionId === this.$orderId() ? order : null;
+  });
+
+  readonly $selectedCategoryId = signal<number | null>(null);
+  readonly $search = signal('');
+  readonly $cart = signal<CartLine[]>([]);
+  readonly $customer = signal<CustomerDto | null>(null);
+  readonly $quantities = computed(() => quantitiesByProduct(this.$cart()));
+
+  readonly form = inject(FormBuilder).group({
+    resTableId: [null as number | null],
+    resWaiterId: [null as string | null],
+    isKitchenOrder: [true],
+    kitchenNote: [''],
+  });
+
+  readonly $isSaving = computed(() =>
+    this.mode === 'add' ? (this.addLinesService.$isLoading() ?? false) : (this.createService.$isLoading() ?? false),
+  );
+  // Qué falta para poder confirmar; se muestra junto al botón.
+  readonly $missing = computed(() => {
+    if (!this.$cart().length) return 'Agrega al menos un producto';
+    if (this.mode === 'create' && !this.$locationId()) return 'Selecciona una sucursal';
+    return null;
+  });
+
+  readonly inputClass = 'glass-input w-full rounded-md px-3 py-2';
+
+  constructor() {
+    effect(() => {
+      const created = this.createService.$created();
+      if (created) {
+        this.toast.show(`Pedido ${created.invoiceNo} creado`, 'success');
+        this.router.navigate(['/orders', created.transactionId]);
+      }
+    });
+
+    effect(() => {
+      if (this.addLinesService.$success()) {
+        this.toast.show('Productos agregados al pedido', 'success');
+        this.router.navigate(['/orders', this.$orderId()]);
+      }
+    });
+
+    effect(() => {
+      const error = this.createService.$error();
+      if (error) this.toast.show(getOrderSaveErrorMessage(error, false), 'error');
+    });
+
+    effect(() => {
+      const error = this.addLinesService.$error();
+      if (error) this.toast.show(getOrderSaveErrorMessage(error, true), 'error');
+    });
+
+    effect(() => {
+      const locationId = this.$locationId();
+      if (locationId) this.tablesService.setParams(locationId);
+    });
+  }
+
+  ngOnInit(): void {
+    this.staffService.load();
+    if (!this.$categories().length) this.categoriesService.getAll();
+    this.loadProducts();
+
+    if (this.mode === 'add') {
+      const id = Number(this.route.snapshot.paramMap.get('id'));
+      this.$orderId.set(id);
+      this.orderService.load(id);
+      return;
+    }
+
+    const query = this.route.snapshot.queryParamMap;
+    const locationId = Number(query.get('location'));
+    const tableId = Number(query.get('table'));
+    if (locationId > 0) this.$locationId.set(locationId);
+    if (tableId > 0) this.form.controls.resTableId.setValue(tableId);
+  }
+
+  ngOnDestroy(): void {
+    this.createService.reset();
+    this.addLinesService.reset();
+  }
+
+  handleLocationChange(locationId: number) {
+    if (this.$locationId() === locationId) return;
+    this.$locationId.set(locationId);
+    this.form.controls.resTableId.setValue(null);
+  }
+
+  handleCategoryChange(categoryId: number | null) {
+    this.$selectedCategoryId.set(categoryId);
+    this.loadProducts();
+  }
+
+  handleSearchChange(search: string) {
+    this.$search.set(search);
+    this.loadProducts();
+  }
+
+  handleAdd(product: ProductDto) {
+    this.$cart.update((cart) => addToCart(cart, product));
+  }
+
+  handleIncrement(key: string) {
+    this.$cart.update((cart) => changeCartQuantity(cart, key, 1));
+  }
+
+  handleDecrement(key: string) {
+    this.$cart.update((cart) => changeCartQuantity(cart, key, -1));
+  }
+
+  handleRemove(key: string) {
+    this.$cart.update((cart) => removeFromCart(cart, key));
+  }
+
+  handleNote({ key, note }: CartNoteChange) {
+    this.$cart.update((cart) => setCartNote(cart, key, note));
+  }
+
+  handleSubmit() {
+    const missing = this.$missing();
+    if (missing) {
+      this.toast.show(missing, 'warning');
+      return;
+    }
+    // Cada producto lleva su nota; la nota general solo existe al crear el pedido.
+    const products: OrderProductDto[] = toOrderProducts(this.$cart());
+
+    if (this.mode === 'add') {
+      this.addLinesService.add({ orderId: this.$orderId()!, products });
+      return;
+    }
+
+    const { resTableId, resWaiterId, isKitchenOrder, kitchenNote } = this.form.getRawValue();
+    this.createService.create({
+      locationId: this.$locationId()!,
+      contactId: this.$customer()?.id,
+      products,
+      resTableId: resTableId ?? undefined,
+      resWaiterId: resWaiterId ?? undefined,
+      isKitchenOrder: !!isKitchenOrder,
+      staffNote: kitchenNote?.trim() || undefined,
+    });
+  }
+
+  private loadProducts() {
+    this.menuService.load({ categoryId: this.$selectedCategoryId(), name: this.$search() });
+  }
+}

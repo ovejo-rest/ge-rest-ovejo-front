@@ -1,0 +1,50 @@
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+  @if (loading()) { @for (item of skeletons; track item) {
+  <div class="glass rounded-[1rem] p-4"><app-skeleton size="lg" /></div>
+  } } @else { @for (station of stations(); track station.id) {
+  @let type = typeOption(station.type);
+  <article class="glass flex flex-col gap-3 rounded-[1rem] p-4" [class.opacity-60]="!station.isActive">
+    <header class="flex items-start gap-3">
+      <div class="bg-primary/10 text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
+        <app-icon class="h-6 w-6">{{ type.icon }}</app-icon>
+      </div>
+      <div class="min-w-0 flex-1">
+        <h3 class="text-foreground truncate font-semibold">{{ station.name }}</h3>
+        <p class="text-muted-foreground text-xs">{{ type.label }}{{ station.isActive ? '' : ' · Inactiva' }}</p>
+      </div>
+      <div class="flex gap-1">
+        <button type="button" title="Editar" [attr.aria-label]="'Editar ' + station.name" class="text-muted-foreground hover:text-primary inline-flex h-9 w-9 items-center justify-center rounded-md" (click)="edit.emit(station)">
+          <app-icon class="h-5 w-5">edit</app-icon>
+        </button>
+        <button type="button" title="Eliminar" [attr.aria-label]="'Eliminar ' + station.name" class="text-muted-foreground inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-red-500/10 hover:text-red-600" (click)="delete.emit(station)">
+          <app-icon class="h-5 w-5">delete</app-icon>
+        </button>
+      </div>
+    </header>
+
+    <dl class="space-y-1 text-sm">
+      <div class="flex items-center gap-2">
+        <app-icon class="text-muted-foreground h-4 w-4">print</app-icon>
+        @if (station.printerId) {
+        <dd class="text-foreground">{{ printerNames()[station.printerId] ?? 'Impresora #' + station.printerId }}</dd>
+        } @else {
+        <dd class="text-amber-600">Sin impresora: solo pantalla de cocina</dd>
+        }
+      </div>
+      <div class="flex items-center gap-2">
+        <app-icon class="text-muted-foreground h-4 w-4">store</app-icon>
+        <dd class="text-muted-foreground">{{ station.locationId ? (locationNames()[station.locationId] ?? '—') : 'Todas las sucursales' }}</dd>
+      </div>
+    </dl>
+
+    <div class="mt-auto grid grid-cols-2 gap-2">
+      <button type="button" class="glass-row inline-flex h-10 items-center justify-center gap-1 rounded-md text-sm font-medium" (click)="manageProducts.emit(station)">
+        <app-icon class="h-4 w-4">restaurant_menu</app-icon>Productos
+      </button>
+      <a [routerLink]="['/kitchen']" [queryParams]="{ station: station.id }" class="glass-row inline-flex h-10 items-center justify-center gap-1 rounded-md text-sm font-medium">
+        <app-icon class="h-4 w-4">tv</app-icon>Ver pantalla
+      </a>
+    </div>
+  </article>
+  } }
+</div>

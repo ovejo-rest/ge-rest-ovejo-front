@@ -6,9 +6,9 @@
   <ng-template app-slot="head">
     <tr>
       @for (item of headerData; track $index) {
-      <th class="h-8 w-[25%] text-center">{{ item }}</th>
+      <th class="h-8 text-center">{{ item }}</th>
       }
-      <th class="w-[90px]"></th>
+      <th class="w-[130px] text-center">Acción</th>
     </tr>
   </ng-template>
 
@@ -16,6 +16,21 @@
   <tr class="glass-row h-10">
     <td class="text-center">{{ getFullName(user) }}</td>
     <td class="text-center">{{ user.email }}</td>
+    <td class="text-center">
+      @if (getBranchName(user); as branchName) {
+      {{ branchName }}
+      } @else {
+      <span class="text-muted-foreground text-sm">Sin sucursal</span>
+      }
+    </td>
+    <td class="text-center">
+      <span
+        class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
+        [ngClass]="user.hasPin ? 'bg-green-500/20 text-green-600' : 'bg-muted text-muted-foreground'">
+        <app-icon class="h-3.5 w-3.5">{{ user.hasPin ? 'lock' : 'lock_open' }}</app-icon>
+        {{ user.hasPin ? 'Con PIN' : 'Sin PIN' }}
+      </span>
+    </td>
     <td class="text-center">
       <span
         class="inline-block rounded-full px-2 py-0.5 text-xs font-medium"
@@ -26,13 +41,20 @@
         {{ user.statusCode }}
       </span>
     </td>
-    <td class="w-[90px] text-center">
+    <td class="w-[130px] text-center">
       <div class="flex items-center justify-center gap-1">
         <app-button
           *appCheckPermission="'users:update-user'"
           size="small"
           icon="edit_document"
           (click)="updateUser(user)"></app-button>
+        <app-button
+          *appCheckPermission="'users:update-user'"
+          size="small"
+          icon="dialpad"
+          [attr.aria-label]="(user.hasPin ? 'Cambiar PIN del POS de ' : 'Asignar PIN del POS a ') + user.name"
+          [attr.title]="user.hasPin ? 'Cambiar PIN del POS' : 'Asignar PIN del POS'"
+          (click)="setServicePin(user)"></app-button>
         <app-button
           *appCheckPermission="'users:delete-user'"
           size="small"
@@ -63,7 +85,7 @@
     <div class="glass-footer -mx-5 -mb-3 flex flex-wrap items-center justify-between gap-2 px-5 py-3">
       <div class="flex items-center gap-2">
         Mostrar
-        <select class="glass-input w-16 rounded-md p-2" [value]="perPage()" (change)="onPerPageChange($event)">
+        <select class="glass-input w-16 rounded-md p-2" [value]="$pagination().perPage" (change)="onPerPageChange($event)">
           <option value="5">5</option>
           <option value="10">10</option>
           <option value="20">20</option>

@@ -1,50 +1,82 @@
-<div>
-    <app-header-dashboard 
-        title="Admin dashboard"
-        subtitle="Administración de backoffice"
-    >
-    <app-button  full impact="light" tone="primary" shape="rounded" size="medium" disabled="true" icon>
-        <app-icon class="h-6 w-7">
-          double_arrow
-        </app-icon>
-        hola mundo
-      </app-button>
-      <app-button full impact="bold" tone="primary" shape="rounded" size="medium" routerLink="/auth/sign-up">
-        <app-icon class="h-6 w-7">
-          double_arrow
-        </app-icon>
-        Hola mundo
-      </app-button>
-    </app-header-dashboard>
-
-    <div class="text-muted-foreground grid grid-cols-1 content-between gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
-        @for (item of indicators ; track $index) {
-          <a routerLink="{{item.action}}">
-            <app-card addBottomLine="true">
-                <div class=" grid grid-cols-2">
-                    <div class="w-13 h-13 content-center text-center rounded-full ring-2 ring-gray-300 dark:ring-gray-500">
-                        <span class="text-primary">{{ item.numbers }}</span>
-                    </div>
-                    <h2 class="w-full text-md mt-1 content-center font-semibold text-foreground ">{{ item.name }}</h2>
-                </div>
-            </app-card>
-          </a>
-        }
+<div class="space-y-4">
+  <!-- Encabezado de bienvenida (prueba de glassmorphism) -->
+  <section class="dashboard-hero rounded-3xl px-5 py-6 sm:px-8 sm:py-8">
+    <div class="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p class="text-sm font-medium text-white/75">{{ $today() }}</p>
+        <h1 class="mt-1 text-2xl font-semibold sm:text-3xl">{{ $greeting() }}</h1>
+        <p class="mt-1 text-sm text-white/80">Así va tu restaurante{{ $locationId() ? ' en ' + $locationName() : '' }}.</p>
+      </div>
+      <label class="dashboard-hero-chip inline-flex items-center gap-2 self-start rounded-full py-1.5 pl-3 pr-2 text-sm md:self-auto">
+        <app-icon class="h-4 w-4">store</app-icon>
+        <select aria-label="Sucursal" class="cursor-pointer border-0 bg-transparent py-0 pl-0 pr-6 text-sm font-medium text-white focus:ring-0" (change)="handleLocation($event)">
+          <option value="all" class="text-black" [selected]="!$locationId()">Todas las sucursales</option>
+          @for (location of $locations(); track location.id) {
+          <option [value]="location.id" class="text-black" [selected]="$locationId() === location.id">{{ location.name }}</option>
+          }
+        </select>
+      </label>
     </div>
+  </section>
 
-    <div class="mt-3 text-muted-foreground grid grid-cols-1 content-between gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
-        <div>
-            <app-card> 
-              <app-area-chart></app-area-chart>
-            </app-card>
-        </div>
-        <div class="md:col-span-3">
-            <app-card>
-                <app-users-dashboard-table/>
-            </app-card>
-        </div>
-        
-        
-    </div>
+  <app-period-selector
+    [preset]="$query().preset"
+    [from]="$query().from"
+    [to]="$query().to"
+    (presetChange)="handlePreset($event)"
+    (customChange)="handleCustom($event)" />
 
+  @if ($metrics(); as m) {
+  <!-- Indicadores principales -->
+  <div class="grid grid-cols-2 gap-3 lg:grid-cols-4" [class.opacity-60]="$isLoading()">
+    <app-kpi-card label="Ventas" icon="payments" [value]="formatCurrency(m.sales.current)" [current]="m.sales.current" [previous]="m.sales.previous" [comparison]="$comparison()" />
+    <app-kpi-card label="Pedidos" icon="receipt_long" [value]="'' + m.orders.current" [current]="m.orders.current" [previous]="m.orders.previous" [comparison]="$comparison()" />
+    <app-kpi-card label="Ticket promedio" icon="sell" [value]="formatCurrency(m.avgTicket)" hint="Ventas / pedidos cerrados" />
+    <app-kpi-card label="Cobrado" icon="point_of_sale" [value]="formatCurrency(m.sales.collected)" [hint]="'Propinas: ' + formatCurrency(m.sales.tips)" />
+  </div>
+
+  <!-- Operación en curso -->
+  <div class="grid grid-cols-2 gap-3 lg:grid-cols-4" [class.opacity-60]="$isLoading()">
+    <app-kpi-card label="Cuentas abiertas" icon="room_service" [value]="'' + m.orders.open" hint="Pedidos sin cerrar" link="/orders" linkLabel="Ver pedidos" />
+    <app-kpi-card label="Mesas ocupadas" icon="table_bar" [value]="m.tables.occupied + ' / ' + m.tables.total" [hint]="$locationId() ? 'En este momento' : 'En este momento, todas las sucursales'" link="/tables" linkLabel="Ver mesas" />
+    <app-kpi-card label="Ventas netas" icon="account_balance" [value]="formatCurrency(m.sales.netSales)" [hint]="'IVA: ' + formatCurrency(m.sales.taxAmount)" />
+    <app-kpi-card label="Cancelados" icon="block" [value]="'' + m.orders.cancelled" hint="Pedidos cancelados en el período" />
+  </div>
+
+  <!-- Gráficos del período -->
+  <div [class.opacity-60]="$isLoading()">
+    <app-sales-by-day-chart [days]="m.salesByDay" />
+  </div>
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-2" [class.opacity-60]="$isLoading()">
+    <app-breakdown-chart title="Ventas por categoría" seriesName="Ventas" [items]="$categories()" emptyText="Sin ventas en el período." />
+    <app-breakdown-chart title="Métodos de pago" seriesName="Cobrado" [items]="$paymentMethods()" emptyText="Sin pagos en el período." />
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <app-top-products-card [products]="m.topProducts" />
+    <app-recent-orders-card [orders]="m.recentOrders" />
+  </div>
+
+  <p class="text-muted-foreground text-xs">
+    Ventas = pedidos cerrados del {{ m.period.from }} al {{ m.period.to }} ({{ m.period.timeZone }}), comparadas con {{ m.period.previousFrom }} – {{ m.period.previousTo }}.
+    @if ($includesToday()) { Se actualiza cada minuto. }
+  </p>
+  } @else if ($hasError()) {
+  <div class="flex flex-col items-center gap-4 py-16 text-center">
+    <app-icon class="text-destructive h-14 w-14">error_outline</app-icon>
+    <p class="text-foreground font-semibold">No se pudieron cargar los indicadores</p>
+    <app-button impact="bold" tone="primary" shape="rounded" (buttonClick)="handleRetry()">Reintentar</app-button>
+  </div>
+  } @else {
+  <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+    <app-skeleton size="xl" />
+    }
+  </div>
+  <app-skeleton size="3xl" />
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <app-skeleton size="3xl" />
+    <app-skeleton size="3xl" />
+  </div>
+  }
 </div>

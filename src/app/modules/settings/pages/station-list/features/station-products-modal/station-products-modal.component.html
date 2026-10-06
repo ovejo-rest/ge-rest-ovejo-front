@@ -1,0 +1,69 @@
+<app-modal-card>
+  <ng-template app-slot="header">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Productos de {{ station.name }}</h2>
+  </ng-template>
+
+  <p class="text-muted-foreground mb-3 text-sm">
+    Los productos asignados salen en la comanda de esta estación. Un producto sin estación no se imprime, pero sí aparece en la pantalla general de cocina.
+  </p>
+
+  <!-- Asignados -->
+  <div class="mb-4">
+    <p class="text-foreground mb-2 text-sm font-medium">Asignados ({{ $assigned().length }})</p>
+    @if ($isLoadingAssigned()) {
+    <app-progress-bar />
+    } @else if (!$assigned().length) {
+    <p class="text-muted-foreground rounded-lg border border-dashed border-[var(--border)] px-3 py-4 text-center text-sm">Aún no hay productos. Agrégalos desde la lista de abajo.</p>
+    } @else {
+    <div class="flex max-h-32 flex-wrap gap-2 overflow-y-auto">
+      @for (product of $assigned(); track product.productId) {
+      <span class="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full py-1 pl-3 pr-1 text-sm">
+        {{ product.productName }}
+        <button type="button" class="hover:bg-primary/20 flex h-6 w-6 items-center justify-center rounded-full" [attr.aria-label]="'Quitar ' + product.productName" [disabled]="$pendingIds().has(product.productId)" (click)="toggle({ id: product.productId, name: product.productName, sku: product.sku })">
+          <app-icon class="h-4 w-4">close</app-icon>
+        </button>
+      </span>
+      }
+    </div>
+    }
+  </div>
+
+  <!-- Catálogo -->
+  <div class="relative mb-2">
+    <app-icon class="text-muted-foreground pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2">search</app-icon>
+    <input type="search" [formControl]="search" placeholder="Buscar producto para agregar…" aria-label="Buscar producto" class="glass-input w-full rounded-md py-2 pl-10 pr-3" />
+  </div>
+  @if ($isSearching()) {
+  <app-progress-bar />
+  }
+  <ul class="max-h-64 divide-y divide-[var(--border)] overflow-y-auto">
+    @for (product of $catalog(); track product.id) {
+    @let assigned = $assignedIds().has(product.id);
+    <li class="flex items-center justify-between gap-3 py-2">
+      <div class="min-w-0">
+        <p class="text-foreground truncate text-sm font-medium">{{ product.name }}</p>
+        <p class="text-muted-foreground font-mono text-xs">{{ product.sku }}</p>
+      </div>
+      <button
+        type="button"
+        class="inline-flex h-9 shrink-0 items-center gap-1 rounded-md px-3 text-sm font-medium disabled:opacity-50"
+        [class]="assigned ? 'bg-green-500/15 text-green-700' : 'glass-row text-foreground'"
+        [disabled]="$pendingIds().has(product.id)"
+        [attr.aria-pressed]="assigned"
+        (click)="toggle(product)">
+        <app-icon class="h-4 w-4">{{ assigned ? 'check' : 'add' }}</app-icon>{{ assigned ? 'Asignado' : 'Agregar' }}
+      </button>
+    </li>
+    } @empty {
+    @if (!$isSearching()) {
+    <li class="text-muted-foreground py-6 text-center text-sm">Sin productos para esta búsqueda.</li>
+    }
+    }
+  </ul>
+
+  <ng-template app-slot="footer">
+    <div class="flex justify-end">
+      <app-button type="button" impact="bold" (buttonClick)="close()">Listo</app-button>
+    </div>
+  </ng-template>
+</app-modal-card>

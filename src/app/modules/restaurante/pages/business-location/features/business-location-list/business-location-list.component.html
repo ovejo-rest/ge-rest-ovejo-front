@@ -1,1 +1,32 @@
-<p>business-location-list works!</p>
+<app-table>
+  <ng-template app-slot="head">
+    <tr>
+      @for (item of headerData; track $index) {
+      <th class="h-8 text-center">{{ item }}</th>
+      }
+    </tr>
+  </ng-template>
+  @if (!isLoading()) {
+  @for (location of $locations(); track location.id) {
+  <tr class="glass-row h-10">
+    <td class="text-center font-medium">{{ location.name }}</td>
+    <td class="text-muted-foreground text-center text-sm">{{ location.city || '—' }}</td>
+    <td class="text-muted-foreground text-center text-sm">{{ location.country || '—' }}</td>
+    <td class="text-muted-foreground text-center text-sm">{{ location.landmark || '—' }}</td>
+    <td class="text-center">
+      <div class="flex items-center justify-center gap-1">
+        <app-button size="small" icon="edit_document" (click)="onUpdate(location)" />
+        <app-button size="small" icon="delete" tone="danger" (click)="onDelete(location)" />
+      </div>
+    </td>
+  </tr>
+  } @empty {
+  <tr>
+    <td class="py-4 text-center text-sm" colspan="5">No hay sucursales</td>
+  </tr>
+  } } @if (isLoading()) {
+  <tr>
+    <td colspan="5" class="px-2 py-4"><app-progress-bar /></td>
+  </tr>
+  }
+</app-table>

@@ -9,6 +9,7 @@ import { provideHttpClient, withInterceptors, withXhr } from '@angular/common/ht
 import { provideRouter } from '@angular/router';
 import { AuthInterceptor } from './app/core/interceptor';
 import { AngularSvgIconModule } from 'angular-svg-icon';
+import { OVERLAY_DEFAULT_CONFIG } from '@angular/cdk/overlay';
 
 if (environment.production) {
   enableProdMode();
@@ -24,6 +25,9 @@ bootstrapApplication(AppComponent, {
     provideAnimations(),
     provideHttpClient(withXhr(), withInterceptors([AuthInterceptor])),
     importProvidersFrom(AngularSvgIconModule.forRoot()),
+    // Los overlays del CDK usan la top layer nativa (popover) por defecto, que queda sobre cualquier z-index.
+    // Se desactiva para que el toast global (z-[9999]) se muestre encima de los modales.
+    { provide: OVERLAY_DEFAULT_CONFIG, useValue: { usePopover: false } },
   ],
 }).catch((err) => console.error(err));
 

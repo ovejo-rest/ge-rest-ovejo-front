@@ -1,0 +1,54 @@
+<div class="space-y-4">
+  <app-header-dashboard title="Reservas" subtitle="Agenda de reservas de tu restaurante">
+    <app-button full impact="bold" tone="primary" shape="rounded" size="medium" icon="add" [disabled]="!$locationId()" (buttonClick)="handleCreate()">
+      Nueva reserva
+    </app-button>
+  </app-header-dashboard>
+
+  <!-- Navegación -->
+  <div class="flex flex-wrap items-center gap-2">
+    <div class="w-52">
+      <app-business-location-selector (selectedLocationChange)="handleLocationChange($event)" />
+    </div>
+    <div class="flex items-center gap-1">
+      <button type="button" class="glass-row flex h-10 w-10 items-center justify-center rounded-md" [attr.aria-label]="$query().view === 'week' ? 'Semana anterior' : 'Día anterior'" (click)="move(-1)">
+        <app-icon class="h-5 w-5">chevron_left</app-icon>
+      </button>
+      <button type="button" class="glass-row h-10 rounded-md px-3 text-sm font-medium" [disabled]="$isToday()" (click)="goToday()">Hoy</button>
+      <button type="button" class="glass-row flex h-10 w-10 items-center justify-center rounded-md" [attr.aria-label]="$query().view === 'week' ? 'Semana siguiente' : 'Día siguiente'" (click)="move(1)">
+        <app-icon class="h-5 w-5">chevron_right</app-icon>
+      </button>
+      <input type="date" aria-label="Ir a una fecha" class="glass-input h-10 rounded-md px-2 text-sm" [value]="$query().date" (change)="pickDate($event)" />
+    </div>
+    <select aria-label="Filtrar por estado" class="glass-input h-10 rounded-md px-2 text-sm" (change)="pickStatus($event)">
+      <option value="" [selected]="!$query().status">Todos los estados</option>
+      @for (option of statusOptions; track option.value) {
+      <option [value]="option.value" [selected]="$query().status === option.value">{{ option.label }}</option>
+      }
+    </select>
+    <div class="ml-auto inline-flex rounded-lg p-1" role="tablist" aria-label="Vista">
+      <button type="button" role="tab" class="rounded-md px-3 py-1.5 text-sm font-medium" [class]="$query().view === 'day' ? 'bg-primary text-white' : 'glass-row'" [attr.aria-selected]="$query().view === 'day'" (click)="setView('day')">Día</button>
+      <button type="button" role="tab" class="ml-1 rounded-md px-3 py-1.5 text-sm font-medium" [class]="$query().view === 'week' ? 'bg-primary text-white' : 'glass-row'" [attr.aria-selected]="$query().view === 'week'" (click)="setView('week')">Semana</button>
+    </div>
+  </div>
+
+  <h2 class="text-foreground text-lg font-semibold">{{ $title() }}</h2>
+
+  @if ($hasError() && !$bookings().length) {
+  <div class="flex flex-col items-center gap-4 py-16 text-center">
+    <app-icon class="text-destructive h-14 w-14">error_outline</app-icon>
+    <p class="text-foreground font-semibold">No se pudieron cargar las reservas</p>
+    <app-button impact="bold" tone="primary" shape="rounded" (buttonClick)="handleRetry()">Reintentar</app-button>
+  </div>
+  } @else if ($isLoading() && !$bookings().length) {
+  <p class="text-muted-foreground py-10 text-center text-sm">Cargando reservas…</p>
+  } @else if ($query().view === 'week') {
+  <app-booking-week [weekStart]="$weekStart()" [bookings]="$bookings()" (selectDay)="openDay($event)" (edit)="handleEdit($event)" />
+  } @else if (!$bookings().length) {
+  <app-empty-state icon="event_available" [title]="$query().status ? 'Sin reservas con ese estado este día' : 'Sin reservas este día'" description="Las reservas que registres aparecerán aquí ordenadas por hora.">
+    <app-button impact="bold" tone="primary" shape="rounded" icon="add" [disabled]="!$locationId()" (buttonClick)="handleCreate()">Nueva reserva</app-button>
+  </app-empty-state>
+  } @else {
+  <app-booking-agenda [bookings]="$bookings()" [busyIds]="$busyIds()" (edit)="handleEdit($event)" (changeStatus)="handleStatus($event)" />
+  }
+</div>

@@ -1,0 +1,87 @@
+<div class="glass flex h-full flex-col gap-3 rounded-[1rem] p-3">
+  <div class="flex items-center justify-between gap-2">
+    <h2 class="text-foreground truncate font-semibold">{{ title() }}</h2>
+    @if (order(); as current) {
+    <a [routerLink]="['/orders', current.transactionId]" class="text-primary shrink-0 font-mono text-xs hover:underline">{{ current.invoiceNo }}</a>
+    }
+  </div>
+
+  @if (loadingOrder()) {
+  <p class="text-muted-foreground text-sm">Cargando cuenta…</p>
+  }
+
+  <!-- Lo que ya se pidió en la cuenta abierta -->
+  @if (order(); as current) {
+  <div class="rounded-lg border border-[var(--border)] p-2">
+    <p class="text-muted-foreground mb-1 text-xs font-medium uppercase tracking-wider">En la cuenta</p>
+    <ul class="max-h-40 space-y-1 overflow-y-auto text-sm">
+      @for (line of current.lines; track line.lineId) {
+      <li class="flex items-center justify-between gap-2">
+        <span class="text-foreground truncate">{{ line.quantity }}× {{ line.productName }}</span>
+        @if (current.isKitchenOrder) {
+        <app-status-badge [map]="kitchenStatus" [status]="line.resLineOrderStatus" fallback="—" />
+        }
+      </li>
+      }
+    </ul>
+    @if (current.staffNote) {
+    <p class="mt-2 whitespace-pre-line rounded bg-amber-500/10 px-2 py-1 text-xs italic text-amber-700">{{ current.staffNote }}</p>
+    }
+    <div class="mt-2 flex justify-between border-t border-[var(--border)] pt-2 text-sm">
+      <span class="text-muted-foreground">Saldo por pagar</span>
+      <span class="text-foreground font-semibold tabular-nums">{{ formatCurrency(current.remaining) }}</span>
+    </div>
+  </div>
+  } @else if (!loadingOrder()) {
+  <app-customer-selector [selected]="customer()" (selectedChange)="customerChange.emit($event)" />
+  }
+
+  <div class="min-h-0 flex-1 overflow-y-auto">
+    <app-order-ticket
+      [lines]="cart()"
+      (increment)="increment.emit($event)"
+      (decrement)="decrement.emit($event)"
+      (remove)="remove.emit($event)"
+      (noteChange)="noteChange.emit($event)" />
+  </div>
+
+  <!-- Nota general solo al abrir la cuenta: al agregar productos, cada uno lleva su propia nota -->
+  @if (cart().length && !order()) {
+  <textarea
+    rows="2"
+    maxlength="300"
+    placeholder="Nota general del pedido (opcional)"
+    aria-label="Nota general del pedido"
+    class="glass-input w-full rounded-md px-3 py-2 text-sm"
+    [value]="kitchenNote()"
+    (input)="kitchenNoteChange.emit($any($event.target).value)"></textarea>
+  }
+
+  <label class="flex cursor-pointer items-center justify-between gap-3 text-sm">
+    <span class="text-foreground">Enviar a cocina</span>
+    <input type="checkbox" class="h-5 w-5 accent-[var(--primary)]" [checked]="sendToKitchen()" [disabled]="!!order()" (change)="sendToKitchenChange.emit($any($event.target).checked)" />
+  </label>
+
+  <div class="grid grid-cols-2 gap-2">
+    <button
+      type="button"
+      class="bg-primary col-span-2 flex h-14 items-center justify-center gap-2 rounded-xl text-base font-semibold text-white disabled:opacity-40"
+      [disabled]="saving() || !cart().length"
+      (click)="submitOrder.emit()">
+      <app-icon class="h-5 w-5">{{ saving() ? 'hourglass_empty' : 'send' }}</app-icon>
+      {{ order() ? 'Agregar a la cuenta' : 'Enviar pedido' }}
+    </button>
+    @if (order(); as current) {
+    @if (current.remaining > 0) {
+    <button
+      type="button"
+      class="col-span-2 flex h-12 items-center justify-center gap-2 rounded-xl border-2 border-green-600 text-base font-semibold text-green-700 disabled:opacity-40"
+      [disabled]="saving() || cart().length > 0"
+      [title]="cart().length ? 'Envía o quita los productos nuevos antes de cobrar' : ''"
+      (click)="collect.emit()">
+      <app-icon class="h-5 w-5">point_of_sale</app-icon>Cobrar {{ formatCurrency(current.remaining) }}
+    </button>
+    }
+    }
+  </div>
+</div>

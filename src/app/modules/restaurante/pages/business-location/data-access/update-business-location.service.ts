@@ -1,0 +1,36 @@
+import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { BehaviorSubject, catchError, EMPTY, map, Subject, switchMap, tap } from 'rxjs';
+import { UpdateBusinessLocationDto } from './dtos';
+import { ApiPathEnum } from 'src/environments';
+
+@Injectable({ providedIn: 'root' })
+export class UpdateBusinessLocationService {
+  readonly #httpClient = inject(HttpClient);
+  readonly #isLoading$ = new BehaviorSubject(false);
+  readonly #error$ = new Subject<HttpStatusCode | undefined>();
+  readonly #submit$ = new Subject<UpdateBusinessLocationDto>();
+  readonly #success$ = new Subject<boolean>();
+
+  readonly $isLoading = toSignal(this.#isLoading$);
+  readonly $error = toSignal(this.#error$);
+  readonly $hasError = toSignal(this.#error$.pipe(map((code) => code !== undefined)));
+  readonly $success = toSignal(this.#success$);
+
+  constructor() {
+    this.#submit$.pipe(
+      tap(() => this.#isLoading$.next(true)),
+      tap(() => this.#error$.next(undefined)),
+      switchMap((data) =>
+        this.#httpClient.post(`${ApiPathEnum.RESTAURANT}/business-locations/${data.id}`, data).pipe(
+          tap(() => { this.#success$.next(true); this.#isLoading$.next(false); }),
+          catchError((error: HttpErrorResponse) => { this.#error$.next(error.status); this.#success$.next(false); this.#isLoading$.next(false); return EMPTY; }),
+        ),
+      ),
+    ).subscribe();
+  }
+
+  update(data: UpdateBusinessLocationDto) { this.#submit$.next(data); }
+  reset() { this.#error$.next(undefined); this.#success$.next(false); this.#isLoading$.next(false); }
+}

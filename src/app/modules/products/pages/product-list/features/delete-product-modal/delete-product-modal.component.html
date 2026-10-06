@@ -1,0 +1,29 @@
+<app-modal-card>
+  <ng-template app-slot="header">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Eliminar producto</h2>
+  </ng-template>
+
+  <div class="flex items-start gap-3 py-2">
+    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-500/15 text-red-600">
+      <app-icon class="h-5 w-5">delete</app-icon>
+    </div>
+    <div>
+      <p class="text-foreground text-sm">
+        ¿Eliminar <span class="font-semibold">{{ product.name }}</span>
+        <span class="text-muted-foreground font-mono text-xs"> ({{ product.sku }})</span>?
+      </p>
+      <p class="text-muted-foreground mt-1 text-sm">
+        Dejará de aparecer en la carta y en el POS. Si solo quieres ocultarlo temporalmente, márcalo como no disponible.
+      </p>
+    </div>
+  </div>
+
+  <ng-template app-slot="footer">
+    <div class="flex justify-end gap-3">
+      <app-button type="button" impact="light" [disabled]="!!$isLoading()" (buttonClick)="handleCancel()"> Cancelar </app-button>
+      <app-button type="button" impact="bold" tone="danger" [disabled]="!!$isLoading()" [isLoading]="!!$isLoading()" (buttonClick)="handleDelete()">
+        Eliminar
+      </app-button>
+    </div>
+  </ng-template>
+</app-modal-card>

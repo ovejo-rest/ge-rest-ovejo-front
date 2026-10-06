@@ -40,7 +40,8 @@
               "node_modules/apexcharts/dist/apexcharts.min.js"
             ],
             "allowedCommonJsDependencies": [
-              "apexcharts"
+              "apexcharts",
+              "qrcode"
             ],
             "browser": "src/main.ts",
             "outputHashing": "all",

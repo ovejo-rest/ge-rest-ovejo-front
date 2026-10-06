@@ -2,7 +2,8 @@ import { Component, effect, inject, OnDestroy, ChangeDetectionStrategy } from '@
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ButtonComponent, IconComponent, ModalCardComponent, SlotDirective, ToastService } from 'src/ui';
-import { UpdateUserService, GetAllUsersService, UserDto } from '../../data-access';
+import { UpdateUserService, GetAllUsersService, getUpdateUserErrorMessage, UserDto } from '../../data-access';
+import { GetAllBusinessLocationsService } from 'src/app/modules/restaurante/pages/business-location/data-access';
 
 @Component({
   selector: 'app-update-user-modal',
@@ -17,6 +18,7 @@ export class UpdateUserModalComponent implements OnDestroy {
   protected readonly $getAllUsersService = inject(GetAllUsersService);
 
   protected readonly $isLoading = this.$updateUserService.$isLoading;
+  protected readonly $locations = inject(GetAllBusinessLocationsService).$locations;
 
   protected readonly data = inject(MAT_DIALOG_DATA) as UserDto;
 
@@ -27,7 +29,7 @@ export class UpdateUserModalComponent implements OnDestroy {
     fatherLastName: [''],
     motherLastName: [''],
     email: [''],
-    branchId: [0],
+    branchId: [null as number | null],
   });
 
   constructor() {
@@ -38,6 +40,7 @@ export class UpdateUserModalComponent implements OnDestroy {
       fatherLastName: this.data.fatherLastName,
       motherLastName: this.data.motherLastName,
       email: this.data.email,
+      branchId: this.data.branchId,
     });
 
     effect(() => {
@@ -46,8 +49,9 @@ export class UpdateUserModalComponent implements OnDestroy {
         this.$getAllUsersService.retry();
         this.dialogRef.close();
       }
-      if (this.$updateUserService.$hasError()) {
-        this.$toast.show(`Algo salió mal. Por favor, vuelva a intentar.`, 'error');
+      const error = this.$updateUserService.$error();
+      if (error) {
+        this.$toast.show(getUpdateUserErrorMessage(error), 'error');
       }
     });
   }
@@ -66,6 +70,9 @@ export class UpdateUserModalComponent implements OnDestroy {
     if (motherLastName) body['motherLastName'] = motherLastName;
     const email = this.form.get('email')!.value;
     if (email) body['email'] = email;
+    // Solo si cambió; null quita la sucursal.
+    const branchId = this.form.get('branchId')!.value ?? null;
+    if (branchId !== this.data.branchId) body['branchId'] = branchId;
     this.$updateUserService.update({ userId: this.data.code, ...(body as any) });
   }
 

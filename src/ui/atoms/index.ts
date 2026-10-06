@@ -4,3 +4,4 @@ export * from './badge';
 export * from './skeleton';
 export * from './progress-bar';
 export * from './toggle';
+export * from './image-thumb';
