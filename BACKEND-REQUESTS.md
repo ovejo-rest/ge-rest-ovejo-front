@@ -11,8 +11,7 @@ Estados: 🔴 bloquea una funcionalidad o produce datos erróneos · 🟡 el fro
 
 | Prioridad | Solicitudes |
 |---|---|
-| 🔴 Bloquean o producen datos erróneos | #1 listado de pedidos · #3 notas por producto · #4 cancelar pedido con pago anulado · #11 "Listo" en cocina marca todas las estaciones |
-| 🟡 Hay workaround en el front | #2, #5–#10, #12–#24, #26 |
+| 🟡 Hay workaround en el front | #15 token de dispositivo para impresión · #16 permiso para ver todas las reservas (fase de permisos) · #28 códigos de error faltantes · #29 `QR_BASE_URL` por ambiente · #30 color de marca del restaurante |
 | ⚪ Por decidir | #25 entrar solo con PIN |
 | 🟢 Resueltas | #1–#14, #17–#24, #26, #27 |
 
@@ -55,6 +54,14 @@ Pendiente del front: la página pública de la carta `app.redom.cl/carta/:qrCode
 **Se pide:** ordenar en la consulta: roles del restaurante primero (`restaurantId IS NULL` al final) y luego `createdAt DESC`.
 
 **Front mientras tanto:** pide 50 por página y ordena en pantalla (propios más nuevos primero, predeterminados al final). Los roles `isGlobal` se muestran como "Predeterminado", sin editar ni eliminar.
+
+### 30. 🟡 Color de marca del restaurante (`theme_color`)
+
+**Problema:** la tabla `restaurant.business` ya tiene la columna `theme_color` (migración inicial), pero la entidad y los DTOs no la exponen. El color que elige el restaurante no se puede guardar ni leer.
+
+**Se pide:** mapear `themeColor` en la entidad del negocio; aceptarlo en `PATCH /business/:id/settings` (valores permitidos: `base`, `red`, `orange`, `yellow`, `green`, `blue`, `violet`; `null` vuelve al predeterminado) y devolverlo en `GET /business/:id/settings` y en `GET /business/my-businesses`.
+
+**Front mientras tanto:** "Mi negocio" permite elegir el color y ya envía `themeColor` en el PATCH (hoy el backend lo descarta en silencio). El color se guarda además en el navegador (`redom.brand-color.<restaurantId>`), así que por ahora solo se ve en el equipo donde se eligió.
 
 ---
 

@@ -2,7 +2,10 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, OnDestroy
 import { HttpStatusCode } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ButtonComponent, IconComponent, ToastService } from 'src/ui';
+import { firstValueFrom } from 'rxjs';
+import { ButtonComponent, IconComponent, ImagePickerComponent, ToastService, RedomLogoComponent } from 'src/ui';
+import { FileUploadService, getUploadErrorMessage, ImageSelection } from 'src/app/core/services/file-upload';
+import { ProfilePhotoService } from 'src/app/modules/profile/data-access';
 import { WhoamiService } from 'src/app/core/services/whoami/whoami.service';
 import { AuthService } from 'src/app/modules/auth/pages/data-access';
 import {
@@ -18,7 +21,7 @@ type OnboardingStep = 'business' | 'done';
   selector: 'app-create-business',
   templateUrl: './create-business.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, ButtonComponent, IconComponent],
+  imports: [RedomLogoComponent, ReactiveFormsModule, ButtonComponent, IconComponent, ImagePickerComponent],
 })
 export class CreateBusinessComponent implements OnDestroy {
   private readonly router = inject(Router);
