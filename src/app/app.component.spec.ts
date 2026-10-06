@@ -15,10 +15,10 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'angular-tailwind'`, () => {
+  it(`should have as title 'Redom'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('angular-tailwind');
+    expect(app.title).toEqual('Redom');
   });
 
   it('should render title', () => {

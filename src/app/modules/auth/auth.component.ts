@@ -1,14 +1,14 @@
 import { Component, ChangeDetectionStrategy, DestroyRef, ElementRef, NgZone, afterNextRender, inject, viewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
-import { IconComponent } from 'src/ui';
+import { IconComponent, RedomLogoComponent } from 'src/ui';
 
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [AngularSvgIconModule, RouterOutlet, IconComponent],
+  imports: [RedomLogoComponent, AngularSvgIconModule, RouterOutlet, IconComponent],
 })
 export class AuthComponent {
   private readonly screen = viewChild.required<ElementRef<HTMLElement>>('screen');

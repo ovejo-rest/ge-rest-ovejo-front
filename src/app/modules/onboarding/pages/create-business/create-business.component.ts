@@ -3,7 +3,7 @@ import { HttpStatusCode } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { ButtonComponent, IconComponent, ImagePickerComponent, ToastService } from 'src/ui';
+import { ButtonComponent, IconComponent, ImagePickerComponent, ToastService, RedomLogoComponent } from 'src/ui';
 import { FileUploadService, getUploadErrorMessage, ImageSelection } from 'src/app/core/services/file-upload';
 import { ProfilePhotoService } from 'src/app/modules/profile/data-access';
 import { WhoamiService } from 'src/app/core/services/whoami/whoami.service';
@@ -22,7 +22,7 @@ type OnboardingStep = 'business' | 'photo' | 'done';
   selector: 'app-create-business',
   templateUrl: './create-business.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, ButtonComponent, IconComponent, ImagePickerComponent],
+  imports: [RedomLogoComponent, ReactiveFormsModule, ButtonComponent, IconComponent, ImagePickerComponent],
 })
 export class CreateBusinessComponent implements OnDestroy {
   private readonly router = inject(Router);

@@ -14,18 +14,11 @@
     <!-- Marca: centrada sobre la tarjeta en móvil/tablet, a la izquierda en escritorio -->
     <section
       class="flex flex-col items-center justify-center px-6 pt-8 text-center text-white sm:pt-12 lg:items-start lg:px-16 lg:pt-0 lg:text-left">
-      <div class="flex items-center gap-3">
-        <span
-          class="bg-white/15 flex h-10 w-10 items-center justify-center rounded-xl backdrop-blur-md sm:h-11 sm:w-11">
-          <app-icon class="h-6 w-6">restaurant</app-icon>
-        </span>
-        <span class="text-lg font-bold tracking-wide sm:text-xl">REDOM | Chile </span>
-      </div>
-
-      <h1 class="mt-4 max-w-lg text-2xl font-semibold leading-tight sm:mt-6 sm:text-3xl lg:mt-12 lg:text-5xl">
-        Tu restaurante, en un solo lugar.
-      </h1>
-      <p class="mt-3 hidden max-w-md text-base font-light text-white/80 md:block lg:mt-4 lg:text-lg">
+      <h1 class="sr-only">REDOM: Todo tu restaurante, en una vuelta.</h1>
+      <app-redom-logo glass class="[--redom-logo-size:2.25rem] sm:[--redom-logo-size:2.75rem] lg:[--redom-logo-size:3.5rem]">
+        <p class="redom-promise" aria-hidden="true">Todo tu restaurante, en una vuelta.</p>
+      </app-redom-logo>
+      <p class="mt-6 hidden max-w-md text-base font-light text-white/80 md:block lg:mt-4 lg:text-lg">
         Toma pedidos, coordina la cocina y cobra más rápido, desde el salón o donde estés.
       </p>
       <ul class="mt-6 hidden max-w-lg flex-wrap justify-center gap-2 sm:flex lg:mt-10 lg:justify-start lg:gap-3">

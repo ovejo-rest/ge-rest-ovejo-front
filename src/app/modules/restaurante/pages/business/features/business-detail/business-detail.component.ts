@@ -1,5 +1,8 @@
-import { Component, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { THEME_COLORS, ThemeColorName } from 'src/app/core/constants/theme-colors';
+import { BrandColorService } from 'src/app/core/services/brand-color';
+import { ThemeService } from 'src/app/core/services/theme.service';
 import {
   FileUploadService,
   getUploadErrorMessage,
@@ -108,6 +111,28 @@ export class BusinessDetailComponent {
   discardLogo() {
     this.$logoSelection.set({ kind: 'keep' });
     this.$pickerKey.update((key) => key + 1);
+  }
+
+  // Color de marca: lo ven todos los usuarios del restaurante.
+  readonly #brandColor = inject(BrandColorService);
+  protected readonly themeColors = THEME_COLORS;
+  readonly #themeService = inject(ThemeService);
+  protected readonly $currentColor = computed(() => this.#themeService.theme().color);
+  protected readonly $savingColor = signal<ThemeColorName | null>(null);
+
+  selectColor(color: ThemeColorName) {
+    if (color === this.$currentColor() || this.$savingColor()) return;
+    this.$savingColor.set(color);
+    this.#brandColor.save(this.business().id, color).subscribe({
+      next: () => {
+        this.$savingColor.set(null);
+        this.$toast.show('Color del restaurante actualizado', 'success');
+      },
+      error: () => {
+        this.$savingColor.set(null);
+        this.$toast.show('No se pudo guardar el color. Inténtalo de nuevo.', 'error');
+      },
+    });
   }
 
   navigateToLocations() {

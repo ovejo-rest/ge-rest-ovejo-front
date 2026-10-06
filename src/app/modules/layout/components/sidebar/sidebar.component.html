@@ -12,24 +12,24 @@
       class="mx-4 mb-2 flex h-9 items-center"
       [ngClass]="menuService.showSideBar ? 'justify-between' : 'justify-center'">
       @if (menuService.showSideBar) {
-      <div class="flex items-center">
-        <a
-          (click)="toggleSidebar()"
-          class="bg-primary flex cursor-pointer items-center justify-center rounded-sm p-2 focus:outline-hidden focus:ring-1">
-          <svg-icon src="assets/icons/logo.svg"></svg-icon>
-        </a>
-        <b class="text-foreground ps-2 ml-1 grow text-sm font-bold">
-          {{ appJson.displayName }}
-        </b>
-      </div>
+      <a routerLink="/dashboard/admin" class="flex items-center rounded-md focus:outline-hidden focus-visible:ring-1">
+        <app-redom-logo class="h-5" />
+      </a>
+      } @else {
+      <!-- Colapsado: el isotipo también expande el menú -->
+      <button type="button" (click)="toggleSidebar()" class="flex items-center rounded-md focus:outline-hidden focus-visible:ring-1" aria-label="Expandir menú">
+        <app-redom-logo variant="isotipo" decorative class="h-7" />
+      </button>
       }
 
+      @if (menuService.showSideBar) {
       <button
         (click)="toggleSidebar()"
-        class="text-muted-foreground/50 hover:text-muted-foreground flex items-center justify-center rounded-md p-2 transition-all duration-200 focus:outline-hidden"
-        [ngClass]="{ 'rotate-180': !menuService.showSideBar }">
+        aria-label="Contraer menú"
+        class="text-muted-foreground/50 hover:text-muted-foreground flex items-center justify-center rounded-md p-2 transition-all duration-200 focus:outline-hidden">
         <app-icon>keyboard_double_arrow_left</app-icon>
       </button>
+      }
     </div>
 
     <div
@@ -41,7 +41,7 @@
   <div class="mx-4 my-4 space-y-1">
     <a
       target="_blank"
-      href="https://github.com/ovejo-rest/ge-rest-ovejo-backoffice-front"
+      href="https://github.com/redom-chile/redom-chile-backoffice-front"
       class="-sm glass-row group flex h-9 cursor-pointer items-center justify-start rounded-md p-2">
       <app-icon class="text-muted-foreground/50 h-5 w-5">info</app-icon>
 
@@ -68,13 +68,9 @@
   <div class="overflow-hidden">
     <div class="mx-4 mb-2 flex h-9 items-center justify-between">
       <div class="flex items-center">
-        <a
-          class="bg-primary flex cursor-pointer items-center justify-center rounded-sm p-2 focus:outline-hidden focus:ring-1">
-          <svg-icon src="assets/icons/logo.svg"></svg-icon>
+        <a routerLink="/dashboard/admin" (click)="toggleMobileSidebar()" class="flex items-center rounded-md focus:outline-hidden focus-visible:ring-1">
+          <app-redom-logo class="h-5" />
         </a>
-        <b class="text-foreground ps-2 ml-1 grow text-sm font-bold">
-          {{ appJson.displayName }}
-        </b>
       </div>
       <button
         (click)="toggleMobileSidebar()"
@@ -92,7 +88,7 @@
   <div class="mx-4 my-4 space-y-1">
     <a
       target="_blank"
-      href="https://github.com/ovejo-rest/ge-rest-ovejo-backoffice-front"
+      href="https://github.com/redom-chile/redom-chile-backoffice-front"
       class="-sm glass-row group flex h-9 cursor-pointer items-center justify-start rounded-md p-2">
       <app-icon class="text-muted-foreground/50 h-5 w-5">info</app-icon>
       <div class="ml-3 truncate text-[10px] font-semibold tracking-wide focus:outline-hidden">
