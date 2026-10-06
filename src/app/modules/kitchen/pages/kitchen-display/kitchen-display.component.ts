@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnIni
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { interval, map } from 'rxjs';
-import { EmptyStateComponent, IconComponent, ToastService } from 'src/ui';
+import { EmptyStateComponent, IconComponent, ToastService, RedomLogoComponent } from 'src/ui';
 import { readApiError } from 'src/app/core/utils';
 import { GetKitchenOrdersService, GetStationsService, KitchenOrderDto, MarkOrderCookedService } from './data-access';
 import { KitchenTicketComponent } from './features';
@@ -14,7 +14,7 @@ const CLOCK_MS = 30_000;
 @Component({
   selector: 'app-kitchen-display',
   standalone: true,
-  imports: [IconComponent, EmptyStateComponent, KitchenTicketComponent],
+  imports: [RedomLogoComponent, IconComponent, EmptyStateComponent, KitchenTicketComponent],
   templateUrl: './kitchen-display.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

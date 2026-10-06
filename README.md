@@ -1,7 +1,7 @@
-# ge-rest-ovejo-backoffice-front
-Backoffice bas project for start new project
+# redom-chile-backoffice-front
+Backoffice de Redom
 <p align="center">
-    <img src="src/assets/preview/logo.png" width="150">
+    <img src="src/assets/brand/redom-logo.svg" width="220" alt="REDOM">
 </p>
 
 <p align="center">

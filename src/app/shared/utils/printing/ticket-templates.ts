@@ -54,6 +54,11 @@ export function kitchenTicketHtml(ticket: KitchenTicketData): string {
 }
 
 // Precuenta para el cliente (no es boleta).
+// Logotipo monocromo (src/assets/brand/redom-logo-mono.svg): en papel térmico solo se usa una tinta.
+const REDOM_LOGO_MONO = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -172 604.73 196" role="img" aria-label="REDOM"><g fill="none" stroke="#1C1815" stroke-width="18" stroke-linecap="butt"><path d="M9 0V-100"/><path d="M9 -50A41 41 0 0 1 71.73 -84.77"/><path d="M181.7 -51.43A41 41 0 1 0 173.04 -24.76"/><path d="M99.73 -50H181.73"/><path d="M293.73 -50A41 41 0 1 0 293.73 -49.93"/><path d="M293.73 0V-148"/><path d="M374.43 -90.6A41 41 0 1 0 406.74 -65.36"/><path d="M439.73 0V-100"/><path d="M439.73 0V-64A27 27 0 0 1 493.73 -64V0"/><path d="M493.73 -64A27 27 0 0 1 547.73 -64V0"/></g><circle cx="393.97" cy="-82.31" r="10" fill="#1C1815"/></svg>`;
+
+const brand = (heightMm: number) => `<div class="center" style="margin:1mm 0"><span style="display:inline-block;height:${heightMm}mm">${REDOM_LOGO_MONO.replace('<svg ', '<svg style="height:100%;width:auto" ')}</span></div>`;
+
 export function billTicketHtml(bill: BillTicketData): string {
   const lines = bill.lines
     .map((line) => `<div class="row"><span>${line.quantity}x ${escapeHtml(line.name)}</span><span>${money(line.total)}</span></div>`)
@@ -76,12 +81,13 @@ export function billTicketHtml(bill: BillTicketData): string {
     ${bill.suggestedTipPercent > 0 ? `<div class="sep"></div><div class="row"><span>Propina sugerida ${bill.suggestedTipPercent}%</span><span>${money(tip)}</span></div><div class="row"><span>Total con propina</span><span>${money(bill.remaining + tip)}</span></div>` : ''}
     <div class="sep"></div>
     <div class="center muted">Documento no válido como boleta</div>
-    <div class="center">¡Gracias por su visita!</div>`;
+    <div class="center">¡Gracias por su visita!</div>
+    ${brand(3.5)}`;
 }
 
 export function testTicketHtml(printerName: string): string {
   return `
-    <h1>REDOM</h1>
+    ${brand(7)}
     <div class="center big">PRUEBA DE IMPRESIÓN</div>
     <div class="sep"></div>
     <div>Impresora: ${escapeHtml(printerName)}</div>

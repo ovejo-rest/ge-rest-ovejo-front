@@ -6,6 +6,7 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
 import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
 import { finalize, Observable } from 'rxjs';
 import { ThemeService } from '../../../../../core/services/theme.service';
+import { ThemeMode } from 'src/app/core/models/theme.model';
 import { IconComponent, ImageThumbComponent } from 'src/ui';
 import { AuthService } from 'src/app/modules/auth/pages/data-access';
 import { WhoamiService } from 'src/app/core/services/whoami/whoami.service';
@@ -72,38 +73,13 @@ export class ProfileMenuComponent {
     // },
   ];
 
-  public themeColors = [
-    {
-      name: 'base',
-      code: '#ea580c',
-    },
-    {
-      name: 'yellow',
-      code: '#f59e0b',
-    },
-    {
-      name: 'green',
-      code: '#22c55e',
-    },
-    {
-      name: 'blue',
-      code: '#3b82f6',
-    },
-    {
-      name: 'orange',
-      code: '#ea580c',
-    },
-    {
-      name: 'red',
-      code: '#cc0022',
-    },
-    {
-      name: 'violet',
-      code: '#6d28d9',
-    },
+  // Por defecto sigue al dispositivo; el color es del restaurante (Mi negocio).
+  protected readonly themeModes: ReadonlyArray<{ value: ThemeMode; label: string; icon: string }> = [
+    { value: 'system', label: 'Sistema', icon: 'contrast' },
+    { value: 'light', label: 'Claro', icon: 'light_mode' },
+    { value: 'dark', label: 'Oscuro', icon: 'dark_mode' },
   ];
 
-  public themeMode = ['light', 'dark'];
   public themeDirection = ['ltr', 'rtl'];
 
   constructor(
@@ -116,23 +92,8 @@ export class ProfileMenuComponent {
     this.isOpen = !this.isOpen;
   }
 
-  toggleThemeMode() {
-    this.themeService.theme.update((theme) => {
-      const mode = !this.themeService.isDark ? 'dark' : 'light';
-      return { ...theme, mode: mode };
-    });
-  }
-
-  toggleThemeColor(color: string) {
-    this.themeService.theme.update((theme) => {
-      return { ...theme, color: color };
-    });
-  }
-
   setDirection(value: string) {
-    this.themeService.theme.update((theme) => {
-      return { ...theme, direction: value };
-    });
+    this.themeService.setDirection(value);
   }
 
   public logout() {

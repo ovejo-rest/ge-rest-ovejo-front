@@ -50,7 +50,7 @@ export class SalesByDayChartComponent {
 
   readonly $options = computed(() => {
     const days = this.days();
-    const theme = readChartTheme(this.themeService.theme().mode as 'light' | 'dark');
+    const theme = readChartTheme(this.themeService.$resolvedMode());
     const axisLabels = { style: { colors: theme.muted, fontSize: '11px' } };
     return {
       series: [{ name: 'Ventas', data: days.map((day) => day.sales) }],

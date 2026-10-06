@@ -1,17 +1,18 @@
 import { NgClass } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import packageJson from '../../../../../../package.json';
 import { MenuService } from '../../services/menu.service';
 import { SidebarMenuComponent } from './sidebar-menu/sidebar-menu.component';
-import { IconComponent } from 'src/ui';
+import { IconComponent, RedomLogoComponent } from 'src/ui';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [NgClass, AngularSvgIconModule, SidebarMenuComponent, IconComponent],
+  imports: [RedomLogoComponent, RouterLink, NgClass, AngularSvgIconModule, SidebarMenuComponent, IconComponent],
 })
 export class SidebarComponent implements OnInit {
   public appJson: any = packageJson;

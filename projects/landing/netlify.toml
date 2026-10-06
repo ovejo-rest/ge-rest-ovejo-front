@@ -1,0 +1,14 @@
+# Sitio Netlify de la landing (redom.cl). En el sitio: Base directory = (raíz del repo),
+# Package directory = projects/landing, para que Netlify lea este archivo y no el de la raíz (app.redom.cl).
+[build]
+command = "npm run build:landing"
+publish = "dist/landing/browser"
+
+[build.environment]
+NODE_VERSION = "22"
+
+# Es una sola página: cualquier ruta desconocida muestra la portada.
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
