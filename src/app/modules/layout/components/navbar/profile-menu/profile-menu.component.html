@@ -59,37 +59,32 @@
       </ul>
       <hr class="border-border border-dashed" />
       <div class="mx-4 my-2">
-        <span class="text-foreground text-xs font-semibold">Color</span>
-        <div class="mt-2 grid grid-cols-2 gap-2">
-          @for (item of themeColors; track $index) {
-          <div
-            :key="$index"
-            (click)="toggleThemeColor(item.name)"
-            [ngClass]="{ 'border-muted-foreground/30 glass-card': item.name == themeService.theme().color }"
-            class="focus-visible:ring-ring border-border text-muted-foreground glass-row hover:text-foreground shadow-xs inline-flex h-8 cursor-pointer items-center justify-start space-x-2 whitespace-nowrap rounded-md border border-dashed px-3 text-xs font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50">
-            <span
-              [style.backgroundColor]="item.code"
-              class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"></span>
-            <p class="capitalize">{{ item.name }}</p>
-          </div>
+        <span class="text-foreground text-xs font-semibold">Apariencia</span>
+        <div class="glass-row mt-2 grid grid-cols-3 gap-1 rounded-lg p-1" role="radiogroup" aria-label="Apariencia">
+          @for (item of themeModes; track item.value) {
+          <button
+            type="button"
+            role="radio"
+            [attr.aria-checked]="themeService.theme().mode === item.value"
+            [ngClass]="themeService.theme().mode === item.value ? 'bg-primary text-primary-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'"
+            class="flex flex-col items-center gap-0.5 rounded-md px-1 py-1.5 text-[11px] font-medium transition-colors"
+            (click)="themeService.setMode(item.value)">
+            <app-icon class="text-base">{{ item.icon }}</app-icon>
+            {{ item.label }}
+          </button>
           }
         </div>
       </div>
       <div class="mx-4 my-2">
-        <span class="text-foreground text-xs font-semibold">Mode</span>
-        <div class="mt-2 grid grid-cols-2 gap-2">
-          @for (item of themeMode; track $index) {
-          <div
-            :key="$index"
-            (click)="toggleThemeMode()"
-            [ngClass]="{ 'border-muted-foreground/30 glass-card': item == themeService.theme().mode }"
-            class="focus-visible:ring-ring border-border text-muted-foreground glass-row hover:text-foreground shadow-xs inline-flex h-8 cursor-pointer items-center justify-start space-x-2 whitespace-nowrap rounded-md border border-dashed px-3 text-xs font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50">
-            <app-icon>{{ item == 'light' ? 'sunny' : 'dark_mode' }}</app-icon>
-
-            <p class="capitalize">{{ item }}</p>
-          </div>
-          }
-        </div>
+        <span class="text-foreground text-xs font-semibold">Color del restaurante</span>
+        <a
+          routerLink="/business"
+          (click)="isOpen = false"
+          class="glass-row text-muted-foreground hover:text-foreground mt-2 flex items-center gap-2 rounded-md px-3 py-2 text-xs">
+          <span class="bg-primary size-4 shrink-0 rounded-full"></span>
+          <span class="flex-1">Se cambia en Mi negocio</span>
+          <app-icon class="text-base">chevron_right</app-icon>
+        </a>
       </div>
       <div class="mx-4 my-2">
         <span class="text-foreground text-xs font-semibold">Dirección</span>

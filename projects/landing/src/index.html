@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Redom · Software para restaurantes: POS, mesas, cocina y reservas</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Redom reúne en un solo lugar el POS, las mesas, la cocina, las reservas, la carta digital con QR y los reportes de tu restaurante. Funciona en el navegador, sin instalar nada.">
+  <meta name="theme-color" content="#1C1815">
+  <link rel="canonical" href="https://redom.cl/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Redom">
+  <meta property="og:url" content="https://redom.cl/">
+  <meta property="og:title" content="Redom · Tu restaurante, en un solo lugar">
+  <meta property="og:description" content="POS, mesas, cocina, reservas, carta digital y reportes para tu restaurante.">
+  <meta property="og:locale" content="es_CL">
+  <meta name="twitter:card" content="summary">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/svg+xml" href="redom-app-icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="redom-icon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="redom-icon-180.png">
+  <!-- Aplica el modo antes de pintar (la página es HTML estático): por defecto, el del dispositivo. -->
+  <script>
+    (function () {
+      try {
+        var mode = localStorage.getItem('redom-landing.mode') || 'system';
+        var dark = mode === 'dark' || (mode !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (dark) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <lnd-root></lnd-root>
+</body>
+</html>

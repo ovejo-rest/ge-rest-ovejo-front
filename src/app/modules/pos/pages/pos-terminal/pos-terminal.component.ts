@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, injec
 import { fromEvent, merge, switchMap, timer } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmModalComponent, ConfirmModalData, IconComponent, ToastService } from 'src/ui';
+import { ConfirmModalComponent, ConfirmModalData, IconComponent, ToastService, RedomLogoComponent } from 'src/ui';
 import { BusinessLocationSelector } from 'src/app/modules/sectors/pages/sector-list/ui';
 import { GetAllSectorsService } from 'src/app/modules/sectors/pages/sector-list/data-access';
 import { GetAllTablesService, TableDto } from 'src/app/modules/tables/pages/table-list/data-access';
@@ -38,7 +38,7 @@ import { PosOrderPanelComponent, PosTablesPanelComponent, WaiterLoginComponent }
 @Component({
   selector: 'app-pos-terminal',
   standalone: true,
-  imports: [
+  imports: [RedomLogoComponent, 
     IconComponent,
     BusinessLocationSelector,
     WaiterLoginComponent,

@@ -1,11 +1,31 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="base" dir="ltr">
+<html lang="es" data-theme="base" dir="ltr">
   <head>
     <meta charset="utf-8" />
-    <title>Angular Tailwind</title>
+    <title>Redom</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="assets/brand/redom-app-icon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/brand/redom-icon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/brand/redom-icon-180.png" />
+    <meta name="theme-color" content="#1C1815" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet" />
+    <!-- Aplica modo y color antes de que cargue Angular (evita el parpadeo claro/oscuro). -->
+    <script>
+      (function () {
+        try {
+          var t = JSON.parse(localStorage.getItem('theme') || 'null') || {};
+          var mode = t.v === 2 ? t.mode : 'system';
+          var dark = mode === 'dark' || (mode !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          var html = document.documentElement;
+          html.className = dark ? 'dark' : 'light';
+          html.setAttribute('data-theme', localStorage.getItem('redom.brand-color') || 'base');
+          if (t.direction === 'rtl') html.setAttribute('dir', 'rtl');
+        } catch (e) {}
+      })();
+    </script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <link
       rel="stylesheet"

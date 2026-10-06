@@ -5,6 +5,7 @@ import { ThemeService } from './core/services/theme.service';
 import { ResponsiveHelperComponent } from './shared/components/responsive-helper/responsive-helper.component';
 import { ToastComponent } from 'src/ui';
 import { WhoamiService } from './core/services/whoami/whoami.service';
+import { BrandColorService } from './core/services/brand-color';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +14,8 @@ import { WhoamiService } from './core/services/whoami/whoami.service';
   imports: [RouterOutlet, ResponsiveHelperComponent, NgxSonnerToaster, ToastComponent],
 })
 export class AppComponent {
-  title = 'Ge Rest';
+  title = 'Redom';
 
-  constructor(public themeService: ThemeService, whoamiService: WhoamiService) {}
+  // BrandColorService aplica el color del restaurante en cuanto whoami trae el restaurantId.
+  constructor(public themeService: ThemeService, whoamiService: WhoamiService, brandColor: BrandColorService) {}
 }

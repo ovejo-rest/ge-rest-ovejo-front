@@ -1,17 +1,18 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { MenuService } from '../../services/menu.service';
 import { NavbarMenuComponent } from './navbar-menu/navbar-menu.component';
 import { NavbarMobileComponent } from './navbar-mobile/navbar-mobilecomponent';
 import { ProfileMenuComponent } from './profile-menu/profile-menu.component';
-import { IconComponent } from 'src/ui';
+import { IconComponent, RedomLogoComponent } from 'src/ui';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [AngularSvgIconModule, NavbarMenuComponent, ProfileMenuComponent, NavbarMobileComponent, IconComponent],
+  imports: [RedomLogoComponent, RouterLink, AngularSvgIconModule, NavbarMenuComponent, ProfileMenuComponent, NavbarMobileComponent, IconComponent],
 })
 export class NavbarComponent implements OnInit {
   constructor(private menuService: MenuService) {}

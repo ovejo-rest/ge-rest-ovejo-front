@@ -1,6 +1,6 @@
 # REDOM — Solicitudes al backend
 
-Cambios que el frontend necesita del backend (`ge-rest-ovejo-backend`), detectados al integrar cada módulo.
+Cambios que el frontend necesita del backend (`redom-chile-backend`), detectados al integrar cada módulo.
 Cada solicitud indica el endpoint, el problema, lo que se pide y cómo lo resuelve el front mientras tanto.
 
 Estados: 🔴 bloquea una funcionalidad o produce datos erróneos · 🟡 el front usa un workaround · ⚪ por decidir · 🟢 resuelto (mover a la sección final)
@@ -11,7 +11,7 @@ Estados: 🔴 bloquea una funcionalidad o produce datos erróneos · 🟡 el fro
 
 | Prioridad | Solicitudes |
 |---|---|
-| 🟡 Hay workaround en el front | #15 token de dispositivo para impresión · #16 permiso para ver todas las reservas (fase de permisos) · #28 códigos de error faltantes · #29 `QR_BASE_URL` por ambiente |
+| 🟡 Hay workaround en el front | #15 token de dispositivo para impresión · #16 permiso para ver todas las reservas (fase de permisos) · #28 códigos de error faltantes · #29 `QR_BASE_URL` por ambiente · #30 color de marca del restaurante |
 | ⚪ Por decidir | #25 entrar solo con PIN |
 | 🟢 Resueltas | #1–#14, #17–#24, #26, #27 |
 
@@ -66,6 +66,14 @@ Pendiente del front: la página pública de la carta `app.redom.cl/carta/:qrCode
 **Se pide:** configurar `QR_BASE_URL=https://app.redom.cl/carta` (o la URL de cada ambiente) en develop y producción.
 
 **Front mientras tanto:** si `qrUrl` es `null`, el modal de QR indica que el enlace de la carta aún no está disponible.
+
+### 30. 🟡 Color de marca del restaurante (`theme_color`)
+
+**Problema:** la tabla `restaurant.business` ya tiene la columna `theme_color` (migración inicial), pero la entidad y los DTOs no la exponen. El color que elige el restaurante no se puede guardar ni leer.
+
+**Se pide:** mapear `themeColor` en la entidad del negocio; aceptarlo en `PATCH /business/:id/settings` (valores permitidos: `base`, `red`, `orange`, `yellow`, `green`, `blue`, `violet`; `null` vuelve al predeterminado) y devolverlo en `GET /business/:id/settings` y en `GET /business/my-businesses`.
+
+**Front mientras tanto:** "Mi negocio" permite elegir el color y ya envía `themeColor` en el PATCH (hoy el backend lo descarta en silencio). El color se guarda además en el navegador (`redom.brand-color.<restaurantId>`), así que por ahora solo se ve en el equipo donde se eligió.
 
 ---
 

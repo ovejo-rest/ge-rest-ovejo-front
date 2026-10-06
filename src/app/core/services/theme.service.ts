@@ -1,48 +1,74 @@
-import { Injectable, signal } from '@angular/core';
-import { Theme } from '../models/theme.model';
-import { effect } from '@angular/core';
+import { computed, DestroyRef, effect, inject, Injectable, signal } from '@angular/core';
+import { DEFAULT_THEME_COLOR, isThemeColor, ThemeColorName } from '../constants/theme-colors';
+import { Theme, ThemeMode } from '../models/theme.model';
 
-@Injectable({
-  providedIn: 'root',
-})
+const THEME_KEY = 'theme';
+// Último color del restaurante, para pintar el login y la carga antes de saber el negocio.
+const BRAND_COLOR_KEY = 'redom.brand-color';
+
+/**
+ * Apariencia:
+ * - modo (sistema/claro/oscuro) y dirección: preferencia de cada dispositivo;
+ * - color: es del restaurante (lo configura el negocio y lo ven todos sus usuarios).
+ */
+@Injectable({ providedIn: 'root' })
 export class ThemeService {
-  public theme = signal<Theme>({ mode: 'dark', color: 'base', direction: 'ltr' });
+  readonly #media = window.matchMedia('(prefers-color-scheme: dark)');
+  readonly #systemDark = signal(this.#media.matches);
+
+  public theme = signal<Theme>(this.#load());
+
+  /** Modo efectivo: con "system" resuelve según el dispositivo. */
+  readonly $resolvedMode = computed<'light' | 'dark'>(() => {
+    const mode = this.theme().mode;
+    return mode === 'system' ? (this.#systemDark() ? 'dark' : 'light') : mode;
+  });
 
   constructor() {
-    this.loadTheme();
+    const onChange = (event: MediaQueryListEvent) => this.#systemDark.set(event.matches);
+    this.#media.addEventListener('change', onChange);
+    inject(DestroyRef).onDestroy(() => this.#media.removeEventListener('change', onChange));
+
     effect(() => {
-      this.setConfig();
+      const theme = this.theme();
+      const html = document.documentElement;
+      html.className = this.$resolvedMode();
+      html.setAttribute('data-theme', theme.color);
+      html.setAttribute('dir', theme.direction);
+      // El color no se guarda aquí: depende del restaurante.
+      localStorage.setItem(THEME_KEY, JSON.stringify({ v: 2, mode: theme.mode, direction: theme.direction }));
     });
   }
 
-  private loadTheme() {
-    const theme = localStorage.getItem('theme');
-    if (theme) {
-      this.theme.set(JSON.parse(theme));
-    }
-  }
-
-  private setConfig() {
-    this.setLocalStorage();
-    this.setThemeClass();
-    this.setRTL();
-  }
-
   public get isDark(): boolean {
-    return this.theme().mode == 'dark';
+    return this.$resolvedMode() === 'dark';
   }
 
-  private setThemeClass() {
-    document.querySelector('html')!.className = this.theme().mode;
-    document.querySelector('html')!.setAttribute('data-theme', this.theme().color);
+  setMode(mode: ThemeMode) {
+    this.theme.update((theme) => ({ ...theme, mode }));
   }
 
-  private setLocalStorage() {
-    localStorage.setItem('theme', JSON.stringify(this.theme()));
+  setDirection(direction: string) {
+    this.theme.update((theme) => ({ ...theme, direction }));
   }
 
-  private setRTL() {
-    document.querySelector('html')!.setAttribute('dir', this.theme().direction);
-    this.setLocalStorage();
+  /** Aplica el color de marca del restaurante (o el predeterminado si no tiene). */
+  setBrandColor(color: string | null | undefined) {
+    const next: ThemeColorName = isThemeColor(color) ? color : DEFAULT_THEME_COLOR;
+    localStorage.setItem(BRAND_COLOR_KEY, next);
+    this.theme.update((theme) => ({ ...theme, color: next }));
+  }
+
+  #load(): Theme {
+    const storedColor = localStorage.getItem(BRAND_COLOR_KEY);
+    const color = isThemeColor(storedColor) ? storedColor : DEFAULT_THEME_COLOR;
+    try {
+      const stored = JSON.parse(localStorage.getItem(THEME_KEY) ?? 'null');
+      // v1 guardaba "dark" por defecto aunque nadie lo eligiera: se migra a "system".
+      const mode: ThemeMode = stored?.v === 2 && ['system', 'light', 'dark'].includes(stored.mode) ? stored.mode : 'system';
+      return { mode, color, direction: stored?.direction === 'rtl' ? 'rtl' : 'ltr' };
+    } catch {
+      return { mode: 'system', color, direction: 'ltr' };
+    }
   }
 }

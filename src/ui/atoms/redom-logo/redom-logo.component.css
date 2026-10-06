@@ -1,0 +1,75 @@
+:host {
+  display: inline-flex;
+  height: 2rem;
+  vertical-align: middle;
+}
+
+/* Colores de marca (src/assets/brand). */
+.tone-color,
+.tone-auto {
+  --redom-logo-ink: #1c1815;
+  --redom-logo-dot: #e5532a;
+}
+.tone-negativo {
+  --redom-logo-ink: #f4eee6;
+  --redom-logo-dot: #f0663c;
+}
+.tone-mono {
+  --redom-logo-ink: #1c1815;
+  --redom-logo-dot: #1c1815;
+}
+:host-context(.dark) .tone-auto {
+  --redom-logo-ink: #f4eee6;
+  --redom-logo-dot: #f0663c;
+}
+
+.redom-logo-wrap {
+  position: relative;
+  display: flex;
+  height: 100%;
+}
+.redom-logo-panel {
+  display: flex;
+  height: 100%;
+  align-items: center;
+}
+/* La proporción fija el ancho a partir del alto (evita que el SVG colapse dentro de un flex). */
+.redom-logo-svg {
+  display: block;
+  height: 100%;
+  width: auto;
+  flex-shrink: 0;
+  overflow: visible;
+}
+.redom-logo-svg.is-logo {
+  aspect-ratio: 604.73 / 196;
+}
+.redom-logo-svg.is-isotipo {
+  aspect-ratio: 1;
+}
+
+/* Halo del punto: solo en oscuro (negativo). */
+.redom-logo-halo {
+  display: none;
+}
+.tone-negativo .redom-logo-halo,
+:host-context(.dark) .tone-auto .redom-logo-halo {
+  display: inline;
+}
+
+/* Con vidrio el panel define el tamaño: el logo mide --redom-logo-size. */
+:host(.is-glass) {
+  height: auto;
+}
+:host(.is-glass) .redom-logo-wrap,
+:host(.is-glass) .redom-logo-panel {
+  height: auto;
+}
+:host(.is-glass) .redom-logo-panel {
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem 2rem;
+}
+:host(.is-glass) .redom-logo-svg {
+  height: var(--redom-logo-size, 3rem);
+}
