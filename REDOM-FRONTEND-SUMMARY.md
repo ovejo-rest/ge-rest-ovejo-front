@@ -2,7 +2,7 @@
 
 > **Fecha:** 10 de agosto de 2026
 > **Versión:** 0.10.1
-> **Proyecto:** `gc-backoffice-front` (display: "Ge Rest")
+> **Proyecto:** `redom-chile-backoffice-front` (display: "Redom")
 > **Propósito:** Análisis del estado actual del frontend y guía para incorporar funcionalidades REDOM utilizando los componentes y patrones existentes.
 
 ---

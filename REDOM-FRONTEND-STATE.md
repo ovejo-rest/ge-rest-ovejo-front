@@ -2,8 +2,8 @@
 
 > **Fecha de auditoría:** 10 de agosto de 2026
 > **Versión del proyecto:** 0.10.1
-> **Nombre interno del proyecto:** `gc-backoffice-front`
-> **Display name:** "Ge Rest"
+> **Nombre interno del proyecto:** `redom-chile-backoffice-front`
+> **Display name:** "Redom"
 
 ---
 
@@ -18,7 +18,7 @@ El frontend de REDOM es una aplicación Angular 19 standalone (bootstrapApplicat
 # 2. ESTRUCTURA DEL PROYECTO
 
 ```
-gc-backoffice-front/
+redom-chile-backoffice-front/
 ├── .angular/
 ├── .editorconfig
 ├── .eslintrc.json

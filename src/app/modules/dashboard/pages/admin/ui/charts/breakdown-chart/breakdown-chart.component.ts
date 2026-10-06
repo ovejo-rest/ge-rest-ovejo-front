@@ -47,7 +47,7 @@ export class BreakdownChartComponent {
 
   readonly $options = computed(() => {
     const items = this.$items();
-    const theme = readChartTheme(this.themeService.theme().mode as 'light' | 'dark');
+    const theme = readChartTheme(this.themeService.$resolvedMode());
     const axisLabels = { style: { colors: theme.muted, fontSize: '12px' } };
     return {
       series: [{ name: this.seriesName(), data: items.map((item) => item.value) }],

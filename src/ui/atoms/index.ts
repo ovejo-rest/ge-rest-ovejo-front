@@ -5,3 +5,4 @@ export * from './skeleton';
 export * from './progress-bar';
 export * from './toggle';
 export * from './image-thumb';
+export * from './redom-logo';
