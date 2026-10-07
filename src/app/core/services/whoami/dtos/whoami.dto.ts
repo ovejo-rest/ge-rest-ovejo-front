@@ -9,6 +9,10 @@ export type WhoamiDto = Readonly<{
     statusCode: string;
     // null mientras el usuario no tenga negocio (va al onboarding).
     restaurantId: number | null;
+    // Nombre actual del negocio (null sin negocio).
+    businessName?: string | null;
+    // Locales activos: 0 con negocio → falta el paso "Tu local" del onboarding.
+    locationsCount?: number;
     branchId: number | null;
   };
   roles: ReadonlyArray<{ id: number; code: string; name: string }>;
