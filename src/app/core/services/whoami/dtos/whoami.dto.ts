@@ -1,3 +1,5 @@
+import { EntitlementsDto } from '../../entitlements/dtos';
+
 export type WhoamiDto = Readonly<{
   user: {
     code: string;
@@ -14,6 +16,10 @@ export type WhoamiDto = Readonly<{
     // Locales activos: 0 con negocio → falta el paso "Tu local" del onboarding.
     locationsCount?: number;
     branchId: number | null;
+    // URL firmada (vence en 1 hora): no persistir.
+    profileImageUrl?: string | null;
+    // Lo que puede usar el negocio según su plan; null sin negocio (onboarding).
+    entitlements?: EntitlementsDto | null;
   };
   roles: ReadonlyArray<{ id: number; code: string; name: string }>;
   permissions: string[];
