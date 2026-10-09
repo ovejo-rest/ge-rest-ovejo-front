@@ -244,7 +244,9 @@ export class AuthService {
   startSession(session: SessionDto) {
     this.saveToken(session.token);
     this.saveRefreshToken(session.refreshToken);
-    localStorage.setItem(this.userDataKey, JSON.stringify(session.userData));
+    const { profileImageUrl: _signedUrl, ...storableUser } = session.userData;
+    localStorage.setItem(this.userDataKey, JSON.stringify(storableUser));
+    this.#whoami.seedFromSession(session.userData);
     localStorage.setItem(this.lastActivityKey, String(Date.now()));
     this.currentUserLoginOn.next(true);
     this.currentUserData.next({

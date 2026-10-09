@@ -41,7 +41,6 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
       if (error.status !== 401) return throwError(() => error);
       // Refresh con cola: si ya hay uno en curso, se espera ese mismo.
       return authService.refreshAccessToken().pipe(
-        switchMap((newToken) => next(withToken(req, newToken))),
         catchError((refreshError) => {
           endSession();
           return throwError(() => (refreshError instanceof HttpErrorResponse ? error : refreshError));

@@ -49,13 +49,25 @@ Pendiente del front: la página pública de la carta `app.redom.cl/carta/:qrCode
 
 **Front mientras tanto:** selección de mesero + PIN.
 
-### 26. 🟡 `GET /roles-and-permissions/roles` sin orden
+### 28. 🟡 Errores que todavía no traen código de negocio
 
-**Problema:** la consulta no tiene `ORDER BY` y la paginación se hace en memoria (`PaginationInterceptor`), así que el orden es arbitrario. Un rol recién creado puede caer en cualquier página y parece que "no se creó".
+**Problema:** al integrar #22 aparecieron casos que llegan solo con el código genérico del status, y el front no puede distinguirlos sin leer el texto:
+- sucursal inexistente al crear o editar un usuario: `NOT_FOUND`, igual que un rol o usuario inexistente (`assertBranchInRestaurant`);
+- `POST /orders/:id/lines` sobre un pedido no abierto: `CONFLICT` en vez de `ORDER_NOT_OPEN`;
+- cancelar un pedido ya cancelado: `CONFLICT` sin código;
+- "Table not found in this location" en reservas: `NOT_FOUND` sin código.
 
-**Se pide:** ordenar en la consulta: roles del restaurante primero (`restaurantId IS NULL` al final) y luego `createdAt DESC`.
+**Se pide:** `BRANCH_NOT_FOUND`, `ORDER_NOT_OPEN` en agregar productos, `ORDER_ALREADY_CANCELLED` y `TABLE_NOT_FOUND`.
 
-**Front mientras tanto:** pide 50 por página y ordena en pantalla (propios más nuevos primero, predeterminados al final). Los roles `isGlobal` se muestran como "Predeterminado", sin editar ni eliminar.
+**Front mientras tanto:** usa mensajes genéricos por status (404/409) en esos casos.
+
+### 29. 🟡 `QR_BASE_URL` en cada ambiente
+
+**Problema:** `qrUrl` es `QR_BASE_URL/{qrCode}` y es `null` si la variable está vacía; los `.env.example-*` la dejan vacía.
+
+**Se pide:** configurar `QR_BASE_URL=https://app.redom.cl/carta` (o la URL de cada ambiente) en develop y producción.
+
+**Front mientras tanto:** si `qrUrl` es `null`, el modal de QR indica que el enlace de la carta aún no está disponible.
 
 ### 30. 🟡 Color de marca del restaurante (`theme_color`)
 
